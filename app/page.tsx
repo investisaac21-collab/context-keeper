@@ -6,10 +6,6 @@ import LoginPage from './login/page'
 export default async function Home() {
   const supabase = createServerComponentClient({ cookies })
   const { data: { session } } = await supabase.auth.getSession()
-
-  if (session) {
-    redirect('/dashboard')
-  }
-
+  if (session) redirect('/dashboard')
   return <LoginPage />
 }
