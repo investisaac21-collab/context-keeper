@@ -1,24 +1,19 @@
 # Context Keeper
 
-App para gestionar proyectos con contexto, variables dinamicas y plantillas predefinidas.
+App para gestionar proyectos con contexto, variables dinamicas y plantillas.
 
-## Stack
-- Next.js 14 (App Router)
-- Supabase (Auth Google + DB)
-- Tailwind CSS
-- Vercel (Deploy)
+## Stack: Next.js 14 + Supabase + Tailwind + Vercel
+
+## Build fixes applied:
+- Array.from(new Set()) for TypeScript ES2017 compat
+- (window as any) for window property access
+- tsconfig target ES2017
+- lib/supabase.ts simplified
 
 ## Features
 - Login con Google OAuth
-- Crear/editar/eliminar proyectos con nombre, categoria y contexto
-- Variables dinamicas tipo {{nombre}} con relleno antes de copiar
-- Boton copiar con un click
-- Plantillas predefinidas (IA, Marketing, Dev, Negocios...)
+- CRUD proyectos con nombre, categoria y contexto
+- Variables dinamicas tipo {{nombre}}
+- Boton copiar con relleno automatico
+- Plantillas predefinidas
 - Exportar/Importar JSON
-
-## Setup env vars
-NEXT_PUBLIC_SUPABASE_URL=your_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
-
-## Deploy
-Connected to Vercel - auto deploy on push.
