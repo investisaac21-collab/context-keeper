@@ -18,6 +18,7 @@ export default function ProjectsClient({ initialProjects, userId }: Props) {
   const [search, setSearch] = useState('')
   const [filterTag, setFilterTag] = useState('')
   const [showModal, setShowModal] = useState(false)
+  const [templateData, setTemplateData] = useState<typeof TEMPLATES[0] | null>(null)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(false)
   const supabase = createClientComponentClient()
@@ -69,7 +70,7 @@ export default function ProjectsClient({ initialProjects, userId }: Props) {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('ÃÂ¿Eliminar este proyecto?')) return
+    if (!confirm('ÃÂÃÂ¿Eliminar este proyecto?')) return
     const { error } = await supabase.from('projects').delete().eq('id', id)
     if (!error) setProjects(prev => prev.filter(p => p.id !== id))
   }
@@ -112,7 +113,7 @@ export default function ProjectsClient({ initialProjects, userId }: Props) {
         setProjects(prev => [...(data || []), ...prev])
         alert(`${data?.length || 0} proyectos importados correctamente`)
       } catch {
-        alert('Error al importar: asegÃÂºrate de que el archivo es vÃÂ¡lido')
+        alert('Error al importar: asegÃÂÃÂºrate de que el archivo es vÃÂÃÂ¡lido')
       }
     }
     reader.readAsText(file)
@@ -121,11 +122,8 @@ export default function ProjectsClient({ initialProjects, userId }: Props) {
 
   const handleUseTemplate = (template: typeof TEMPLATES[0]) => {
     setEditingProject(null)
+    setTemplateData(template)
     setShowModal(true)
-    // Pass template data via state
-    setTimeout(() => {
-      (window as any).__templateData = template
-    }, 50)
   }
 
   return (
@@ -175,7 +173,7 @@ export default function ProjectsClient({ initialProjects, userId }: Props) {
         </div>
         {tags.length > 0 && (
           <select value={filterTag} onChange={e => setFilterTag(e.target.value)} className="input sm:w-48">
-            <option value="">Todas las categorÃÂ­as</option>
+            <option value="">Todas las categorÃÂÃÂ­as</option>
             {tags.map(tag => <option key={tag} value={tag}>{tag}</option>)}
           </select>
         )}
@@ -184,8 +182,8 @@ export default function ProjectsClient({ initialProjects, userId }: Props) {
       {/* Templates */}
       {projects.length === 0 && (
         <div className="card p-6">
-          <h2 className="font-semibold text-gray-900 mb-1">Ã°ÂÂÂ Empieza con una plantilla</h2>
-          <p className="text-sm text-gray-500 mb-4">Crea tu primer proyecto rÃÂ¡pidamente</p>
+          <h2 className="font-semibold text-gray-900 mb-1">ÃÂ°ÃÂÃÂÃÂ Empieza con una plantilla</h2>
+          <p className="text-sm text-gray-500 mb-4">Crea tu primer proyecto rÃÂÃÂ¡pidamente</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {TEMPLATES.map((t, i) => (
               <button key={i} onClick={() => handleUseTemplate(t)}
@@ -217,7 +215,7 @@ export default function ProjectsClient({ initialProjects, userId }: Props) {
           <svg className="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p className="font-medium">No hay resultados para tu bÃÂºsqueda</p>
+          <p className="font-medium">No hay resultados para tu bÃÂÃÂºsqueda</p>
         </div>
       ) : null}
 
@@ -225,8 +223,9 @@ export default function ProjectsClient({ initialProjects, userId }: Props) {
       {showModal && (
         <ProjectModal
           project={editingProject}
+          templateData={templateData}
           onSave={handleSave}
-          onClose={() => { setShowModal(false); setEditingProject(null) }}
+          onClose={() => { setShowModal(false); setEditingProject(null); setTemplateData(null) }}
           loading={loading}
         />
       )}
