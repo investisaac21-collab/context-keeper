@@ -65,7 +65,7 @@ export default function ProjectModal({ project, onSave, onClose, loading }: Prop
           {!project && (
             <div className="mb-6">
               <button onClick={() => setShowTemplates(!showTemplates)} className="text-sm text-sky-600 hover:text-sky-700 font-medium flex items-center gap-1">
-                Usar plantilla predefinida {showTemplates ? 'â²' : 'â¼'}
+                Usar plantilla predefinida {showTemplates ? 'Ã¢ÂÂ²' : 'Ã¢ÂÂ¼'}
               </button>
               {showTemplates && (
                 <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
