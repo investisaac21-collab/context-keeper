@@ -6,6 +6,7 @@ import { TEMPLATES } from '@/lib/templates'
 
 interface Props {
   project: Project | null
+  templateData?: { name: string; tag: string; context: string; emoji: string } | null
   onSave: (data: { name: string; tag: string; context: string }) => void
   onClose: () => void
   loading: boolean
@@ -18,22 +19,19 @@ function extractVariables(text: string): string[] {
   return Array.from(new Set(matches.map(m => m.slice(2, -2))))
 }
 
-export default function ProjectModal({ project, onSave, onClose, loading }: Props) {
+export default function ProjectModal({ project, templateData, onSave, onClose, loading }: Props) {
   const [name, setName] = useState(project?.name || '')
   const [tag, setTag] = useState(project?.tag || '')
   const [context, setContext] = useState(project?.context || '')
   const [showTemplates, setShowTemplates] = useState(false)
 
   useEffect(() => {
-    // Check for template data passed from parent
-    const tmpl = (window as any).__templateData
-    if (tmpl && !project) {
-      setName(tmpl.name)
-      setTag(tmpl.tag)
-      setContext(tmpl.context)
-      delete (window as any).__templateData
+    if (templateData && !project) {
+      setName(templateData.name)
+      setTag(templateData.tag)
+      setContext(templateData.context)
     }
-  }, [])
+  }, [templateData, project])
 
   const variables = extractVariables(context)
 
@@ -65,7 +63,7 @@ export default function ProjectModal({ project, onSave, onClose, loading }: Prop
           {!project && (
             <div className="mb-6">
               <button onClick={() => setShowTemplates(!showTemplates)} className="text-sm text-sky-600 hover:text-sky-700 font-medium flex items-center gap-1">
-                Usar plantilla predefinida {showTemplates ? 'Ã¢ÂÂ²' : 'Ã¢ÂÂ¼'}
+                Usar plantilla predefinida {showTemplates ? 'ÃÂ¢ÃÂÃÂ²' : 'ÃÂ¢ÃÂÃÂ¼'}
               </button>
               {showTemplates && (
                 <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
