@@ -16,7 +16,7 @@ function fillVariables(text: string, vars: Record<string, string>): string {
 
 function extractVariables(text: string): string[] {
   const matches = text.match(/\{\{(\w+)\}\}/g) || []
-  return [...new Set(matches.map(m => m.slice(2, -2)))]
+  return Array.from(new Set(matches.map(m => m.slice(2, -2))))
 }
 
 export default function ProjectCard({ project, onEdit, onDelete, onCopy }: Props) {
@@ -76,7 +76,7 @@ export default function ProjectCard({ project, onEdit, onDelete, onCopy }: Props
       {hasVars && (
         <div className="border border-dashed border-amber-300 rounded-lg p-3 bg-amber-50">
           <button onClick={() => setShowVars(!showVars)} className="text-xs font-medium text-amber-700 flex items-center gap-1 w-full">
-            Variables dinamicas: {variables.length}
+            {variables.length} variable{variables.length > 1 ? 's' : ''} dinamica{variables.length > 1 ? 's' : ''}
             <span className="ml-auto">{showVars ? '▲' : '▼'}</span>
           </button>
           {showVars && (
@@ -100,7 +100,7 @@ export default function ProjectCard({ project, onEdit, onDelete, onCopy }: Props
         </div>
       )}
       <div className="flex items-center justify-between pt-1 border-t border-gray-100">
-        <span className="text-xs text-gray-400">{project.copies} copias</span>
+        <span className="text-xs text-gray-400">{project.copies} {project.copies === 1 ? 'copia' : 'copias'}</span>
         <button
           onClick={handleCopy}
           className={`flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg transition-all ${copied ? 'bg-green-100 text-green-700' : 'bg-sky-600 hover:bg-sky-700 text-white'}`}
