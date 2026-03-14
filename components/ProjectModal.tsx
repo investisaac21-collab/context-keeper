@@ -4,9 +4,16 @@ import { useState, useEffect } from 'react'
 import type { Project } from '@/lib/types'
 import { TEMPLATES } from '@/lib/templates'
 
+interface TemplateData {
+  name: string
+  tag: string
+  context: string
+  emoji: string
+}
+
 interface Props {
   project: Project | null
-  templateData?: { name: string; tag: string; context: string; emoji: string } | null
+  templateData?: TemplateData | null
   onSave: (data: { name: string; tag: string; context: string }) => void
   onClose: () => void
   loading: boolean
@@ -63,7 +70,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
           {!project && (
             <div className="mb-6">
               <button onClick={() => setShowTemplates(!showTemplates)} className="text-sm text-sky-600 hover:text-sky-700 font-medium flex items-center gap-1">
-                Usar plantilla predefinida {showTemplates ? 'ÃÂ¢ÃÂÃÂ²' : 'ÃÂ¢ÃÂÃÂ¼'}
+                Usar plantilla predefinida {showTemplates ? '▲' : '▼'}
               </button>
               {showTemplates && (
                 <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -96,15 +103,12 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="label mb-0">Contexto / Prompt *</label>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-400">Variables: usa {'{{nombre}}'}</span>
-                </div>
               </div>
               <textarea
                 value={context}
                 onChange={e => setContext(e.target.value)}
                 className="input min-h-[180px] resize-y font-mono text-sm"
-                placeholder="Escribe tu contexto aqui... Usa {{variable}} para valores dinamicos"
+                placeholder="Escribe tu contexto... Usa {{variable}} para valores dinamicos"
                 required
               />
               {variables.length > 0 && (
