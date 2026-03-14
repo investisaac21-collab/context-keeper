@@ -15,7 +15,7 @@ const CATEGORIES = ['IA', 'Marketing', 'Desarrollo', 'Negocios', 'Educacion', 'P
 
 function extractVariables(text: string): string[] {
   const matches = text.match(/\{\{(\w+)\}\}/g) || []
-  return [...new Set(matches.map(m => m.slice(2, -2)))]
+  return Array.from(new Set(matches.map(m => m.slice(2, -2))))
 }
 
 export default function ProjectModal({ project, onSave, onClose, loading }: Props) {
@@ -65,7 +65,7 @@ export default function ProjectModal({ project, onSave, onClose, loading }: Prop
           {!project && (
             <div className="mb-6">
               <button onClick={() => setShowTemplates(!showTemplates)} className="text-sm text-sky-600 hover:text-sky-700 font-medium flex items-center gap-1">
-                Usar plantilla predefinida {showTemplates ? '▲' : '▼'}
+                Usar plantilla predefinida {showTemplates ? 'â²' : 'â¼'}
               </button>
               {showTemplates && (
                 <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
