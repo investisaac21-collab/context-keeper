@@ -22,7 +22,7 @@ export default function LoginPage() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: window.location.origin + '/auth/callback',
       },
     })
   }
@@ -30,7 +30,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-indigo-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full">
-        {/* Logo & Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-sky-600 rounded-2xl mb-4 shadow-lg">
             <svg className="w-9 h-9 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -40,14 +39,11 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-gray-900">Context Keeper</h1>
           <p className="text-gray-500 mt-2">Gestiona tu contexto de proyectos con IA</p>
         </div>
-
-        {/* Card */}
-        <div className="card p-8">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Bienvenido</h2>
           <p className="text-gray-500 text-sm mb-6">
-            Inicia sesión para gestionar tus proyectos, usar variables dinámicas y exportar tu contexto.
+            Inicia sesion para gestionar tus proyectos y usar variables dinamicas.
           </p>
-
           <button
             onClick={handleGoogleLogin}
             className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-700 font-medium px-4 py-3 rounded-xl border-2 border-gray-200 hover:border-gray-300 transition-all duration-200 shadow-sm"
@@ -60,17 +56,11 @@ export default function LoginPage() {
             </svg>
             Continuar con Google
           </button>
-
-          <div className="mt-6 text-center text-xs text-gray-400">
-            Al iniciar sesión aceptas nuestros términos de uso y política de privacidad
-          </div>
         </div>
-
-        {/* Features */}
         <div className="mt-8 grid grid-cols-3 gap-4 text-center">
           {[
             { icon: '📁', text: 'Proyectos organizados' },
-            { icon: '⚡', text: 'Variables dinámicas' },
+            { icon: '⚡', text: 'Variables dinamicas' },
             { icon: '📋', text: 'Copia con un click' },
           ].map((f, i) => (
             <div key={i} className="bg-white/80 rounded-xl p-3 border border-gray-100">
