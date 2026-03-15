@@ -37,7 +37,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   const filtered = useMemo(() => {
     return projects.filter(p => {
       const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
-        p.prompt?.toLowerCase().includes(search.toLowerCase())
+        p.context?.toLowerCase().includes(search.toLowerCase())
       const matchTag = filterTag ? p.tag === filterTag : true
       return matchSearch && matchTag
     })
@@ -81,7 +81,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
     if (isFreeLimitReached) { alert('Has alcanzado el limite del plan Free. Actualiza a Pro para duplicar proyectos.'); return }
     const { data: created } = await supabase
       .from('projects')
-      .insert({ name: project.name + ' (copia)', prompt: project.prompt, tag: project.tag, user_id: userId })
+      .insert({ name: project.name + ' (copia)', context: project.context, tag: project.tag, user_id: userId })
       .select()
       .single()
     if (created) setProjects(prev => [created, ...prev])
@@ -103,7 +103,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
       const text = await file.text()
       const imported = JSON.parse(text) as Project[]
       for (const p of imported) {
-        await supabase.from('projects').insert({ name: p.name, prompt: p.prompt, tag: p.tag, user_id: userId })
+        await supabase.from('projects').insert({ name: p.name, context: p.context, tag: p.tag, user_id: userId })
       }
       window.location.reload()
     } catch { alert('Error al importar') }
@@ -174,7 +174,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       )}
 
-      {/* BARRA PROGRESO (sin llegar al limite) */}
+      {/* BARRA PROGRESO */}
       {!isPro && !isFreeLimitReached && (
         <div className="rounded-xl border border-gray-200 bg-white p-3">
           <div className="flex items-center justify-between mb-1.5">
@@ -208,7 +208,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       )}
 
-      {/* TEMPLATES (solo si no hay proyectos) */}
+      {/* TEMPLATES */}
       {projects.length === 0 && !showModal && (
         <div className="rounded-xl border border-gray-200 bg-white p-5">
           <h2 className="font-semibold text-gray-900 mb-1">Empieza con una plantilla</h2>
@@ -221,7 +221,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
                 className="text-left border border-gray-200 rounded-xl p-4 hover:border-indigo-300 hover:bg-indigo-50/30 transition"
               >
                 <p className="font-medium text-sm text-gray-900">{t.name}</p>
-                <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{t.prompt?.slice(0,80)}...</p>
+                <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{t.context?.slice(0,80)}...</p>
               </button>
             ))}
           </div>
@@ -290,7 +290,6 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         />
       )}
 
-      {/* PANEL DE VARIABLES */}
       <UserVariablesPanel
         variables={variables}
         setVariables={setVariables}
