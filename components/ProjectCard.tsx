@@ -8,6 +8,7 @@ interface ProjectCardProps {
   onEdit: (project: Project) => void;
   onDelete: (id: string) => void;
   onHistory: (project: Project) => void;
+  onCopy?: () => void;
 }
 
 function fillVariables(text: string, vars: Record<string, string>): string {
@@ -19,7 +20,7 @@ function extractVariables(text: string): string[] {
   return [...new Set(matches.map((m: string) => m.replace(/\{\{|\}\}/g, '')))];
 }
 
-export default function ProjectCard({ project, onEdit, onDelete, onHistory }: ProjectCardProps) {
+export default function ProjectCard({ project, onEdit, onDelete, onHistory, onCopy }: ProjectCardProps) {
   const [copied, setCopied] = useState(false);
   const [varValues, setVarValues] = useState<Record<string, string>>({});
   const [showVars, setShowVars] = useState(false);
@@ -125,7 +126,7 @@ export default function ProjectCard({ project, onEdit, onDelete, onHistory }: Pr
             : 'bg-indigo-600 hover:bg-indigo-700 text-white'
         }`}
       >
-        {copied ? '✓ Copiado!' : '📋 Copiar contexto'}
+        {copied ? 'â Copiado!' : 'ð Copiar contexto'}
       </button>
     </div>
   );
