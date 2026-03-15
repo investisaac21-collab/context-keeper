@@ -4,12 +4,16 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import type { UserVariable } from '@/lib/types'
 
 interface Props {
-  initialVariables: UserVariable[]
+  variables?: UserVariable[]
+  initialVariables?: UserVariable[]
+  setVariables?: (vars: UserVariable[]) => void
   userId: string
+  plan?: string
 }
 
-export default function UserVariablesPanel({ initialVariables, userId }: Props) {
-  const [variables, setVariables] = useState<UserVariable[]>(initialVariables)
+export default function UserVariablesPanel({ variables: propVars, initialVariables, setVariables: setPropVars, userId, plan = 'free' }: Props) {
+  const [variables, setVariablesLocal] = useState<UserVariable[]>(propVars || initialVariables || [])
+  const setVariables = (vars: UserVariable[]) => { setVariablesLocal(vars); if (setPropVars) setPropVars(vars); }
   const [newName, setNewName] = useState('')
   const [newDefault, setNewDefault] = useState('')
   const [loading, setLoading] = useState(false)
