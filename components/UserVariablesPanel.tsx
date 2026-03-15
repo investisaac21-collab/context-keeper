@@ -29,7 +29,7 @@ export default function UserVariablesPanel({ variables: propVars, initialVariabl
       .select()
       .single()
     if (!error && data) {
-      setVariables(prev => [...prev, data])
+      setVariables((prev: UserVariable[]) => [...prev, data])
       setNewName('')
       setNewDefault('')
     }
@@ -38,7 +38,7 @@ export default function UserVariablesPanel({ variables: propVars, initialVariabl
 
   const handleDelete = async (id: string) => {
     await supabase.from('user_variables').delete().eq('id', id)
-    setVariables(prev => prev.filter(v => v.id !== id))
+    setVariables((prev: UserVariable[]) => prev.filter(v => v.id !== id))
   }
 
   return (
