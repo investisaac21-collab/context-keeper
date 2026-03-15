@@ -1,6 +1,7 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import Navbar from '@/components/Navbar'
 
 const PLANS = [
@@ -16,9 +17,8 @@ const PLANS = [
       'Importar / exportar JSON',
       'Plantillas predefinidas',
     ],
-    locked: [],
     cta: 'Empezar gratis',
-    ctaHref: '/register',
+    ctaHref: '/login',
     highlight: false,
   },
   {
@@ -35,7 +35,6 @@ const PLANS = [
       'Soporte prioritario',
       'Acceso anticipado a nuevas funciones',
     ],
-    locked: [],
     cta: 'Hazte Pro',
     ctaHref: null,
     highlight: true,
@@ -55,7 +54,6 @@ const PLANS = [
       'Facturación centralizada',
       'Permisos por rol (admin, editor, viewer)',
     ],
-    locked: [],
     cta: 'Empezar con Team',
     ctaHref: null,
     highlight: false,
@@ -64,54 +62,47 @@ const PLANS = [
 ]
 
 const FAQ = [
-  {
-    q: '¿Qué incluye el plan Free?',
-    a: 'El plan Free incluye hasta 3 proyectos, variables dinámicas, plantillas predefinidas e importación/exportación JSON. Sin tarjeta de crédito.',
-  },
-  {
-    q: '¿Qué funciones exactas se desbloquean con Pro?',
-    a: 'Con Pro desbloqueas proyectos ilimitados, historial de versiones con rollback, variables globales guardadas, soporte prioritario y acceso anticipado a nuevas funciones.',
-  },
-  {
-    q: '¿Cuál es la diferencia entre Pro y Team?',
-    a: 'Team incluye todo lo de Pro más colaboración para hasta 5 miembros, prompts compartidos, panel de administrador, facturación centralizada y permisos por rol (admin, editor, viewer).',
-  },
-  {
-    q: '¿Team incluye permisos por rol?',
-    a: 'Sí. Con el plan Team puedes asignar roles a cada miembro: admin (control total), editor (puede crear y editar) y viewer (solo lectura).',
-  },
-  {
-    q: '¿Qué pasa con mis proyectos si cancelo?',
-    a: 'Tus proyectos siempre son tuyos. Si cancelas Pro o Team, volverás al plan Free y conservarás hasta 3 proyectos. El resto quedará archivado y podrás recuperarlo si vuelves a suscribirte.',
-  },
-  {
-    q: '¿Puedo cambiar de plan en cualquier momento?',
-    a: 'Sí, puedes subir o bajar de plan cuando quieras desde tu página de cuenta. Los cambios se aplican de forma inmediata.',
-  },
-  {
-    q: '¿Qué pasa si llego al límite gratuito?',
-    a: 'Si llegas al límite de 3 proyectos en el plan Free, no podrás crear nuevos proyectos hasta que actualices al plan Pro o elimines alguno existente.',
-  },
-  {
-    q: '¿Habrá plan anual con descuento?',
-    a: 'Estamos preparando un plan anual con descuento. Próximamente podrás pagar por año y ahorrar hasta un 20%. Si quieres ser notificado, escríbenos.',
-  },
+  { q: '¿Qué incluye el plan Free?', a: 'El plan Free incluye hasta 3 proyectos, variables dinámicas, plantillas predefinidas e importación/exportación JSON. Sin tarjeta de crédito.' },
+  { q: '¿Qué funciones exactas se desbloquean con Pro?', a: 'Con Pro desbloqueas proyectos ilimitados, historial de versiones con rollback, variables globales guardadas, soporte prioritario y acceso anticipado a nuevas funciones.' },
+  { q: '¿Cuál es la diferencia entre Pro y Team?', a: 'Team incluye todo lo de Pro más colaboración para hasta 5 miembros, prompts compartidos, panel de administrador, facturación centralizada y permisos por rol (admin, editor, viewer).' },
+  { q: '¿Team incluye permisos por rol?', a: 'Sí. Con el plan Team puedes asignar roles a cada miembro: admin (control total), editor (puede crear y editar) y viewer (solo lectura).' },
+  { q: '¿Qué pasa con mis proyectos si cancelo?', a: 'Tus proyectos siempre son tuyos. Si cancelas Pro o Team, volverás al plan Free y conservarás hasta 3 proyectos. El resto quedará archivado y podrás recuperarlo si vuelves a suscribirte.' },
+  { q: '¿Puedo cambiar de plan en cualquier momento?', a: 'Sí, puedes subir o bajar de plan cuando quieras desde tu página de cuenta. Los cambios se aplican de forma inmediata.' },
+  { q: '¿Qué pasa si llego al límite gratuito?', a: 'Si llegas al límite de 3 proyectos en el plan Free, no podrás crear nuevos proyectos hasta que actualices al plan Pro o elimines alguno existente.' },
+  { q: '¿Habrá plan anual con descuento?', a: 'Estamos preparando un plan anual con descuento. Próximamente podrás pagar por año y ahorrar hasta un 20%. Si quieres ser notificado, escríbenos.' },
 ]
 
 export default function PricingPage() {
   const router = useRouter()
+  const supabase = createClientComponentClient()
   const [loading, setLoading] = useState<string | null>(null)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [billing, setBilling] = useState<'monthly' | 'yearly'>('monthly')
+  const [userInfo, setUserInfo] = useState<{ id: string; email: string; plan: string } | null>(null)
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      supabase.from('subscriptions').select('plan').eq('user_id', user.id).single().then(({ data: sub }) => {
+        setUserInfo({ id: user.id, email: user.email || '', plan: sub?.plan || 'free' })
+      })
+    })
+  }, [])
 
   async function handleCheckout(plan: typeof PLANS[0]) {
     if (plan.ctaHref) { router.push(plan.ctaHref); return }
+    if (!userInfo) { router.push('/login'); return }
+
     setLoading(plan.name)
     try {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId: plan.priceId }),
+        body: JSON.stringify({
+          priceId: plan.priceId,
+          userId: userInfo.id,
+          email: userInfo.email,
+        }),
       })
       const data = await res.json()
       if (data.url) window.location.href = data.url
@@ -123,16 +114,19 @@ export default function PricingPage() {
     }
   }
 
+  const getPlanBtnLabel = (planName: string, defaultCta: string) => {
+    if (!userInfo) return defaultCta
+    if (userInfo.plan === planName.toLowerCase()) return 'Plan actual'
+    return defaultCta
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      <Navbar userEmail={userInfo?.email} plan={userInfo?.plan || 'free'} />
       <main className="max-w-5xl mx-auto px-4 py-16">
-        {/* HERO */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-3">Planes y precios</h1>
           <p className="text-gray-500 text-lg">Empieza gratis. Sin tarjeta de crédito. Cancela cuando quieras.</p>
-
-          {/* TOGGLE MENSUAL / ANUAL */}
           <div className="inline-flex items-center gap-3 mt-6 bg-white border border-gray-200 rounded-full px-2 py-1.5 shadow-sm">
             <button
               onClick={() => setBilling('monthly')}
@@ -148,79 +142,78 @@ export default function PricingPage() {
               <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-semibold">-20%</span>
             </button>
           </div>
-
           {billing === 'yearly' && (
             <p className="text-xs text-green-600 mt-2 font-medium">
-              Próximamente disponible — apúntate para ser el primero en saberlo
+              Próximamente disponible &#8212; apúntate para ser el primero en saberlo
             </p>
           )}
         </div>
 
-        {/* CARDS DE PLANES */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          {PLANS.map(plan => (
-            <div
-              key={plan.name}
-              className={`relative rounded-2xl border-2 bg-white p-6 flex flex-col shadow-sm transition hover:shadow-md ${plan.highlight ? 'border-indigo-500 shadow-indigo-100' : plan.color}`}
-            >
-              {plan.badge && (
-                <div className={`absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 rounded-full shadow ${
-                  plan.name === 'Team' ? 'bg-purple-600 text-white' : 'bg-indigo-600 text-white'
-                }`}>
-                  {plan.badge}
-                </div>
-              )}
-
-              <div className="mb-4">
-                <h2 className="text-xl font-bold text-gray-900">{plan.name}</h2>
-                <p className="text-sm text-gray-500 mt-0.5">{plan.desc}</p>
-              </div>
-
-              <div className="mb-6">
-                {plan.price === 0 ? (
-                  <div className="flex items-end gap-1">
-                    <span className="text-4xl font-bold text-gray-900">0 €</span>
-                    <span className="text-gray-400 text-sm mb-1">/mes</span>
+          {PLANS.map(plan => {
+            const isCurrentPlan = userInfo?.plan === plan.name.toLowerCase()
+            return (
+              <div
+                key={plan.name}
+                className={`relative rounded-2xl border-2 bg-white p-6 flex flex-col shadow-sm transition hover:shadow-md ${
+                  plan.highlight ? 'border-indigo-500 shadow-indigo-100' : plan.color
+                } ${isCurrentPlan ? 'ring-2 ring-green-400' : ''}`}
+              >
+                {plan.badge && (
+                  <div className={`absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 rounded-full shadow ${
+                    plan.name === 'Team' ? 'bg-purple-600 text-white' : 'bg-indigo-600 text-white'
+                  }`}>
+                    {plan.badge}
                   </div>
-                ) : (
+                )}
+                {isCurrentPlan && (
+                  <div className="absolute -top-3 right-4 text-xs font-bold px-3 py-1 rounded-full shadow bg-green-500 text-white">
+                    Tu plan
+                  </div>
+                )}
+                <div className="mb-4">
+                  <h2 className="text-xl font-bold text-gray-900">{plan.name}</h2>
+                  <p className="text-sm text-gray-500 mt-0.5">{plan.desc}</p>
+                </div>
+                <div className="mb-6">
                   <div className="flex items-end gap-1">
                     <span className="text-4xl font-bold text-gray-900">
-                      {billing === 'yearly' ? Math.round(plan.price * 0.8) : plan.price} €
+                      {plan.price === 0 ? '0' : billing === 'yearly' ? Math.round(plan.price * 0.8) : plan.price} &#8364;
                     </span>
                     <span className="text-gray-400 text-sm mb-1">/mes</span>
                   </div>
-                )}
-                {billing === 'yearly' && plan.price > 0 && (
-                  <p className="text-xs text-green-600 font-medium mt-1">
-                    Facturado anualmente · ahorras {Math.round(plan.price * 0.2 * 12)} €/año
-                  </p>
-                )}
+                  {billing === 'yearly' && plan.price > 0 && (
+                    <p className="text-xs text-green-600 font-medium mt-1">
+                      Ahorras {Math.round(plan.price * 0.2 * 12)} &#8364;/año
+                    </p>
+                  )}
+                </div>
+                <ul className="space-y-2.5 mb-8 flex-1">
+                  {plan.features.map(f => (
+                    <li key={f} className="flex items-start gap-2 text-sm text-gray-700">
+                      <span className="text-indigo-500 mt-0.5 shrink-0">&#10003;</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  onClick={() => handleCheckout(plan)}
+                  disabled={loading === plan.name || isCurrentPlan}
+                  className={`w-full py-2.5 rounded-xl font-semibold text-sm transition ${
+                    isCurrentPlan
+                      ? 'bg-green-100 text-green-700 cursor-default'
+                      : plan.highlight
+                      ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md'
+                      : plan.name === 'Team'
+                      ? 'bg-purple-600 text-white hover:bg-purple-700'
+                      : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                  } ${loading === plan.name ? 'opacity-60 cursor-not-allowed' : ''}`}
+                >
+                  {loading === plan.name ? 'Redirigiendo...' : getPlanBtnLabel(plan.name, plan.cta)}
+                </button>
               </div>
-
-              <ul className="space-y-2.5 mb-8 flex-1">
-                {plan.features.map(f => (
-                  <li key={f} className="flex items-start gap-2 text-sm text-gray-700">
-                    <span className="text-indigo-500 mt-0.5 shrink-0">✓</span>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-
-              <button
-                onClick={() => handleCheckout(plan)}
-                disabled={loading === plan.name}
-                className={`w-full py-2.5 rounded-xl font-semibold text-sm transition ${
-                  plan.highlight
-                    ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md'
-                    : plan.name === 'Team'
-                    ? 'bg-purple-600 text-white hover:bg-purple-700'
-                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                } ${loading === plan.name ? 'opacity-60 cursor-not-allowed' : ''}`}
-              >
-                {loading === plan.name ? 'Redirigiendo...' : plan.cta}
-              </button>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         {/* COMPARATIVA */}
@@ -239,23 +232,23 @@ export default function PricingPage() {
               <tbody className="divide-y divide-gray-50">
                 {[
                   ['Proyectos', '3', 'Ilimitados', 'Ilimitados'],
-                  ['Variables dinámicas', '✓', '✓', '✓'],
-                  ['Plantillas predefinidas', '✓', '✓', '✓'],
-                  ['Importar / exportar JSON', '✓', '✓', '✓'],
-                  ['Historial de versiones', '✗', '✓', '✓'],
-                  ['Variables globales', '✗', '✓', '✓'],
-                  ['Soporte prioritario', '✗', '✓', '✓'],
-                  ['Miembros del equipo', '✗', '✗', 'Hasta 5'],
-                  ['Prompts compartidos', '✗', '✗', '✓'],
-                  ['Panel de administrador', '✗', '✗', '✓'],
-                  ['Permisos por rol', '✗', '✗', '✓'],
-                  ['Facturación centralizada', '✗', '✗', '✓'],
+                  ['Variables dinámicas', '&#10003;', '&#10003;', '&#10003;'],
+                  ['Plantillas predefinidas', '&#10003;', '&#10003;', '&#10003;'],
+                  ['Importar / exportar JSON', '&#10003;', '&#10003;', '&#10003;'],
+                  ['Historial de versiones', '&#10007;', '&#10003;', '&#10003;'],
+                  ['Variables globales', '&#10007;', '&#10003;', '&#10003;'],
+                  ['Soporte prioritario', '&#10007;', '&#10003;', '&#10003;'],
+                  ['Miembros del equipo', '&#10007;', '&#10007;', 'Hasta 5'],
+                  ['Prompts compartidos', '&#10007;', '&#10007;', '&#10003;'],
+                  ['Panel de administrador', '&#10007;', '&#10007;', '&#10003;'],
+                  ['Permisos por rol', '&#10007;', '&#10007;', '&#10003;'],
+                  ['Facturación centralizada', '&#10007;', '&#10007;', '&#10003;'],
                 ].map(([feature, free, pro, team]) => (
                   <tr key={feature}>
                     <td className="py-3 text-gray-700">{feature}</td>
-                    <td className="py-3 text-center text-gray-400">{free}</td>
-                    <td className="py-3 text-center text-indigo-600 font-medium">{pro}</td>
-                    <td className="py-3 text-center text-purple-600 font-medium">{team}</td>
+                    <td className="py-3 text-center text-gray-400" dangerouslySetInnerHTML={{ __html: free }} />
+                    <td className="py-3 text-center text-indigo-600 font-medium" dangerouslySetInnerHTML={{ __html: pro }} />
+                    <td className="py-3 text-center text-purple-600 font-medium" dangerouslySetInnerHTML={{ __html: team }} />
                   </tr>
                 ))}
               </tbody>
