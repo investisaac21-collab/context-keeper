@@ -1,5 +1,4 @@
 'use client';
-
 import { useState } from 'react';
 import Link from 'next/link';
 import { Project, UserVariable } from '@/lib/types';
@@ -31,6 +30,7 @@ export default function ProjectCard({ project, variables: _vars, onEdit, onDelet
 
   const detectedVars = extractVariables(project.context || '');
   const hasVars = detectedVars.length > 0;
+  const missingVars = detectedVars.filter(v => !varValues[v]);
 
   const handleCopy = () => {
     const filled = hasVars ? fillVariables(project.context || '', varValues) : (project.context || '');
@@ -44,21 +44,44 @@ export default function ProjectCard({ project, variables: _vars, onEdit, onDelet
     'writing': 'bg-green-100 text-green-800',
     'analysis': 'bg-purple-100 text-purple-800',
     'marketing': 'bg-yellow-100 text-yellow-800',
+    'IA': 'bg-indigo-100 text-indigo-800',
+    'Desarrollo': 'bg-blue-100 text-blue-800',
+    'Marketing': 'bg-yellow-100 text-yellow-800',
+    'Negocios': 'bg-orange-100 text-orange-800',
+    'Educacion': 'bg-teal-100 text-teal-800',
+    'Personal': 'bg-pink-100 text-pink-800',
     'other': 'bg-gray-100 text-gray-800',
   };
 
-  const colorClass = categoryColors[project.category || 'other'] || 'bg-gray-100 text-gray-800';
+  const category = project.category || project.tag || '';
+  const colorClass = categoryColors[category] || 'bg-gray-100 text-gray-800';
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
+      {/* Header: nombre + acciones */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <Link href={'/dashboard/proyecto/' + project.id} className="font-semibold text-gray-900 truncate hover:text-indigo-600 transition block">{project.name}</Link>
-          {project.category && (
-            <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium ${colorClass}`}>
-              {project.category}
-            </span>
-          )}
+          <Link
+            href={'/dashboard/proyecto/' + project.id}
+            className="font-semibold text-gray-900 hover:text-indigo-600 transition block truncate"
+          >
+            {project.name}
+          </Link>
+          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+            {category && (
+              <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${colorClass}`}>
+                {category}
+              </span>
+            )}
+            {hasVars && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-100">
+                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                </svg>
+                {detectedVars.length} var{detectedVars.length !== 1 ? 's' : ''}
+              </span>
+            )}
+          </div>
         </div>
         <div className="flex gap-1 shrink-0">
           <button
@@ -102,23 +125,28 @@ export default function ProjectCard({ project, variables: _vars, onEdit, onDelet
         </div>
       </div>
 
+      {/* Preview del prompt */}
       {project.context && (
-        <p className="text-sm text-gray-600 line-clamp-3">{project.context}</p>
+        <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">{project.context}</p>
       )}
 
+      {/* Variables */}
       {hasVars && (
         <div>
           <button
             onClick={() => setShowVars(!showVars)}
-            className="text-xs text-indigo-600 hover:underline"
+            className="text-xs text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1"
           >
+            <svg className={`w-3.5 h-3.5 transition-transform ${showVars ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
             {showVars ? 'Ocultar variables' : `Rellenar variables (${detectedVars.length})`}
           </button>
           {showVars && (
             <div className="mt-2 flex flex-col gap-2">
               {detectedVars.map((v: string) => (
                 <div key={v} className="flex items-center gap-2">
-                  <label className="text-xs text-gray-500 w-24 shrink-0">{v}</label>
+                  <label className="text-xs text-gray-500 w-24 shrink-0 font-mono">{v}</label>
                   <input
                     type="text"
                     value={varValues[v] || ''}
@@ -128,21 +156,33 @@ export default function ProjectCard({ project, variables: _vars, onEdit, onDelet
                   />
                 </div>
               ))}
+              {missingVars.length > 0 && (
+                <p className="text-xs text-amber-500 mt-1">
+                  {missingVars.length} variable{missingVars.length !== 1 ? 's' : ''} sin rellenar
+                </p>
+              )}
             </div>
           )}
         </div>
       )}
 
-      <button
-        onClick={handleCopy}
-        className={`mt-auto w-full py-2 rounded-lg text-sm font-medium transition-colors ${
-          copied
-            ? 'bg-green-100 text-green-700'
-            : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-        }`}
-      >
-        {copied ? 'Copiado!' : 'Copiar contexto'}
-      </button>
+      {/* Acciones inferiores */}
+      <div className="mt-auto flex gap-2">
+        <Link
+          href={'/dashboard/proyecto/' + project.id}
+          className="flex-1 py-2 rounded-lg text-sm font-medium text-center border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
+        >
+          Ver detalle
+        </Link>
+        <button
+          onClick={handleCopy}
+          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
+            copied ? 'bg-green-100 text-green-700' : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+          }`}
+        >
+          {copied ? '✓ Copiado' : 'Copiar contexto'}
+        </button>
+      </div>
     </div>
   );
 }
