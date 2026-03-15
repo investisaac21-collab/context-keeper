@@ -6,6 +6,7 @@ import ProjectCard from './ProjectCard'
 import ProjectModal from './ProjectModal'
 import HistoryModal from './HistoryModal'
 import UserVariablesPanel from './UserVariablesPanel'
+import OnboardingChecklist from './OnboardingChecklist'
 import { TEMPLATES } from '@/lib/templates'
 
 interface Props {
@@ -30,15 +31,18 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   const [historyProject, setHistoryProject] = useState<Project | null>(null)
   const [variables, setVariables] = useState<UserVariable[]>(initialVariables)
   const [loading, setLoading] = useState(false)
+  const [hasCopied, setHasCopied] = useState(false)
+  const [hasPreview, setHasPreview] = useState(false)
+  const [showVariablesPanel, setShowVariablesPanel] = useState(false)
+  const [onboardingVisible, setOnboardingVisible] = useState(true)
+
   const supabase = createClientComponentClient()
 
   const isFreeLimitReached = !isPro && projects.length >= FREE_LIMIT
 
   const filtered = useMemo(() => {
     return projects.filter(p => {
-      const matchSearch =
-        p.name.toLowerCase().includes(search.toLowerCase()) ||
-        p.context?.toLowerCase().includes(search.toLowerCase())
+      const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.context?.toLowerCase().includes(search.toLowerCase())
       const matchTag = filterTag ? (p.tag === filterTag || p.category === filterTag) : true
       return matchSearch && matchTag
     })
@@ -70,7 +74,6 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   async function handleSave(data: Partial<Project>) {
     setLoading(true)
     if (editingProject) {
-      // Guardar versión anterior antes de editar (solo Pro)
       if (editingProject.context) {
         await saveVersion(editingProject.id, editingProject.context)
       }
@@ -158,6 +161,9 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
     { icon: '&#128228;', label: 'Exportación avanzada' },
   ]
 
+  // Onboarding: mostrar si el usuario nunca ha tenido proyectos o es nuevo
+  const showOnboarding = onboardingVisible && projects.length === 0
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
       {/* HEADER */}
@@ -166,9 +172,9 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           <h1 className="text-2xl font-bold text-gray-900">Mis Proyectos</h1>
           <div className="flex items-center gap-2 mt-1.5">
             <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
-              plan === 'team' ? 'bg-purple-100 text-purple-700' :
-              plan === 'pro' ? 'bg-indigo-100 text-indigo-700' :
-              'bg-gray-100 text-gray-500'
+              plan === 'team' ? 'bg-purple-100 text-purple-700'
+              : plan === 'pro' ? 'bg-indigo-100 text-indigo-700'
+              : 'bg-gray-100 text-gray-500'
             }`}>
               Plan {planLabel}
             </span>
@@ -231,7 +237,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
       )}
 
       {/* BARRA DE PROGRESO */}
-      {!isPro && !isFreeLimitReached && (
+      {!isPro && !isFreeLimitReached && projects.length > 0 && (
         <div className="rounded-xl border border-gray-200 bg-white p-3.5">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs text-gray-500">
@@ -254,6 +260,22 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             </p>
           )}
         </div>
+      )}
+
+      {/* ONBOARDING CHECKLIST */}
+      {showOnboarding && (
+        <OnboardingChecklist
+          hasProjects={projects.length > 0}
+          hasVariables={variables.length > 0}
+          hasCopied={hasCopied}
+          hasPreview={hasPreview}
+          onCreateProject={() => setShowModal(true)}
+          onAddVariable={() => {
+            const el = document.getElementById('variables-panel')
+            if (el) el.scrollIntoView({ behavior: 'smooth' })
+          }}
+          onDismiss={() => setOnboardingVisible(false)}
+        />
       )}
 
       {/* FUNCIONES PREMIUM BLOQUEADAS */}
@@ -280,7 +302,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       )}
 
-      {/* PLANTILLAS */}
+      {/* PLANTILLAS (solo si no hay proyectos y no se muestra onboarding) */}
       {projects.length === 0 && !showModal && (
         <div className="rounded-xl border border-gray-200 bg-white p-5">
           <h2 className="font-semibold text-gray-900 mb-1">Empieza con una plantilla</h2>
@@ -302,7 +324,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       )}
 
-      {/* BÚSQUEDA Y FILTROS */}
+      {/* BÚSQL Y FILTROS */}
       {projects.length > 0 && (
         <div className="flex flex-col sm:flex-row gap-2">
           <input
@@ -336,6 +358,8 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
               onHistory={() => setHistoryProject(project)}
               onDuplicate={() => handleDuplicate(project)}
               plan={plan}
+              onCopy={() => setHasCopied(true)}
+              onPreview={() => setHasPreview(true)}
             />
           ))}
         </div>
@@ -361,6 +385,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           loading={loading}
         />
       )}
+
       {historyProject && (
         <HistoryModal
           project={historyProject}
@@ -368,12 +393,15 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           plan={plan}
         />
       )}
-      <UserVariablesPanel
-        variables={variables}
-        setVariables={setVariables}
-        userId={userId}
-        plan={plan}
-      />
+
+      <div id="variables-panel">
+        <UserVariablesPanel
+          variables={variables}
+          setVariables={setVariables}
+          userId={userId}
+          plan={plan}
+        />
+      </div>
     </div>
   )
 }
