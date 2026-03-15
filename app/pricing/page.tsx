@@ -1,192 +1,279 @@
 'use client'
 import { useState } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import Navbar from '@/components/Navbar'
 
 const PLANS = [
   {
-    id: 'free',
     name: 'Free',
     price: 0,
     desc: 'Para empezar sin compromiso',
+    color: 'border-gray-200',
+    badge: null,
     features: [
-      '3 proyectos',
+      'Hasta 3 proyectos',
       'Variables dinamicas',
-      'Exportar / Importar JSON',
+      'Importar / exportar JSON',
       'Plantillas predefinidas',
     ],
+    locked: [],
     cta: 'Empezar gratis',
-    href: '/login',
+    ctaHref: '/register',
     highlight: false,
-    priceId: null,
   },
   {
-    id: 'pro',
     name: 'Pro',
     price: 9,
     desc: 'Para profesionales que usan IA a diario',
+    color: 'border-indigo-500',
+    badge: 'MAS POPULAR',
     features: [
+      'Todo lo del plan Free',
       'Proyectos ilimitados',
       'Historial de versiones y rollback',
       'Variables globales guardadas',
       'Soporte prioritario',
-      'Acceso anticipado a nuevas features',
+      'Acceso anticipado a nuevas funciones',
     ],
+    locked: [],
     cta: 'Hazte Pro',
-    href: null,
+    ctaHref: null,
     highlight: true,
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO,
   },
   {
-    id: 'team',
     name: 'Team',
     price: 20,
-    desc: 'Para equipos que comparten prompts',
+    desc: 'Para equipos que trabajan con IA juntos',
+    color: 'border-purple-400',
+    badge: 'PARA EQUIPOS',
     features: [
-      'Todo lo de Pro',
-      'Hasta 5 miembros del equipo',
+      'Todo lo del plan Pro',
+      'Hasta 5 miembros',
       'Prompts compartidos entre miembros',
       'Panel de administrador',
       'Facturacion centralizada',
+      'Permisos por rol (admin, editor, viewer)',
     ],
-    cta: 'Ver Team',
-    href: null,
+    locked: [],
+    cta: 'Empezar con Team',
+    ctaHref: null,
     highlight: false,
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_TEAM,
   },
 ]
 
-export default function PricingPage() {
-  const [loading, setLoading] = useState<string | null>(null)
-  const supabase = createClientComponentClient()
+const FAQ = [
+  {
+    q: '\u00bfQue incluye el plan Free?',
+    a: 'El plan Free incluye hasta 3 proyectos, variables dinamicas, plantillas predefinidas e importacion/exportacion JSON. Sin tarjeta de credito.',
+  },
+  {
+    q: '\u00bfQue funciones se desbloquean con Pro?',
+    a: 'Con Pro desbloqueas proyectos ilimitados, historial de versiones con rollback, variables globales guardadas, soporte prioritario y acceso anticipado a nuevas funciones.',
+  },
+  {
+    q: '\u00bfCuál es la diferencia entre Pro y Team?',
+    a: 'Team incluye todo lo de Pro mas colaboracion para hasta 5 miembros, prompts compartidos, panel de administrador, facturacion centralizada y permisos por rol (admin, editor, viewer).',
+  },
+  {
+    q: '\u00bfTeam incluye permisos por rol?',
+    a: 'Si. Con el plan Team puedes asignar roles a cada miembro: admin (control total), editor (puede crear y editar) y viewer (solo lectura).',
+  },
+  {
+    q: '\u00bfQue pasa con mis proyectos si cancelo?',
+    a: 'Tus proyectos siempre son tuyos. Si cancelas Pro o Team, volveras al plan Free y conservaras hasta 3 proyectos. El resto quedara archivado y podras recuperarlo si vuelves a suscribirte.',
+  },
+  {
+    q: '\u00bfPuedo cambiar de plan en cualquier momento?',
+    a: 'Si, puedes subir o bajar de plan cuando quieras desde tu pagina de cuenta. Los cambios se aplican de forma inmediata.',
+  },
+  {
+    q: '\u00bfHabra plan anual con descuento?',
+    a: 'Estamos preparando un plan anual con descuento. Proximamente podras pagar por ano y ahorrar hasta un 20%. Si quieres ser notificado, escribenos.',
+  },
+]
 
-  const handleCheckout = async (priceId: string, planId: string) => {
-    setLoading(planId)
+export default function PricingPage() {
+  const router = useRouter()
+  const [loading, setLoading] = useState<string | null>(null)
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [billing, setBilling] = useState<'monthly' | 'yearly'>('monthly')
+
+  async function handleCheckout(plan: typeof PLANS[0]) {
+    if (plan.ctaHref) { router.push(plan.ctaHref); return }
+    setLoading(plan.name)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        window.location.href = '/login'
-        return
-      }
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId, userId: user.id, email: user.email }),
+        body: JSON.stringify({ priceId: plan.priceId }),
       })
       const data = await res.json()
-      if (data.url) {
-        window.location.href = data.url
-      } else {
-        alert('Error al iniciar el pago. Intentalo de nuevo.')
-      }
+      if (data.url) window.location.href = data.url
+      else alert('Error al iniciar el pago. Intentalo de nuevo.')
     } catch {
-      alert('Error al conectar con el servidor de pagos.')
+      alert('Error de conexion. Intentalo de nuevo.')
     } finally {
       setLoading(null)
     }
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* NAV */}
-      <nav className="flex items-center justify-between px-6 py-4 border-b border-gray-100 max-w-6xl mx-auto">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-          <span className="font-bold text-gray-900 text-lg">Context Keeper</span>
-        </Link>
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="text-sm text-gray-600 hover:text-gray-900">Mi dashboard</Link>
-          <Link href="/login" className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
-            Entrar
-          </Link>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <main className="max-w-5xl mx-auto px-4 py-16">
 
-      {/* HEADER */}
-      <section className="max-w-3xl mx-auto px-6 pt-16 pb-12 text-center">
-        <h1 className="text-4xl font-extrabold text-gray-900 mb-4">Planes y precios</h1>
-        <p className="text-lg text-gray-500">Empieza gratis. Sin tarjeta de credito. Cancela cuando quieras.</p>
-      </section>
+        {/* HERO */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">Planes y precios</h1>
+          <p className="text-gray-500 text-lg">Empieza gratis. Sin tarjeta de credito. Cancela cuando quieras.</p>
 
-      {/* PLANS */}
-      <section className="max-w-5xl mx-auto px-6 pb-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {PLANS.map((plan) => (
-            <div
-              key={plan.id}
-              className={`rounded-2xl p-7 border flex flex-col ${
-                plan.highlight
-                  ? 'bg-indigo-600 border-indigo-600 text-white shadow-2xl shadow-indigo-200 scale-105'
-                  : 'bg-white border-gray-200'
-              }`}
+          {/* TOGGLE MENSUAL / ANUAL */}
+          <div className="inline-flex items-center gap-3 mt-6 bg-white border border-gray-200 rounded-full px-2 py-1.5 shadow-sm">
+            <button
+              onClick={() => setBilling('monthly')}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${billing === 'monthly' ? 'bg-indigo-600 text-white shadow' : 'text-gray-500 hover:text-gray-700'}`}
             >
-              {plan.highlight && (
-                <div className="text-xs font-bold text-indigo-200 uppercase tracking-widest mb-3">Mas popular</div>
-              )}
-              <div className="mb-5">
-                <h2 className={`text-xl font-bold mb-1 ${plan.highlight ? 'text-white' : 'text-gray-900'}`}>{plan.name}</h2>
-                <div className="flex items-baseline gap-1 mb-1">
-                  <span className="text-4xl font-extrabold">{plan.price}€</span>
-                  <span className={`text-sm ${plan.highlight ? 'text-indigo-200' : 'text-gray-400'}`}>/mes</span>
+              Mensual
+            </button>
+            <button
+              onClick={() => setBilling('yearly')}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition flex items-center gap-1.5 ${billing === 'yearly' ? 'bg-indigo-600 text-white shadow' : 'text-gray-500 hover:text-gray-700'}`}
+            >
+              Anual
+              <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-semibold">-20%</span>
+            </button>
+          </div>
+          {billing === 'yearly' && (
+            <p className="text-xs text-green-600 mt-2 font-medium">Proximamente disponible &mdash; apuntate para ser el primero en saberlo</p>
+          )}
+        </div>
+
+        {/* CARDS DE PLANES */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+          {PLANS.map(plan => (
+            <div
+              key={plan.name}
+              className={`relative rounded-2xl border-2 bg-white p-6 flex flex-col shadow-sm transition hover:shadow-md ${plan.highlight ? 'border-indigo-500 shadow-indigo-100' : plan.color}`}
+            >
+              {plan.badge && (
+                <div className={`absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 rounded-full shadow ${
+                  plan.name === 'Team' ? 'bg-purple-600 text-white' : 'bg-indigo-600 text-white'
+                }`}>
+                  {plan.badge}
                 </div>
-                <p className={`text-sm ${plan.highlight ? 'text-indigo-200' : 'text-gray-500'}`}>{plan.desc}</p>
+              )}
+
+              <div className="mb-4">
+                <h2 className="text-xl font-bold text-gray-900">{plan.name}</h2>
+                <p className="text-sm text-gray-500 mt-0.5">{plan.desc}</p>
               </div>
-              <ul className="flex flex-col gap-2.5 mb-8 flex-1">
-                {plan.features.map((f, i) => (
-                  <li key={i} className={`flex items-start gap-2 text-sm ${plan.highlight ? 'text-indigo-100' : 'text-gray-600'}`}>
-                    <svg className={`w-4 h-4 shrink-0 mt-0.5 ${plan.highlight ? 'text-indigo-300' : 'text-indigo-500'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                    </svg>
+
+              <div className="mb-6">
+                {plan.price === 0 ? (
+                  <div className="flex items-end gap-1">
+                    <span className="text-4xl font-bold text-gray-900">0 &euro;</span>
+                    <span className="text-gray-400 text-sm mb-1">/mes</span>
+                  </div>
+                ) : (
+                  <div className="flex items-end gap-1">
+                    <span className="text-4xl font-bold text-gray-900">{plan.price} &euro;</span>
+                    <span className="text-gray-400 text-sm mb-1">/mes</span>
+                  </div>
+                )}
+              </div>
+
+              <ul className="space-y-2.5 mb-8 flex-1">
+                {plan.features.map(f => (
+                  <li key={f} className="flex items-start gap-2 text-sm text-gray-700">
+                    <span className="text-indigo-500 mt-0.5 shrink-0">&#10003;</span>
                     {f}
                   </li>
                 ))}
               </ul>
-              {plan.href ? (
-                <Link
-                  href={plan.href}
-                  className={`block text-center text-sm font-semibold py-3 rounded-xl transition-colors ${
-                    plan.highlight ? 'bg-white text-indigo-600 hover:bg-indigo-50' : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  }`}
-                >
-                  {plan.cta}
-                </Link>
-              ) : (
-                <button
-                  onClick={() => plan.priceId && handleCheckout(plan.priceId, plan.id)}
-                  disabled={loading === plan.id || !plan.priceId}
-                  className={`w-full text-sm font-semibold py-3 rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${
-                    plan.highlight ? 'bg-white text-indigo-600 hover:bg-indigo-50' : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  }`}
-                >
-                  {loading === plan.id ? 'Cargando...' : plan.cta}
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
 
-      {/* FAQ */}
-      <section className="max-w-2xl mx-auto px-6 pb-20">
-        <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">Preguntas frecuentes</h2>
-        <div className="flex flex-col gap-6">
-          {[
-            { q: 'Puedo cancelar en cualquier momento?', a: 'Si, cancela cuando quieras desde tu cuenta. Sin penalizaciones ni compromisos.' },
-            { q: 'Mis datos estan seguros?', a: 'Totalmente. Usamos Supabase con RLS para que solo tu accedas a tus proyectos. Nunca compartimos tus datos.' },
-            { q: 'Que pasa si llego al limite gratuito?', a: 'Seguiras viendo tus 3 proyectos existentes. Para crear mas necesitas el plan Pro.' },
-            { q: 'Hay descuento anual?', a: 'Proximamente. Suscribete ahora y te avisamos cuando lancemos el plan anual con descuento.' },
-          ].map((faq, i) => (
-            <div key={i} className="border-b border-gray-100 pb-5">
-              <h3 className="font-semibold text-gray-900 mb-2">{faq.q}</h3>
-              <p className="text-gray-500 text-sm">{faq.a}</p>
+              <button
+                onClick={() => handleCheckout(plan)}
+                disabled={loading === plan.name}
+                className={`w-full py-2.5 rounded-xl font-semibold text-sm transition ${
+                  plan.highlight
+                    ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md'
+                    : plan.name === 'Team'
+                    ? 'bg-purple-600 text-white hover:bg-purple-700'
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                } ${loading === plan.name ? 'opacity-60 cursor-not-allowed' : ''}`}
+              >
+                {loading === plan.name ? 'Redirigiendo...' : plan.cta}
+              </button>
             </div>
           ))}
         </div>
-      </section>
+
+        {/* COMPARATIVA DE DIFERENCIAS */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-16 shadow-sm">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">Comparativa de planes</h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="text-left py-3 text-gray-500 font-medium w-1/2">Funcion</th>
+                  <th className="text-center py-3 text-gray-700 font-semibold">Free</th>
+                  <th className="text-center py-3 text-indigo-600 font-semibold">Pro</th>
+                  <th className="text-center py-3 text-purple-600 font-semibold">Team</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {[
+                  ['Proyectos', '3', 'Ilimitados', 'Ilimitados'],
+                  ['Variables dinamicas', '&#10003;', '&#10003;', '&#10003;'],
+                  ['Plantillas predefinidas', '&#10003;', '&#10003;', '&#10003;'],
+                  ['Importar / exportar JSON', '&#10003;', '&#10003;', '&#10003;'],
+                  ['Historial de versiones', '&#10007;', '&#10003;', '&#10003;'],
+                  ['Variables globales', '&#10007;', '&#10003;', '&#10003;'],
+                  ['Soporte prioritario', '&#10007;', '&#10003;', '&#10003;'],
+                  ['Miembros del equipo', '&#10007;', '&#10007;', 'Hasta 5'],
+                  ['Prompts compartidos', '&#10007;', '&#10007;', '&#10003;'],
+                  ['Panel de administrador', '&#10007;', '&#10007;', '&#10003;'],
+                  ['Permisos por rol', '&#10007;', '&#10007;', '&#10003;'],
+                  ['Facturacion centralizada', '&#10007;', '&#10007;', '&#10003;'],
+                ].map(([feature, free, pro, team]) => (
+                  <tr key={feature}>
+                    <td className="py-3 text-gray-700">{feature}</td>
+                    <td className="py-3 text-center text-gray-400" dangerouslySetInnerHTML={{ __html: free }} />
+                    <td className="py-3 text-center text-indigo-600 font-medium" dangerouslySetInnerHTML={{ __html: pro }} />
+                    <td className="py-3 text-center text-purple-600 font-medium" dangerouslySetInnerHTML={{ __html: team }} />
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* FAQ */}
+        <div className="max-w-2xl mx-auto">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Preguntas frecuentes</h2>
+          <div className="space-y-3">
+            {FAQ.map((item, i) => (
+              <div key={i} className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full text-left px-5 py-4 flex items-center justify-between gap-3"
+                >
+                  <span className="font-medium text-gray-900 text-sm">{item.q}</span>
+                  <span className={`text-gray-400 text-lg transition-transform ${openFaq === i ? 'rotate-45' : ''}`}>+</span>
+                </button>
+                {openFaq === i && (
+                  <div className="px-5 pb-4 text-sm text-gray-600 border-t border-gray-100 pt-3">
+                    {item.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+      </main>
     </div>
   )
 }
