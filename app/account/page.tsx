@@ -2,11 +2,11 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Navbar from '@/components/Navbar'
 
 export default async function AccountPage() {
   const supabase = createServerComponentClient({ cookies })
   const { data: { user } } = await supabase.auth.getUser()
-
   if (!user) redirect('/login')
 
   const { data: sub } = await supabase
@@ -15,87 +15,148 @@ export default async function AccountPage() {
     .eq('user_id', user.id)
     .single()
 
+  const { data: projects } = await supabase
+    .from('projects')
+    .select('id')
+    .eq('user_id', user.id)
+
+  const { data: variables } = await supabase
+    .from('user_variables')
+    .select('id')
+    .eq('user_id', user.id)
+
   const plan = sub?.plan || 'free'
+  const isPro = plan === 'pro' || plan === 'team'
   const status = sub?.status || 'active'
+  const projectCount = projects?.length || 0
+  const variableCount = variables?.length || 0
+
   const periodEnd = sub?.current_period_end
-    ? new Date(sub.current_period_end).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })
+    ? new Date(sub.current_period_end).toLocaleDateString('es-ES', {
+        day: '2-digit', month: 'long', year: 'numeric'
+      })
     : null
 
-  const planLabels: Record<string, string> = { free: 'Gratuito', pro: 'Pro', team: 'Team' }
-  const planColors: Record<string, string> = { free: 'bg-gray-100 text-gray-700', pro: 'bg-indigo-100 text-indigo-700', team: 'bg-purple-100 text-purple-700' }
+  const planLabels: Record<string, string> = { free: 'Free', pro: 'Pro', team: 'Team' }
+  const planColors: Record<string, string> = {
+    free: 'bg-gray-100 text-gray-700',
+    pro: 'bg-indigo-100 text-indigo-700',
+    team: 'bg-purple-100 text-purple-700',
+  }
+  const FREE_LIMIT = 3
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* NAV */}
-      <nav className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <span className="font-bold text-gray-900">Context Keeper</span>
-          </Link>
-          <Link href="/dashboard" className="text-sm text-indigo-600 hover:underline">Ir al dashboard</Link>
-        </div>
-      </nav>
+      <Navbar userEmail={user.email} plan={plan} />
 
-      <div className="max-w-2xl mx-auto px-6 py-12">
-        <h1 className="text-2xl font-bold text-gray-900 mb-8">Mi cuenta</h1>
+      <div className="max-w-2xl mx-auto px-4 py-10">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Mi cuenta</h1>
 
-        {/* USER INFO */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Perfil</h2>
+        {/* PERFIL */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-4 shadow-sm">
+          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Perfil</h2>
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+            <div className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg shrink-0">
               {user.email?.[0]?.toUpperCase()}
             </div>
             <div>
               <p className="font-semibold text-gray-900">{user.email}</p>
-              <p className="text-sm text-gray-400">Miembro desde {new Date(user.created_at).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}</p>
+              <p className="text-sm text-gray-400">
+                Miembro desde{' '}
+                {new Date(user.created_at).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
+              </p>
             </div>
           </div>
         </div>
 
-        {/* SUBSCRIPTION */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Suscripcion</h2>
-          <div className="flex items-center justify-between mb-4">
+        {/* USO */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-4 shadow-sm">
+          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Uso actual</h2>
+          <div className="space-y-4">
             <div>
-              <div className="flex items-center gap-3 mb-1">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-sm text-gray-700">Proyectos</span>
+                <span className="text-sm font-medium text-gray-900">
+                  {projectCount} {isPro ? '' : `/ ${FREE_LIMIT}`}
+                  {isPro && <span className="text-xs text-indigo-500 ml-1">ilimitados</span>}
+                </span>
+              </div>
+              {!isPro && (
+                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all ${
+                      projectCount >= FREE_LIMIT ? 'bg-red-500' : 'bg-indigo-500'
+                    }`}
+                    style={{ width: Math.min((projectCount / FREE_LIMIT) * 100, 100) + '%' }}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-700">Variables guardadas</span>
+              <span className="text-sm font-medium text-gray-900">{variableCount}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* SUSCRIPCIÓN */}
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-4 shadow-sm">
+          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Suscripción</h2>
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
                 <span className={`text-sm font-semibold px-3 py-1 rounded-full ${planColors[plan]}`}>
                   Plan {planLabels[plan]}
                 </span>
                 {status === 'active' && plan !== 'free' && (
-                  <span className="text-xs text-green-600 font-medium">Activo</span>
+                  <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-full">
+                    Activo
+                  </span>
                 )}
                 {status === 'past_due' && (
-                  <span className="text-xs text-red-600 font-medium">Pago pendiente</span>
+                  <span className="text-xs text-red-600 font-medium bg-red-50 px-2 py-0.5 rounded-full">
+                    Pago pendiente
+                  </span>
                 )}
               </div>
               {periodEnd && (
-                <p className="text-sm text-gray-500">Proxima renovacion: {periodEnd}</p>
+                <p className="text-sm text-gray-500 mt-1">Próxima renovación: {periodEnd}</p>
               )}
               {plan === 'free' && (
-                <p className="text-sm text-gray-500">Sin fecha de renovacion</p>
+                <p className="text-sm text-gray-400 mt-1">Sin suscripción activa</p>
               )}
             </div>
           </div>
 
           {plan === 'free' ? (
-            <Link href="/pricing" className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">
-              Mejorar a Pro →
-            </Link>
+            <div className="rounded-xl bg-indigo-50 border border-indigo-100 p-4 flex items-start justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-indigo-900">Desbloquea todo con Pro</p>
+                <p className="text-xs text-indigo-600 mt-0.5">
+                  Proyectos ilimitados, historial de versiones y variables globales por solo 9 &#8364;/mes
+                </p>
+              </div>
+              <Link
+                href="/pricing"
+                className="shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
+              >
+                Ver planes
+              </Link>
+            </div>
           ) : (
-            <p className="text-sm text-gray-400">Para cancelar tu suscripcion, contacta con soporte.</p>
+            <p className="text-sm text-gray-400">
+              Para cancelar o gestionar tu suscripción, escríbenos a{' '}
+              <a href="mailto:hola@contextkeeper.app" className="text-indigo-600 hover:underline">
+                hola@contextkeeper.app
+              </a>
+            </p>
           )}
         </div>
 
-        {/* BACK */}
+        {/* VOLVER */}
         <div className="text-center">
           <Link href="/dashboard" className="text-sm text-indigo-600 hover:underline">
-            ← Volver al dashboard
+            &#8592; Volver al dashboard
           </Link>
         </div>
       </div>
