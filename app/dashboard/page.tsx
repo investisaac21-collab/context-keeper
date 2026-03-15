@@ -1,21 +1,44 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+import Navbar from '@/components/Navbar'
 import ProjectsClient from '@/components/ProjectsClient'
 
 export default async function DashboardPage() {
   const supabase = createServerComponentClient({ cookies })
-  const { data: { session } } = await supabase.auth.getSession()
 
-  const [{ data: projects }, { data: variables }] = await Promise.all([
-    supabase.from('projects').select('*').order('updated_at', { ascending: false }),
-    supabase.from('user_variables').select('*').order('created_at', { ascending: true })
-  ])
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: projects } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+
+  const { data: variables } = await supabase
+    .from('user_variables')
+    .select('*')
+    .eq('user_id', user.id)
+
+  const { data: sub } = await supabase
+    .from('subscriptions')
+    .select('plan')
+    .eq('user_id', user.id)
+    .single()
+
+  const plan = sub?.plan || 'free'
 
   return (
-    <ProjectsClient
-      initialProjects={projects || []}
-      initialVariables={variables || []}
-      userId={session!.user.id}
-    />
+    <div className="min-h-screen bg-gray-50">
+      <Navbar userEmail={user.email} plan={plan} />
+      <ProjectsClient
+        initialProjects={projects || []}
+        initialVariables={variables || []}
+        userEmail={user.email || ''}
+        userId={user.id}
+        plan={plan}
+      />
+    </div>
   )
 }
