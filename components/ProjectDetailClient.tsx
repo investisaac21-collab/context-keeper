@@ -5,6 +5,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import type { Project } from '@/lib/types'
 import HistoryModal from './HistoryModal'
 import ProjectModal from './ProjectModal'
+import Navbar from './Navbar'
 
 function extractVariables(text: string): string[] {
   const matches = text.match(/\{\{(\w+)\}\}/g) || []
@@ -19,9 +20,10 @@ interface Props {
   project: Project
   plan: string
   userId: string
+  userEmail?: string
 }
 
-export default function ProjectDetailClient({ project: initialProject, plan, userId }: Props) {
+export default function ProjectDetailClient({ project: initialProject, plan, userId, userEmail }: Props) {
   const router = useRouter()
   const supabase = createClientComponentClient()
   const [project, setProject] = useState<Project>(initialProject)
@@ -34,6 +36,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
   const isPro = plan === 'pro' || plan === 'team'
   const planLabel = plan === 'team' ? 'Team' : plan === 'pro' ? 'Pro' : 'Free'
   const detectedVars = extractVariables(project.context || '')
+  const missingVars = detectedVars.filter(v => !varValues[v])
   const previewText = fillVariables(project.context || '', varValues)
 
   async function handleSave(data: Partial<Project>) {
@@ -52,14 +55,20 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
   async function handleDuplicate() {
     const { data: created } = await supabase
       .from('projects')
-      .insert({ name: project.name + ' (copia)', context: project.context, tag: project.tag, user_id: userId })
+      .insert({
+        name: project.name + ' (copia)',
+        context: project.context,
+        tag: project.tag,
+        category: project.category,
+        user_id: userId
+      })
       .select()
       .single()
     if (created) router.push('/dashboard')
   }
 
   async function handleDelete() {
-    if (!confirm('Seguro que quieres eliminar este proyecto?')) return
+    if (!confirm('¿Seguro que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) return
     await supabase.from('projects').delete().eq('id', project.id)
     router.push('/dashboard')
   }
@@ -75,61 +84,99 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
     writing: 'bg-green-100 text-green-800',
     analysis: 'bg-purple-100 text-purple-800',
     marketing: 'bg-yellow-100 text-yellow-800',
+    IA: 'bg-indigo-100 text-indigo-800',
+    Desarrollo: 'bg-blue-100 text-blue-800',
+    Marketing: 'bg-yellow-100 text-yellow-800',
+    Negocios: 'bg-orange-100 text-orange-800',
+    Educacion: 'bg-teal-100 text-teal-800',
+    Personal: 'bg-pink-100 text-pink-800',
     other: 'bg-gray-100 text-gray-800',
   }
 
+  const category = project.category || project.tag || ''
+  const colorClass = categoryColors[category] || 'bg-gray-100 text-gray-700'
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navbar userEmail={userEmail} plan={plan} />
       <div className="max-w-3xl mx-auto px-4 py-8">
+        {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
           <a href="/dashboard" className="hover:text-indigo-600 transition">Mis Proyectos</a>
           <span>/</span>
-          <span className="text-gray-700 font-medium">{project.name}</span>
+          <span className="text-gray-700 font-medium truncate">{project.name}</span>
         </div>
+
+        {/* Card principal */}
         <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-4 shadow-sm">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="flex-1">
               <div className="flex items-center gap-2 flex-wrap mb-1">
                 <h1 className="text-2xl font-bold text-gray-900">{project.name}</h1>
-                {project.category && (
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ` + (categoryColors[project.category] || 'bg-gray-100 text-gray-700')}>
-                    {project.category}
+                {category && (
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ` + (colorClass)}>
+                    {category}
                   </span>
                 )}
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ` + (plan === 'team' ? 'bg-purple-100 text-purple-700' : plan === 'pro' ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-500')}>
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ` + (
+                  plan === 'team' ? 'bg-purple-100 text-purple-700' :
+                  plan === 'pro' ? 'bg-indigo-100 text-indigo-700' :
+                  'bg-gray-100 text-gray-500'
+                )}>
                   Plan {planLabel}
                 </span>
               </div>
               {project.updated_at && (
-                <p className="text-xs text-gray-400">Ultima edicion: {new Date(project.updated_at).toLocaleDateString('es-ES', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</p>
+                <p className="text-xs text-gray-400">
+                  Última edición: {new Date(project.updated_at).toLocaleDateString('es-ES', {
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                  })}
+                </p>
               )}
             </div>
             <div className="flex gap-2 flex-wrap">
-              <button onClick={() => setShowHistory(true)} className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition">
-                &#128336; Historial {!isPro && <span className="text-gray-300">&#128274;</span>}
+              <button
+                onClick={() => setShowHistory(true)}
+                className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition flex items-center gap-1"
+              >
+                🕐 Historial {!isPro && <span className="text-gray-300">🔒</span>}
               </button>
-              <button onClick={handleDuplicate} className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition">
-                &#128203; Duplicar
+              <button
+                onClick={handleDuplicate}
+                className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition"
+              >
+                📋 Duplicar
               </button>
-              <button onClick={() => setShowEdit(true)} className="text-xs px-3 py-1.5 border border-blue-200 rounded-lg text-blue-600 hover:bg-blue-50 transition">
+              <button
+                onClick={() => setShowEdit(true)}
+                className="text-xs px-3 py-1.5 border border-blue-200 rounded-lg text-blue-600 hover:bg-blue-50 transition"
+              >
                 Editar
               </button>
-              <button onClick={handleDelete} className="text-xs px-3 py-1.5 border border-red-200 rounded-lg text-red-600 hover:bg-red-50 transition">
+              <button
+                onClick={handleDelete}
+                className="text-xs px-3 py-1.5 border border-red-200 rounded-lg text-red-600 hover:bg-red-50 transition"
+              >
                 Eliminar
               </button>
             </div>
           </div>
         </div>
+
+        {/* Variables detectadas */}
         {detectedVars.length > 0 && (
           <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-4 shadow-sm">
-            <h2 className="font-semibold text-gray-900 mb-3">
+            <h2 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
               Variables detectadas
-              <span className="ml-2 text-xs font-normal text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{detectedVars.length}</span>
+              <span className="text-xs font-normal text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                {detectedVars.length}
+              </span>
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {detectedVars.map(v => (
                 <div key={v} className="flex flex-col gap-1">
-                  <label className="text-xs font-medium text-gray-600">{v}</label>
+                  <label className="text-xs font-medium text-gray-600 font-mono">{v}</label>
                   <input
                     type="text"
                     value={varValues[v] || ''}
@@ -140,41 +187,39 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
                 </div>
               ))}
             </div>
+            {missingVars.length > 0 && (
+              <p className="text-xs text-amber-600 mt-3 flex items-center gap-1">
+                ⚠️ {missingVars.length} variable{missingVars.length !== 1 ? 's' : ''} sin rellenar.
+                El prompt se copiará con los marcadores sin sustituir.
+              </p>
+            )}
           </div>
         )}
 
+        {/* Vista previa del prompt */}
         <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-4 shadow-sm">
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-semibold text-gray-900">Vista previa del prompt</h2>
             <button
               onClick={handleCopy}
-              className={'text-sm px-4 py-1.5 rounded-lg font-medium transition ' + (copied ? 'bg-green-100 text-green-700' : 'bg-indigo-600 text-white hover:bg-indigo-700')}
+              className={'text-sm px-4 py-1.5 rounded-lg font-medium transition ' + (
+                copied ? 'bg-green-100 text-green-700' : 'bg-indigo-600 text-white hover:bg-indigo-700'
+              )}
             >
-              {copied ? 'Copiado!' : 'Copiar contexto'}
+              {copied ? '✓ Copiado' : 'Copiar contexto'}
             </button>
           </div>
           <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm text-gray-700 whitespace-pre-wrap font-mono leading-relaxed max-h-96 overflow-y-auto">
-            {previewText || <span className="text-gray-400 italic">Este proyecto no tiene contenido aun.</span>}
+            {previewText || <span className="text-gray-400 italic">Este proyecto no tiene contenido aún.</span>}
           </div>
-          {detectedVars.length > 0 && detectedVars.some(v => !varValues[v]) && (
-            <p className="text-xs text-amber-600 mt-2">
-              Hay variables sin rellenar. El prompt se copiara con los marcadores sin sustituir.
-            </p>
-          )}
         </div>
-
       </div>
 
       {showHistory && (
         <HistoryModal project={project} onClose={() => setShowHistory(false)} plan={plan} />
       )}
       {showEdit && (
-        <ProjectModal
-          project={project}
-          onClose={() => setShowEdit(false)}
-          onSave={handleSave}
-          loading={loading}
-        />
+        <ProjectModal project={project} onClose={() => setShowEdit(false)} onSave={handleSave} loading={loading} />
       )}
     </div>
   )
