@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Project, UserVariable } from '@/lib/types';
 
 interface ProjectCardProps {
@@ -52,7 +53,7 @@ export default function ProjectCard({ project, variables: _vars, onEdit, onDelet
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-gray-900 truncate">{project.name}</h3>
+          <Link href={'/dashboard/proyecto/' + project.id} className="font-semibold text-gray-900 truncate hover:text-indigo-600 transition block">{project.name}</Link>
           {project.category && (
             <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium ${colorClass}`}>
               {project.category}
