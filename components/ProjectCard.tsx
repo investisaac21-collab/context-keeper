@@ -1,5 +1,4 @@
 'use client'
-
 import { useState } from 'react'
 import type { Project } from '@/lib/types'
 
@@ -8,18 +7,19 @@ interface Props {
   onEdit: () => void
   onDelete: () => void
   onCopy: () => void
+  onHistory: () => void
 }
 
-function fillVariables(text: string, vars: Record<string, string>): string {
+function fillVariables(text, vars) {
   return text.replace(/\{\{(\w+)\}\}/g, (_, k) => vars[k] || '{{' + k + '}}')
 }
 
-function extractVariables(text: string): string[] {
+function extractVariables(text) {
   const matches = text.match(/\{\{(\w+)\}\}/g) || []
   return Array.from(new Set(matches.map(m => m.slice(2, -2))))
 }
 
-export default function ProjectCard({ project, onEdit, onDelete, onCopy }: Props) {
+export default function ProjectCard({ project, onEdit, onDelete, onCopy, onHistory }: Props) {
   const [showVars, setShowVars] = useState(false)
   const [varValues, setVarValues] = useState<Record<string, string>>({})
   const [copied, setCopied] = useState(false)
@@ -29,9 +29,7 @@ export default function ProjectCard({ project, onEdit, onDelete, onCopy }: Props
 
   const handleCopy = async () => {
     let text = project.context
-    if (hasVars) {
-      text = fillVariables(project.context, varValues)
-    }
+    if (hasVars) text = fillVariables(project.context, varValues)
     await navigator.clipboard.writeText(text)
     setCopied(true)
     onCopy()
@@ -60,6 +58,11 @@ export default function ProjectCard({ project, onEdit, onDelete, onCopy }: Props
           )}
         </div>
         <div className="flex items-center gap-1 shrink-0">
+          <button onClick={onHistory} className="p-1.5 text-gray-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg" title="Historial de versiones">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </button>
           <button onClick={onEdit} className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg" title="Editar">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -72,7 +75,9 @@ export default function ProjectCard({ project, onEdit, onDelete, onCopy }: Props
           </button>
         </div>
       </div>
+
       <p className="text-sm text-gray-600 line-clamp-3 flex-1">{project.context}</p>
+
       {hasVars && (
         <div className="border border-dashed border-amber-300 rounded-lg p-3 bg-amber-50">
           <button onClick={() => setShowVars(!showVars)} className="text-xs font-medium text-amber-700 flex items-center gap-1 w-full">
@@ -83,12 +88,10 @@ export default function ProjectCard({ project, onEdit, onDelete, onCopy }: Props
             <div className="mt-2 space-y-2">
               {variables.map(v => (
                 <div key={v}>
-                  <label className="text-xs text-amber-700 font-medium block mb-1">
-                    {'{{' + v + '}}'}
-                  </label>
+                  <label className="text-xs text-amber-700 font-medium block mb-1">{'{{' + v + '}}'}</label>
                   <input
                     type="text"
-                    placeholder={`Valor para ${v}...`}
+                    placeholder={'Valor para ' + v + '...'}
                     value={varValues[v] || ''}
                     onChange={e => setVarValues(prev => ({ ...prev, [v]: e.target.value }))}
                     className="w-full px-2 py-1 text-xs border border-amber-200 rounded-md bg-white focus:outline-none focus:ring-1 focus:ring-amber-400"
@@ -99,6 +102,7 @@ export default function ProjectCard({ project, onEdit, onDelete, onCopy }: Props
           )}
         </div>
       )}
+
       <div className="flex items-center justify-between pt-1 border-t border-gray-100">
         <span className="text-xs text-gray-400">{project.copies} {project.copies === 1 ? 'copia' : 'copias'}</span>
         <button
