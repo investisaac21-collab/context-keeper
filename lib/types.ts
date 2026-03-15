@@ -3,7 +3,9 @@ export interface Project {
   user_id: string;
   name: string;
   category?: string;
+  tag?: string;
   context?: string;
+  copies?: number;
   created_at?: string;
   updated_at?: string;
 }
