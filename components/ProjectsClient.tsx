@@ -8,7 +8,6 @@ import HistoryModal from './HistoryModal'
 import UserVariablesPanel from './UserVariablesPanel'
 import { TEMPLATES } from '@/lib/templates'
 
-const FREE_LIMIT = (plan === 'pro' || plan === 'team') ? Infinity : 3
 
 interface Props {
   initialProjects: Project[]
@@ -19,6 +18,7 @@ interface Props {
 }
 
 export default function ProjectsClient({ initialProjects, initialVariables, userId, userEmail, plan = 'free' }: Props) {
+  const FREE_LIMIT = (plan === 'pro' || plan === 'team') ? Infinity : 3
   const [projects, setProjects] = useState<Project[]>(initialProjects)
   const [search, setSearch] = useState('')
   const [filterTag, setFilterTag] = useState('')
