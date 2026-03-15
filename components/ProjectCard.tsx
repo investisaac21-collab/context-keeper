@@ -23,7 +23,7 @@ function extractVariables(text: string): string[] {
   return [...new Set(matches.map((m: string) => m.replace(/\{\{|\}\}/g, '')))];
 }
 
-export default function ProjectCard({ project, variables: _vars, onEdit, onDelete, onHistory, onDuplicate, onCopy, plan }: ProjectCardProps) {
+export default function ProjectCard({ project, variables: _vars, onEdit, onDelete, onHistory, onDuplicate, plan }: ProjectCardProps) {
   const [copied, setCopied] = useState(false);
   const [varValues, setVarValues] = useState<Record<string, string>>({});
   const [showVars, setShowVars] = useState(false);
@@ -40,17 +40,18 @@ export default function ProjectCard({ project, variables: _vars, onEdit, onDelet
   };
 
   const categoryColors: Record<string, string> = {
-    'coding': 'bg-blue-100 text-blue-800',
-    'writing': 'bg-green-100 text-green-800',
-    'analysis': 'bg-purple-100 text-purple-800',
-    'marketing': 'bg-yellow-100 text-yellow-800',
-    'IA': 'bg-indigo-100 text-indigo-800',
-    'Desarrollo': 'bg-blue-100 text-blue-800',
-    'Marketing': 'bg-yellow-100 text-yellow-800',
-    'Negocios': 'bg-orange-100 text-orange-800',
-    'Educacion': 'bg-teal-100 text-teal-800',
-    'Personal': 'bg-pink-100 text-pink-800',
-    'other': 'bg-gray-100 text-gray-800',
+    coding: 'bg-blue-100 text-blue-800',
+    writing: 'bg-green-100 text-green-800',
+    analysis: 'bg-purple-100 text-purple-800',
+    marketing: 'bg-yellow-100 text-yellow-800',
+    IA: 'bg-indigo-100 text-indigo-800',
+    Desarrollo: 'bg-blue-100 text-blue-800',
+    Marketing: 'bg-yellow-100 text-yellow-800',
+    Negocios: 'bg-orange-100 text-orange-800',
+    Educacion: 'bg-teal-100 text-teal-800',
+    Personal: 'bg-pink-100 text-pink-800',
+    Otro: 'bg-gray-100 text-gray-800',
+    other: 'bg-gray-100 text-gray-800',
   };
 
   const category = project.category || project.tag || '';
@@ -58,12 +59,13 @@ export default function ProjectCard({ project, variables: _vars, onEdit, onDelet
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
-      {/* Header: nombre + acciones */}
+      {/* Header */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <Link
             href={'/dashboard/proyecto/' + project.id}
-            className="font-semibold text-gray-900 hover:text-indigo-600 transition block truncate"
+            className="font-semibold text-gray-900 hover:text-indigo-600 transition block"
+            title={project.name}
           >
             {project.name}
           </Link>
@@ -166,7 +168,7 @@ export default function ProjectCard({ project, variables: _vars, onEdit, onDelet
         </div>
       )}
 
-      {/* Acciones inferiores */}
+      {/* Acciones */}
       <div className="mt-auto flex gap-2">
         <Link
           href={'/dashboard/proyecto/' + project.id}
@@ -180,7 +182,7 @@ export default function ProjectCard({ project, variables: _vars, onEdit, onDelet
             copied ? 'bg-green-100 text-green-700' : 'bg-indigo-600 hover:bg-indigo-700 text-white'
           }`}
         >
-          {copied ? '✓ Copiado' : 'Copiar contexto'}
+          {copied ? '&#10003; Copiado' : 'Copiar contexto'}
         </button>
       </div>
     </div>
