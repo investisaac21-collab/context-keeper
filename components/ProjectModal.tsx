@@ -1,5 +1,4 @@
 'use client'
-
 import { useState, useEffect } from 'react'
 import type { Project } from '@/lib/types'
 import { TEMPLATES } from '@/lib/templates'
@@ -14,12 +13,12 @@ interface TemplateData {
 interface Props {
   project: Project | null
   templateData?: TemplateData | null
-  onSave: (data: { name: string; tag: string; context: string }) => void
+  onSave: (data: { name: string; tag: string; category: string; context: string }) => void
   onClose: () => void
   loading: boolean
 }
 
-const CATEGORIES = ['IA', 'Marketing', 'Desarrollo', 'Negocios', 'Educacion', 'Personal', 'Otro']
+const CATEGORIES = ['IA', 'Marketing', 'Desarrollo', 'Negocios', 'Educación', 'Personal', 'Otro']
 
 function extractVariables(text: string): string[] {
   const matches = text.match(/\{\{(\w+)\}\}/g) || []
@@ -28,7 +27,7 @@ function extractVariables(text: string): string[] {
 
 export default function ProjectModal({ project, templateData, onSave, onClose, loading }: Props) {
   const [name, setName] = useState(project?.name || '')
-  const [tag, setTag] = useState(project?.tag || '')
+  const [tag, setTag] = useState(project?.tag || project?.category || '')
   const [context, setContext] = useState(project?.context || '')
   const [showTemplates, setShowTemplates] = useState(false)
 
@@ -45,7 +44,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim() || !context.trim()) return
-    onSave({ name: name.trim(), tag, context: context.trim() })
+    onSave({ name: name.trim(), tag, category: tag, context: context.trim() })
   }
 
   const insertVar = (varName: string) => {
@@ -53,7 +52,10 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={e => e.target === e.currentTarget && onClose()}>
+    <div
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={e => e.target === e.currentTarget && onClose()}
+    >
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
@@ -69,15 +71,25 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
 
           {!project && (
             <div className="mb-6">
-              <button onClick={() => setShowTemplates(!showTemplates)} className="text-sm text-sky-600 hover:text-sky-700 font-medium flex items-center gap-1">
+              <button
+                onClick={() => setShowTemplates(!showTemplates)}
+                className="text-sm text-sky-600 hover:text-sky-700 font-medium flex items-center gap-1"
+              >
                 Usar plantilla predefinida {showTemplates ? '▲' : '▼'}
               </button>
               {showTemplates && (
                 <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {TEMPLATES.map((t, i) => (
-                    <button key={i}
-                      onClick={() => { setName(t.name); setTag(t.tag); setContext(t.context); setShowTemplates(false) }}
-                      className="text-left p-3 rounded-lg border border-gray-200 hover:border-sky-400 hover:bg-sky-50 transition-all">
+                    <button
+                      key={i}
+                      onClick={() => {
+                        setName(t.name)
+                        setTag(t.tag)
+                        setContext(t.context)
+                        setShowTemplates(false)
+                      }}
+                      className="text-left p-3 rounded-lg border border-gray-200 hover:border-sky-400 hover:bg-sky-50 transition-all"
+                    >
                       <span className="text-lg">{t.emoji}</span>
                       <p className="text-xs font-medium text-gray-900 mt-1">{t.name}</p>
                     </button>
@@ -90,16 +102,24 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="label">Nombre del proyecto *</label>
-              <input type="text" value={name} onChange={e => setName(e.target.value)}
-                className="input" placeholder="Ej: Prompt para emails de ventas" required />
+              <input
+                type="text"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                className="input"
+                placeholder="Ej: Prompt para emails de ventas"
+                required
+              />
             </div>
+
             <div>
-              <label className="label">Categoria</label>
+              <label className="label">Categoría</label>
               <select value={tag} onChange={e => setTag(e.target.value)} className="input">
-                <option value="">Sin categoria</option>
+                <option value="">Sin categoría</option>
                 {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
+
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="label mb-0">Contexto / Prompt *</label>
@@ -108,7 +128,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
                 value={context}
                 onChange={e => setContext(e.target.value)}
                 className="input min-h-[180px] resize-y font-mono text-sm"
-                placeholder="Escribe tu contexto... Usa {{variable}} para valores dinamicos"
+                placeholder="Escribe tu contexto... Usa {{variable}} para valores dinámicos"
                 required
               />
               {variables.length > 0 && (
@@ -124,13 +144,18 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
               <div className="mt-2 flex flex-wrap gap-1">
                 <span className="text-xs text-gray-400">Insertar variable:</span>
                 {['nombre', 'empresa', 'producto', 'fecha', 'rol', 'objetivo'].map(v => (
-                  <button key={v} type="button" onClick={() => insertVar(v)}
-                    className="text-xs bg-gray-100 hover:bg-sky-100 text-gray-600 hover:text-sky-700 px-2 py-0.5 rounded-full transition-colors">
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => insertVar(v)}
+                    className="text-xs bg-gray-100 hover:bg-sky-100 text-gray-600 hover:text-sky-700 px-2 py-0.5 rounded-full transition-colors"
+                  >
                     + {v}
                   </button>
                 ))}
               </div>
             </div>
+
             <div className="flex justify-end gap-3 pt-2">
               <button type="button" onClick={onClose} className="btn-secondary">Cancelar</button>
               <button type="submit" disabled={loading} className="btn-primary disabled:opacity-60">
