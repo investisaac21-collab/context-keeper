@@ -8,15 +8,17 @@ import HistoryModal from './HistoryModal'
 import UserVariablesPanel from './UserVariablesPanel'
 import { TEMPLATES } from '@/lib/templates'
 
-const FREE_LIMIT = 3
+const FREE_LIMIT = (plan === 'pro' || plan === 'team') ? Infinity : 3
 
 interface Props {
   initialProjects: Project[]
   initialVariables: UserVariable[]
   userId: string
+  userEmail?: string
+  plan?: string
 }
 
-export default function ProjectsClient({ initialProjects, initialVariables, userId }: Props) {
+export default function ProjectsClient({ initialProjects, initialVariables, userId, userEmail, plan = 'free' }: Props) {
   const [projects, setProjects] = useState<Project[]>(initialProjects)
   const [search, setSearch] = useState('')
   const [filterTag, setFilterTag] = useState('')
