@@ -25,5 +25,12 @@ export default async function ProjectDetailPage({ params }: { params: { id: stri
 
   const plan = sub?.plan || 'free'
 
-  return <ProjectDetailClient project={project} plan={plan} userId={user.id} />
+  return (
+    <ProjectDetailClient
+      project={project}
+      plan={plan}
+      userId={user.id}
+      userEmail={user.email}
+    />
+  )
 }
