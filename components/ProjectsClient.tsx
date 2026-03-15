@@ -277,8 +277,8 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         <ProjectModal
           onClose={() => { setShowModal(false); setEditingProject(null); setTemplateData(null) }}
           onSave={handleSave}
-          initialData={editingProject || templateData || undefined}
-          variables={variables}
+          project={editingProject}
+          templateData={templateData}
           loading={loading}
         />
       )}
