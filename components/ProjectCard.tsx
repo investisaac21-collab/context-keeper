@@ -11,6 +11,7 @@ interface ProjectCardProps {
   onHistory: (project: Project) => void;
   onDuplicate?: (project: Project) => void;
   onCopy?: () => void;
+  onPreview?: () => void;
   plan?: string;
 }
 
@@ -23,20 +24,28 @@ function extractVariables(text: string): string[] {
   return [...new Set(matches.map((m: string) => m.replace(/\{\{|\}\}/g, '')))];
 }
 
-export default function ProjectCard({ project, variables: _vars, onEdit, onDelete, onHistory, onDuplicate, plan }: ProjectCardProps) {
+export default function ProjectCard({ project, variables: _vars, onEdit, onDelete, onHistory, onDuplicate, onCopy, onPreview, plan }: ProjectCardProps) {
   const [copied, setCopied] = useState(false);
   const [varValues, setVarValues] = useState<Record<string, string>>({});
   const [showVars, setShowVars] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   const detectedVars = extractVariables(project.context || '');
   const hasVars = detectedVars.length > 0;
   const missingVars = detectedVars.filter(v => !varValues[v]);
 
+  const filledContext = hasVars ? fillVariables(project.context || '', varValues) : (project.context || '');
+
   const handleCopy = () => {
-    const filled = hasVars ? fillVariables(project.context || '', varValues) : (project.context || '');
-    navigator.clipboard.writeText(filled);
+    navigator.clipboard.writeText(filledContext);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    if (onCopy) onCopy();
+  };
+
+  const handlePreview = () => {
+    setShowPreview(true);
+    if (onPreview) onPreview();
   };
 
   const categoryColors: Record<string, string> = {
@@ -168,14 +177,53 @@ export default function ProjectCard({ project, variables: _vars, onEdit, onDelet
         </div>
       )}
 
+      {/* Modal vista previa */}
+      {showPreview && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowPreview(false)}>
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-gray-900">Vista previa del prompt</h3>
+              <button onClick={() => setShowPreview(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
+            </div>
+            {missingVars.length > 0 && (
+              <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                <p className="text-xs text-amber-700 font-medium">
+                  Faltan {missingVars.length} variable{missingVars.length !== 1 ? 's' : ''}: {missingVars.map(v => `{{${v}}}`).join(', ')}
+                </p>
+                <p className="text-xs text-amber-600 mt-0.5">Rellena las variables para ver el prompt completo.</p>
+              </div>
+            )}
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 max-h-64 overflow-y-auto">
+              <pre className="text-sm text-gray-800 whitespace-pre-wrap font-sans leading-relaxed">
+                {filledContext}
+              </pre>
+            </div>
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={() => setShowPreview(false)}
+                className="flex-1 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition"
+              >
+                Cerrar
+              </button>
+              <button
+                onClick={() => { handleCopy(); setShowPreview(false); }}
+                className="flex-1 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
+              >
+                Copiar prompt
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Acciones */}
       <div className="mt-auto flex gap-2">
-        <Link
-          href={'/dashboard/proyecto/' + project.id}
+        <button
+          onClick={handlePreview}
           className="flex-1 py-2 rounded-lg text-sm font-medium text-center border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
         >
-          Ver detalle
-        </Link>
+          Vista previa
+        </button>
         <button
           onClick={handleCopy}
           className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
