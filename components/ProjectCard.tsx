@@ -1,14 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { Project } from '@/lib/types';
+import { Project, UserVariable } from '@/lib/types';
 
 interface ProjectCardProps {
   project: Project;
+  variables?: UserVariable[];
   onEdit: (project: Project) => void;
   onDelete: (id: string) => void;
   onHistory: (project: Project) => void;
+  onDuplicate?: (project: Project) => void;
   onCopy?: () => void;
+  plan?: string;
 }
 
 function fillVariables(text: string, vars: Record<string, string>): string {
@@ -20,13 +23,13 @@ function extractVariables(text: string): string[] {
   return [...new Set(matches.map((m: string) => m.replace(/\{\{|\}\}/g, '')))];
 }
 
-export default function ProjectCard({ project, onEdit, onDelete, onHistory, onCopy }: ProjectCardProps) {
+export default function ProjectCard({ project, variables: _vars, onEdit, onDelete, onHistory, onDuplicate, onCopy, plan }: ProjectCardProps) {
   const [copied, setCopied] = useState(false);
   const [varValues, setVarValues] = useState<Record<string, string>>({});
   const [showVars, setShowVars] = useState(false);
 
-  const variables = extractVariables(project.context || '');
-  const hasVars = variables.length > 0;
+  const detectedVars = extractVariables(project.context || '');
+  const hasVars = detectedVars.length > 0;
 
   const handleCopy = () => {
     const filled = hasVars ? fillVariables(project.context || '', varValues) : (project.context || '');
@@ -66,6 +69,17 @@ export default function ProjectCard({ project, onEdit, onDelete, onHistory, onCo
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </button>
+          {onDuplicate && (
+            <button
+              onClick={() => onDuplicate(project)}
+              className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+              title="Duplicar proyecto"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </button>
+          )}
           <button
             onClick={() => onEdit(project)}
             className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -97,11 +111,11 @@ export default function ProjectCard({ project, onEdit, onDelete, onHistory, onCo
             onClick={() => setShowVars(!showVars)}
             className="text-xs text-indigo-600 hover:underline"
           >
-            {showVars ? 'Ocultar variables' : `Rellenar variables (${variables.length})`}
+            {showVars ? 'Ocultar variables' : `Rellenar variables (${detectedVars.length})`}
           </button>
           {showVars && (
             <div className="mt-2 flex flex-col gap-2">
-              {variables.map((v: string) => (
+              {detectedVars.map((v: string) => (
                 <div key={v} className="flex items-center gap-2">
                   <label className="text-xs text-gray-500 w-24 shrink-0">{v}</label>
                   <input
@@ -126,7 +140,7 @@ export default function ProjectCard({ project, onEdit, onDelete, onHistory, onCo
             : 'bg-indigo-600 hover:bg-indigo-700 text-white'
         }`}
       >
-        {copied ? 'â Copiado!' : 'ð Copiar contexto'}
+        {copied ? 'Copiado!' : 'Copiar contexto'}
       </button>
     </div>
   );
