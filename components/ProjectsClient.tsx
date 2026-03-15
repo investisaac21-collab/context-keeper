@@ -126,7 +126,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
     await saveVersion(historyProject)
     const { data: updated, error } = await supabase
       .from('projects')
-      .update({ name: version.name, tag: version.tag, context: version.context, updated_at: new Date().toISOString() })
+      .update({ context: version.context, updated_at: new Date().toISOString() })
       .eq('id', historyProject.id)
       .select()
       .single()
