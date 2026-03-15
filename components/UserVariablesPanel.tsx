@@ -51,7 +51,7 @@ export default function UserVariablesPanel({ variables: propVars, initialVariabl
     <div className="card p-5">
       <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-lg">⚡</span>
+          <span className="text-base font-semibold text-indigo-600">&#9889;</span>
           <span className="font-semibold text-gray-900">Mis Variables</span>
           <span className="text-xs bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full font-medium">{variables.length}</span>
         </div>
@@ -62,14 +62,13 @@ export default function UserVariablesPanel({ variables: propVars, initialVariabl
 
       {open && (
         <div className="mt-4 space-y-4">
-          {/* Helper text */}
           <div className="bg-sky-50 border border-sky-100 rounded-xl p-3">
             <p className="text-xs text-sky-700 leading-relaxed">
-              Define variables globales con valores por defecto. Podrás reutilizarlas al crear o editar proyectos escribiendo <code className="bg-sky-100 px-1 rounded font-mono">{'{{nombre_variable}}'}</code> en el prompt.
+              Define variables globales con valores por defecto. Las reutilizas en proyectos escribiendo{' '}
+              <code className="bg-sky-100 px-1 rounded font-mono">{'{{nombre_variable}}'}</code> en el prompt.
             </p>
           </div>
 
-          {/* Formulario para añadir */}
           <div className="flex gap-2">
             <input
               type="text"
@@ -90,7 +89,7 @@ export default function UserVariablesPanel({ variables: propVars, initialVariabl
             <button
               onClick={handleAdd}
               disabled={loading || !newName.trim()}
-              className="btn-primary text-sm disabled:opacity-50"
+              className="btn-primary text-sm disabled:opacity-50 flex items-center gap-1.5"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -99,16 +98,13 @@ export default function UserVariablesPanel({ variables: propVars, initialVariabl
             </button>
           </div>
 
-          {/* Lista de variables */}
           {variables.length > 0 ? (
             <div className="space-y-2">
               {variables.map(v => (
                 <div
                   key={v.id}
                   className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
-                    justAdded === v.id
-                      ? 'bg-green-50 border-green-200 scale-[1.01]'
-                      : 'bg-gray-50 border-gray-100'
+                    justAdded === v.id ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-100'
                   }`}
                 >
                   <code className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded font-mono flex-shrink-0">
@@ -118,7 +114,7 @@ export default function UserVariablesPanel({ variables: propVars, initialVariabl
                     {v.default_value || <span className="text-gray-400 italic">Sin valor por defecto</span>}
                   </span>
                   {justAdded === v.id && (
-                    <span className="text-xs text-green-600 font-medium shrink-0">✓ Añadida</span>
+                    <span className="text-xs text-green-600 font-medium shrink-0">&#10003; Añadida</span>
                   )}
                   <button onClick={() => handleDelete(v.id)} className="p-1 text-gray-400 hover:text-red-500 rounded shrink-0">
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -129,17 +125,17 @@ export default function UserVariablesPanel({ variables: propVars, initialVariabl
               ))}
             </div>
           ) : (
-            /* Estado vacío mejorado */
             <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-5 text-center">
-              <span className="text-2xl mb-2 block">📌</span>
+              <div className="text-2xl mb-2">&#128204;</div>
               <p className="text-sm font-medium text-gray-700 mb-1">Aún no tienes variables guardadas</p>
-              <p className="text-xs text-gray-400 mb-3">Las variables te permiten reutilizar valores entre proyectos sin tener que escribirlos cada vez.</p>
+              <p className="text-xs text-gray-400 mb-3">
+                Las variables te permiten reutilizar valores entre proyectos sin escribirlos cada vez.
+              </p>
               <div className="inline-flex items-center gap-2 bg-white border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-700">
                 <code className="font-mono">{'{{empresa}}'}</code>
-                <span className="text-gray-400">→</span>
+                <span className="text-gray-400">&#8594;</span>
                 <span>Anthropic</span>
               </div>
-              <p className="text-xs text-gray-400 mt-2">Ejemplo: define <code className="font-mono">empresa</code> con valor <em>Anthropic</em> y se rellenará automáticamente en todos tus prompts.</p>
             </div>
           )}
         </div>
