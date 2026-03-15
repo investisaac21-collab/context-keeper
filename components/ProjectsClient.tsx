@@ -38,13 +38,13 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
     return projects.filter(p => {
       const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
         p.context?.toLowerCase().includes(search.toLowerCase())
-      const matchTag = filterTag ? p.tag === filterTag : true
+      const matchTag = filterTag ? (p.tag === filterTag || p.category === filterTag) : true
       return matchSearch && matchTag
     })
   }, [projects, search, filterTag])
 
   const allTags = useMemo(() => {
-    const tags = projects.map(p => p.tag).filter(Boolean) as string[]
+    const tags = projects.map(p => p.tag || p.category).filter(Boolean) as string[]
     return [...new Set(tags)]
   }, [projects])
 
@@ -78,10 +78,19 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   }
 
   async function handleDuplicate(project: Project) {
-    if (isFreeLimitReached) { alert('Has alcanzado el limite del plan Free. Actualiza a Pro para duplicar proyectos.'); return }
+    if (isFreeLimitReached) {
+      alert('Has alcanzado el límite del plan Free. Actualiza a Pro para duplicar proyectos.')
+      return
+    }
     const { data: created } = await supabase
       .from('projects')
-      .insert({ name: project.name + ' (copia)', context: project.context, tag: project.tag, user_id: userId })
+      .insert({
+        name: project.name + ' (copia)',
+        context: project.context,
+        tag: project.tag,
+        category: project.category,
+        user_id: userId
+      })
       .select()
       .single()
     if (created) setProjects(prev => [created, ...prev])
@@ -103,15 +112,24 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
       const text = await file.text()
       const imported = JSON.parse(text) as Project[]
       for (const p of imported) {
-        await supabase.from('projects').insert({ name: p.name, context: p.context, tag: p.tag, user_id: userId })
+        await supabase.from('projects').insert({
+          name: p.name,
+          context: p.context,
+          tag: p.tag,
+          category: p.category,
+          user_id: userId
+        })
       }
       window.location.reload()
-    } catch { alert('Error al importar') }
+    } catch {
+      alert('Error al importar')
+    }
   }
 
-  return (
-    <div className="space-y-6">
+  const progressPercent = isPro ? 100 : Math.min((projects.length / FREE_LIMIT) * 100, 100)
 
+  return (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
       {/* HEADER */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
@@ -130,7 +148,10 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           </div>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <button onClick={handleExport} className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition">
+          <button
+            onClick={handleExport}
+            className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition"
+          >
             Exportar JSON
           </button>
           <label className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition cursor-pointer">
@@ -151,39 +172,55 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       </div>
 
-      {/* BANNER LIMITE ALCANZADO */}
+      {/* BANNER LÍMITE ALCANZADO */}
       {isFreeLimitReached && (
-        <div className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 p-4 text-white shadow-md">
+        <div className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 p-5 text-white shadow-md">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <p className="font-semibold text-sm">Has alcanzado el limite del plan Free</p>
-              <p className="text-xs text-indigo-100 mt-0.5">
+              <p className="font-bold text-base">Has alcanzado el límite del plan Free</p>
+              <p className="text-sm text-indigo-100 mt-1">
                 Actualiza a Pro para desbloquear proyectos ilimitados, historial de versiones y variables globales
               </p>
             </div>
-            <a href="/pricing" className="shrink-0 bg-white text-indigo-700 font-semibold text-xs px-4 py-2 rounded-lg hover:bg-indigo-50 transition whitespace-nowrap">
-              Hazte Pro &mdash; 9 &euro;/mes
+            <a
+              href="/pricing"
+              className="shrink-0 bg-white text-indigo-700 font-semibold text-sm px-5 py-2 rounded-lg hover:bg-indigo-50 transition whitespace-nowrap shadow-sm"
+            >
+              Hazte Pro — 9 €/mes
             </a>
           </div>
-          <div className="mt-3">
+          <div className="mt-4">
             <div className="h-1.5 bg-indigo-400/40 rounded-full overflow-hidden">
               <div className="h-full bg-white rounded-full w-full" />
             </div>
-            <span className="text-xs text-indigo-200 mt-1 block">{projects.length}/{FREE_LIMIT} proyectos &mdash; limite alcanzado</span>
+            <span className="text-xs text-indigo-200 mt-1.5 block">{projects.length}/{FREE_LIMIT} proyectos — límite alcanzado</span>
           </div>
         </div>
       )}
 
-      {/* BARRA PROGRESO */}
+      {/* BARRA DE PROGRESO (cuando no se ha alcanzado el límite) */}
       {!isPro && !isFreeLimitReached && (
-        <div className="rounded-xl border border-gray-200 bg-white p-3">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs text-gray-500">{projects.length} de {FREE_LIMIT} proyectos usados</span>
-            <a href="/pricing" className="text-xs text-indigo-600 hover:underline font-medium">Ver planes</a>
+        <div className="rounded-xl border border-gray-200 bg-white p-3.5">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs text-gray-500">
+              {projects.length} de {FREE_LIMIT} proyectos usados
+            </span>
+            <a href="/pricing" className="text-xs text-indigo-600 hover:underline font-medium">
+              Ver planes
+            </a>
           </div>
           <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full bg-indigo-500 rounded-full transition-all" style={{ width: (projects.length / FREE_LIMIT * 100) + '%' }} />
+            <div
+              className="h-full bg-indigo-500 rounded-full transition-all"
+              style={{ width: progressPercent + '%' }}
+            />
           </div>
+          {projects.length === FREE_LIMIT - 1 && (
+            <p className="text-xs text-amber-600 mt-1.5">
+              ⚠️ Te queda 1 proyecto disponible en el plan Free.{' '}
+              <a href="/pricing" className="underline font-medium">Hazte Pro</a> para proyectos ilimitados.
+            </p>
+          )}
         </div>
       )}
 
@@ -193,26 +230,30 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Disponible en Pro</p>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {[
-              { icon: '\uD83D\uDCDA', label: 'Historial de versiones' },
-              { icon: '\uD83C\uDF10', label: 'Variables globales' },
-              { icon: '\uD83D\uDCCB', label: 'Duplicado avanzado' },
-              { icon: '\uD83D\uDCE4', label: 'Exportacion avanzada' },
+              { icon: '📚', label: 'Historial de versiones' },
+              { icon: '🌐', label: 'Variables globales' },
+              { icon: '📋', label: 'Duplicado avanzado' },
+              { icon: '📤', label: 'Exportación avanzada' },
             ].map(f => (
-              <a key={f.label} href="/pricing" className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2 hover:border-indigo-300 hover:bg-indigo-50/30 transition group">
+              <a
+                key={f.label}
+                href="/pricing"
+                className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2 hover:border-indigo-300 hover:bg-indigo-50/30 transition group"
+              >
                 <span className="text-sm">{f.icon}</span>
                 <span className="text-xs text-gray-500 group-hover:text-indigo-600 flex-1 leading-tight">{f.label}</span>
-                <span className="text-gray-300 text-xs">&#128274;</span>
+                <span className="text-gray-300 text-xs">🔒</span>
               </a>
             ))}
           </div>
         </div>
       )}
 
-      {/* TEMPLATES */}
+      {/* PLANTILLAS (solo si no hay proyectos) */}
       {projects.length === 0 && !showModal && (
         <div className="rounded-xl border border-gray-200 bg-white p-5">
           <h2 className="font-semibold text-gray-900 mb-1">Empieza con una plantilla</h2>
-          <p className="text-sm text-gray-500 mb-4">Elige una plantilla para crear tu primer proyecto rapidamente.</p>
+          <p className="text-sm text-gray-500 mb-4">Elige una plantilla para crear tu primer proyecto rápidamente.</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {TEMPLATES.map(t => (
               <button
@@ -221,14 +262,14 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
                 className="text-left border border-gray-200 rounded-xl p-4 hover:border-indigo-300 hover:bg-indigo-50/30 transition"
               >
                 <p className="font-medium text-sm text-gray-900">{t.name}</p>
-                <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{t.context?.slice(0,80)}...</p>
+                <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{t.context?.slice(0, 80)}...</p>
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {/* BUSQUEDA Y FILTROS */}
+      {/* BÚSQUEDA Y FILTROS */}
       {projects.length > 0 && (
         <div className="flex flex-col sm:flex-row gap-2">
           <input
@@ -243,13 +284,13 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             onChange={e => setFilterTag(e.target.value)}
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
           >
-            <option value="">Todas las categorias</option>
+            <option value="">Todas las categorías</option>
             {allTags.map(tag => <option key={tag} value={tag}>{tag}</option>)}
           </select>
         </div>
       )}
 
-      {/* GRID PROYECTOS */}
+      {/* GRID DE PROYECTOS */}
       {filtered.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map(project => (
@@ -267,8 +308,11 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       ) : projects.length > 0 ? (
         <div className="text-center py-12 text-gray-400">
-          <p className="text-lg mb-1">&#128269;</p>
+          <p className="text-lg mb-1">🔍</p>
           <p className="text-sm">No se encontraron proyectos con ese filtro.</p>
+          <button onClick={() => { setSearch(''); setFilterTag('') }} className="text-xs text-indigo-600 hover:underline mt-2">
+            Limpiar filtros
+          </button>
         </div>
       ) : null}
 
@@ -282,6 +326,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           loading={loading}
         />
       )}
+
       {historyProject && (
         <HistoryModal
           project={historyProject}
@@ -296,7 +341,6 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         userId={userId}
         plan={plan}
       />
-
     </div>
   )
 }
