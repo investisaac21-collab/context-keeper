@@ -38,7 +38,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
 
   const filtered = useMemo(() => {
     return projects.filter(p => {
-      const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.context.toLowerCase().includes(search.toLowerCase())
+      const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || (p.context || '').toLowerCase().includes(search.toLowerCase())
       const matchTag = !filterTag || p.tag === filterTag
       return matchSearch && matchTag
     })
