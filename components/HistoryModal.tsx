@@ -1,71 +1,99 @@
 'use client'
-import type { ProjectVersion } from '@/lib/types'
+import { useState, useEffect } from 'react'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import type { Project, ProjectVersion } from '@/lib/types'
 
 interface Props {
-  versions: ProjectVersion[]
-  onRollback: (version: ProjectVersion) => void
+  project: Project
   onClose: () => void
-  loading: boolean
+  plan?: string
+  // legacy props kept for compatibility
+  versions?: ProjectVersion[]
+  onRollback?: (version: ProjectVersion) => void
+  loading?: boolean
 }
 
-export default function HistoryModal({ versions, onRollback, onClose, loading }: Props) {
+export default function HistoryModal({ project, onClose, plan = 'free', versions: initialVersions, onRollback, loading: externalLoading }: Props) {
+  const isPro = plan === 'pro' || plan === 'team'
+  const [versions, setVersions] = useState<ProjectVersion[]>(initialVersions || [])
+  const [loading, setLoading] = useState(false)
+  const supabase = createClientComponentClient()
+
+  useEffect(() => {
+    if (!isPro || !project?.id) return
+    setLoading(true)
+    supabase
+      .from('project_versions')
+      .select('*')
+      .eq('project_id', project.id)
+      .order('version_number', { ascending: false })
+      .then(({ data }) => {
+        setVersions(data || [])
+        setLoading(false)
+      })
+  }, [project?.id, isPro])
+
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr)
     return d.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
     })
   }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col">
-        <div className="flex items-center justify-between p-5 border-b">
-          <h2 className="text-lg font-semibold text-gray-900">Historial de versiones</h2>
-          <button
-            onClick={onClose}
-            className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+        <div className="flex items-center justify-between p-5 border-b border-gray-100">
+          <h2 className="font-bold text-gray-900 text-lg">Historial de versiones</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl font-bold">&#10005;</button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5">
-          {loading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-            </div>
-          ) : versions.length === 0 ? (
-            <p className="text-center text-gray-500 py-8">No hay versiones guardadas</p>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {versions.map((v: ProjectVersion) => (
-                <div key={v.id} className="border border-gray-200 rounded-xl p-4 hover:border-indigo-300 transition-colors">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-indigo-600">v{v.version_number}</span>
-                        <span className="text-xs text-gray-400 ml-auto">{formatDate(v.created_at)}</span>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1 line-clamp-2">{v.context}</p>
-                    </div>
-                    <button
-                      onClick={() => onRollback(v)}
-                      className="shrink-0 px-3 py-1.5 text-xs font-medium text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors"
-                    >
-                      Restaurar
-                    </button>
-                  </div>
+        {!isPro ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+            <span className="text-4xl mb-4">&#128274;</span>
+            <h3 className="font-bold text-gray-900 text-lg mb-2">Historial disponible en Pro</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Accede al historial de versiones, compara cambios y restaura versiones anteriores con el plan Pro.
+            </p>
+            <a
+              href="/pricing"
+              className="bg-indigo-600 text-white font-semibold px-6 py-2.5 rounded-xl hover:bg-indigo-700 transition text-sm"
+            >
+              Desbloquear con Pro &mdash; 9 &euro;/mes
+            </a>
+          </div>
+        ) : loading ? (
+          <div className="flex-1 flex items-center justify-center p-8">
+            <p className="text-sm text-gray-400">Cargando historial...</p>
+          </div>
+        ) : versions.length === 0 ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+            <span className="text-3xl mb-3">&#128196;</span>
+            <p className="text-sm text-gray-500">Aun no hay versiones guardadas para este proyecto.</p>
+            <p className="text-xs text-gray-400 mt-1">Las versiones se guardan automaticamente al editar.</p>
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {versions.map(v => (
+              <div key={v.id} className="border border-gray-200 rounded-xl p-4 hover:border-indigo-300 transition">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-sm text-gray-900">Version {v.version_number}</span>
+                  <span className="text-xs text-gray-400">{formatDate(v.created_at)}</span>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                <p className="text-xs text-gray-500 line-clamp-2">{v.context}</p>
+                {onRollback && (
+                  <button
+                    onClick={() => { onRollback(v); onClose(); }}
+                    className="mt-2 text-xs text-indigo-600 hover:underline font-medium"
+                  >
+                    Restaurar esta version
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
