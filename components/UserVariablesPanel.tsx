@@ -6,14 +6,13 @@ import type { UserVariable } from '@/lib/types'
 interface Props {
   variables?: UserVariable[]
   initialVariables?: UserVariable[]
-  setVariables?: (vars: UserVariable[]) => void
+  setVariables?: React.Dispatch<React.SetStateAction<UserVariable[]>>
   userId: string
   plan?: string
 }
 
 export default function UserVariablesPanel({ variables: propVars, initialVariables, setVariables: setPropVars, userId, plan = 'free' }: Props) {
-  const [variables, setVariablesLocal] = useState<UserVariable[]>(propVars || initialVariables || [])
-  const setVariables = (vars: UserVariable[]) => { setVariablesLocal(vars); if (setPropVars) setPropVars(vars); }
+  const [variables, setVariables] = useState<UserVariable[]>(propVars || initialVariables || [])
   const [newName, setNewName] = useState('')
   const [newDefault, setNewDefault] = useState('')
   const [loading, setLoading] = useState(false)
