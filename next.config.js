@@ -8,5 +8,5 @@ const nextConfig = {
   },
 }
 
-// built with AI support
+// built with AI + Groq support v2
 module.exports = nextConfig
