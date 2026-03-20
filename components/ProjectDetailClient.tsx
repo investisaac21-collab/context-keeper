@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import type { Project } from '@/lib/types'
@@ -14,6 +14,11 @@ function extractVariables(text: string): string[] {
 
 function fillVariables(text: string, vars: Record<string, string>): string {
   return text.replace(/\{\{(\w+)\}\}/g, (_: string, key: string) => vars[key] || '{{' + key + '}}')
+}
+
+interface ChatMessage {
+  role: 'user' | 'assistant'
+  content: string
 }
 
 interface Props {
@@ -33,11 +38,34 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
   const [copied, setCopied] = useState(false)
   const [loading, setLoading] = useState(false)
 
+  // Chat refinamiento
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
+  const [chatInput, setChatInput] = useState('')
+  const [chatLoading, setChatLoading] = useState(false)
+  const [chatError, setChatError] = useState('')
+  const [showChat, setShowChat] = useState(false)
+  const [refinedPreview, setRefinedPreview] = useState('')
+  const chatEndRef = useRef<HTMLDivElement>(null)
+
+  // Toast global
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
+
   const isPro = plan === 'pro' || plan === 'team'
   const planLabel = plan === 'team' ? 'Team' : plan === 'pro' ? 'Pro' : 'Free'
   const detectedVars = extractVariables(project.context || '')
   const missingVars = detectedVars.filter(v => !varValues[v])
   const previewText = fillVariables(project.context || '', varValues)
+
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [chatMessages])
+
+  function showToast(msg: string, type: 'success' | 'error' = 'success') {
+    setToast({ msg, type })
+    setTimeout(() => setToast(null), 3000)
+  }
 
   async function saveVersion(context: string) {
     if (!isPro) return
@@ -59,7 +87,6 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
 
   async function handleSave(data: Partial<Project>) {
     setLoading(true)
-    // Guardar versión anterior antes de editar
     if (project.context) {
       await saveVersion(project.context)
     }
@@ -72,6 +99,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
     if (updated) setProject(updated)
     setLoading(false)
     setShowEdit(false)
+    showToast('Proyecto guardado correctamente')
   }
 
   async function handleDuplicate() {
@@ -85,11 +113,14 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
       })
       .select()
       .single()
-    if (created) router.push('/dashboard')
+    if (created) {
+      showToast('Proyecto duplicado')
+      router.push('/dashboard')
+    }
   }
 
   async function handleDelete() {
-    if (!confirm('Â¿Seguro que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) return
+    if (!confirm('¿Seguro que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) return
     await supabase.from('projects').delete().eq('id', project.id)
     router.push('/dashboard')
   }
@@ -97,7 +128,59 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
   function handleCopy() {
     navigator.clipboard.writeText(previewText)
     setCopied(true)
+    showToast('¡Prompt copiado al portapapeles!')
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  async function handleChatSend() {
+    if (!chatInput.trim() || chatLoading) return
+    const instruction = chatInput.trim()
+    setChatInput('')
+    setChatError('')
+
+    const newMessages: ChatMessage[] = [...chatMessages, { role: 'user', content: instruction }]
+    setChatMessages(newMessages)
+    setChatLoading(true)
+
+    try {
+      const res = await fetch('/api/refine-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPrompt: refinedPreview || project.context,
+          instruction,
+        }),
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+
+      setRefinedPreview(data.refined)
+      setChatMessages([...newMessages, { role: 'assistant', content: data.refined }])
+    } catch (err) {
+      setChatError('Error al refinar: ' + String(err))
+    } finally {
+      setChatLoading(false)
+    }
+  }
+
+  async function handleApplyRefined() {
+    if (!refinedPreview) return
+    setLoading(true)
+    if (project.context) await saveVersion(project.context)
+    const { data: updated } = await supabase
+      .from('projects')
+      .update({ context: refinedPreview, updated_at: new Date().toISOString() })
+      .eq('id', project.id)
+      .select()
+      .single()
+    if (updated) {
+      setProject(updated)
+      setRefinedPreview('')
+      setChatMessages([])
+      setShowChat(false)
+      showToast('¡Prompt actualizado con el refinamiento de IA!')
+    }
+    setLoading(false)
   }
 
   const categoryColors: Record<string, string> = {
@@ -121,6 +204,18 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar userEmail={userEmail} plan={plan} />
+
+      {/* Toast global */}
+      {toast && (
+        <div className={`fixed top-5 right-5 z-[100] px-5 py-3 rounded-xl shadow-lg text-sm font-medium transition-all ${
+          toast.type === 'success'
+            ? 'bg-green-600 text-white'
+            : 'bg-red-600 text-white'
+        }`}>
+          {toast.type === 'success' ? '&#10003; ' : '&#9888; '}{toast.msg}
+        </div>
+      )}
+
       <div className="max-w-3xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
@@ -197,7 +292,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
         {detectedVars.length === 0 && project.context && (
           <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-4 mb-4 text-center">
             <p className="text-sm text-gray-400 italic">
-              Sin variables dinámicas. Añade <code className="font-mono bg-gray-100 px-1 rounded text-xs">{{nombre}}</code> al contexto para personalizar el prompt.
+              Sin variables dinámicas. Añade <code className="font-mono bg-gray-100 px-1 rounded text-xs">{'{{'+'nombre'+'}}'}</code> al contexto para personalizar el prompt.
             </p>
           </div>
         )}
@@ -242,7 +337,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
                 copied ? 'bg-green-100 text-green-700' : 'bg-indigo-600 text-white hover:bg-indigo-700'
               }`}
             >
-              {copied ? '&#10003; Copiado' : 'Copiar contexto'}
+              {copied ? '&#10003; Copiado' : 'Copiar'}
             </button>
           </div>
           <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm text-gray-700 whitespace-pre-wrap font-mono leading-relaxed max-h-96 overflow-y-auto">
@@ -250,6 +345,145 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
               <span className="text-gray-400 italic">Este proyecto no tiene contenido aún.</span>
             )}
           </div>
+        </div>
+
+        {/* CHAT DE REFINAMIENTO IA */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm mb-4 overflow-hidden">
+          <button
+            onClick={() => { if (isPro) setShowChat(!showChat) }}
+            className={`w-full flex items-center justify-between p-5 transition ${
+              isPro ? 'hover:bg-gray-50 cursor-pointer' : 'cursor-default'
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                isPro ? 'bg-gradient-to-br from-indigo-500 to-purple-600' : 'bg-gray-100'
+              }`}>
+                <span className="text-sm">&#129302;</span>
+              </div>
+              <div className="text-left">
+                <p className={`font-semibold text-sm ${isPro ? 'text-gray-900' : 'text-gray-400'}`}>
+                  Refinar con IA
+                  {!isPro && <span className="ml-2 text-gray-300">&#128274;</span>}
+                </p>
+                <p className={`text-xs ${isPro ? 'text-gray-500' : 'text-gray-300'}`}>
+                  {isPro ? 'Dile a la IA cómo mejorar este prompt' : 'Disponible en plan Pro'}
+                </p>
+              </div>
+            </div>
+            {isPro && (
+              <span className="text-gray-400 text-lg">{showChat ? '&#8964;' : '&#8963;'}</span>
+            )}
+            {!isPro && (
+              <a
+                href="/pricing"
+                onClick={e => e.stopPropagation()}
+                className="text-xs bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-3 py-1.5 rounded-lg font-medium hover:opacity-90 transition"
+              >
+                Hazte Pro
+              </a>
+            )}
+          </button>
+
+          {isPro && showChat && (
+            <div className="border-t border-gray-100">
+              {/* Mensajes del chat */}
+              <div className="max-h-80 overflow-y-auto p-4 flex flex-col gap-3 bg-gray-50/50">
+                {chatMessages.length === 0 && (
+                  <div className="text-center py-6">
+                    <p className="text-sm text-gray-400 mb-3">Dile a la IA cómo quieres mejorar el prompt</p>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      {[
+                        'Házlo más formal',
+                        'Házlo más corto',
+                        'Añade más detalle',
+                        'Cambia el tono a amigable',
+                        'Añade instrucciones de formato',
+                      ].map(s => (
+                        <button
+                          key={s}
+                          onClick={() => setChatInput(s)}
+                          className="text-xs bg-white border border-gray-200 rounded-full px-3 py-1 text-gray-600 hover:border-indigo-300 hover:text-indigo-600 transition"
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {chatMessages.map((msg, i) => (
+                  <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
+                      msg.role === 'user'
+                        ? 'bg-indigo-600 text-white rounded-br-sm'
+                        : 'bg-white border border-gray-200 text-gray-800 rounded-bl-sm shadow-sm'
+                    }`}>
+                      {msg.role === 'assistant' ? (
+                        <div>
+                          <p className="text-xs text-indigo-500 font-medium mb-1.5">Prompt refinado:</p>
+                          <p className="whitespace-pre-wrap font-mono text-xs leading-relaxed">{msg.content}</p>
+                        </div>
+                      ) : (
+                        msg.content
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {chatLoading && (
+                  <div className="flex justify-start">
+                    <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
+                      <div className="flex gap-1 items-center">
+                        <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {chatError && (
+                  <p className="text-xs text-red-500 text-center">{chatError}</p>
+                )}
+                <div ref={chatEndRef} />
+              </div>
+
+              {/* Input del chat */}
+              <div className="p-4 border-t border-gray-100 bg-white">
+                {refinedPreview && (
+                  <div className="mb-3 p-3 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between gap-3">
+                    <p className="text-xs text-indigo-700 font-medium">
+                      &#10003; Tienes un prompt refinado listo para guardar
+                    </p>
+                    <button
+                      onClick={handleApplyRefined}
+                      disabled={loading}
+                      className="shrink-0 text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition font-medium"
+                    >
+                      {loading ? 'Guardando...' : 'Aplicar y guardar'}
+                    </button>
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={chatInput}
+                    onChange={e => setChatInput(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleChatSend()}
+                    placeholder="Ej: Házlo más formal, añade contexto sobre..."
+                    disabled={chatLoading}
+                    className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 disabled:opacity-50"
+                  />
+                  <button
+                    onClick={handleChatSend}
+                    disabled={chatLoading || !chatInput.trim()}
+                    className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2.5 rounded-xl font-medium text-sm hover:opacity-90 transition disabled:opacity-40"
+                  >
+                    &#10148;
+                  </button>
+                </div>
+                <p className="text-xs text-gray-400 mt-2">Enter para enviar &bull; Solo plan Pro</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
