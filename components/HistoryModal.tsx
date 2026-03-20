@@ -21,6 +21,7 @@ export default function HistoryModal({ project, onClose, plan = 'free', versions
 
   useEffect(() => {
     if (!isPro || !project?.id) return
+    let cancelled = false
     setLoading(true)
     supabase
       .from('project_versions')
@@ -28,9 +29,12 @@ export default function HistoryModal({ project, onClose, plan = 'free', versions
       .eq('project_id', project.id)
       .order('version_number', { ascending: false })
       .then(({ data }) => {
-        setVersions(data || [])
-        setLoading(false)
+        if (!cancelled) {
+          setVersions(data || [])
+          setLoading(false)
+        }
       })
+    return () => { cancelled = true }
   }, [project?.id, isPro])
 
   const formatDate = (dateStr: string) => {
