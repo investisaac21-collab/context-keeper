@@ -488,7 +488,16 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
       </div>
 
       {showHistory && (
-        <HistoryModal project={project} onClose={() => setShowHistory(false)} plan={plan} />
+        <HistoryModal
+          project={project}
+          onClose={() => setShowHistory(false)}
+          plan={plan}
+          onRestored={(updated) => {
+            setProject(updated)
+            setShowHistory(false)
+            showToast('\u00a1Versi\u00f3n restaurada correctamente!')
+          }}
+        />
       )}
       {showEdit && (
         <ProjectModal
