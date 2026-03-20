@@ -89,7 +89,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
   }
 
   async function handleDelete() {
-    if (!confirm('¿Seguro que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) return
+    if (!confirm('Â¿Seguro que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) return
     await supabase.from('projects').delete().eq('id', project.id)
     router.push('/dashboard')
   }
@@ -150,7 +150,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
               </div>
               {project.updated_at && (
                 <p className="text-xs text-gray-400">
-                  ÃÂÃÂltima edición:{' '}
+                  Última edición:{' '}
                   {new Date(project.updated_at).toLocaleDateString('es-ES', {
                     day: '2-digit', month: '2-digit', year: 'numeric',
                     hour: '2-digit', minute: '2-digit',
