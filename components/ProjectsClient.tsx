@@ -99,7 +99,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('¿Seguro que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) return
+    if (!confirm('Â¿Seguro que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) return
     const { error } = await supabase.from('projects').delete().eq('id', id)
     if (!error) setProjects(prev => prev.filter(p => p.id !== id))
   }
@@ -207,7 +207,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       </div>
 
-      {/* BANNER LÃÂÃÂMITE ALCANZADO */}
+      {/* BANNER LÃÂÂMITE ALCANZADO */}
       {isFreeLimitReached && (
         <div className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 p-5 text-white shadow-md">
           <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -323,7 +323,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       )}
 
-      {/* BÃÂÃÂSQL Y FILTROS */}
+      {/* BÚSQL Y FILTROS */}
       {projects.length > 0 && (
         <div className="flex flex-col sm:flex-row gap-2">
           <input
