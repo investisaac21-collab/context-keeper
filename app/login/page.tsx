@@ -56,7 +56,7 @@ export default function LoginPage() {
           <div className="space-y-4">
             {[
               { icon: '&#128196;', title: 'Prompts organizados', desc: 'Guarda todos tus prompts en un solo lugar' },
-              { icon: '&#9889;', title: 'Variables din&aacute;micas', desc: 'Usa {{nombre}} para personalizar instant&aacute;neamente' },
+              { icon: '&#9889;', title: 'Variables dinámicas', desc: 'Usa {{nombre}} para personalizar instantáneamente' },
               { icon: '&#129504;', title: 'Genera con IA', desc: 'Describe lo que necesitas y la IA lo crea por ti' },
             ].map((f, i) => (
               <div key={i} className="flex items-start gap-4">
@@ -64,7 +64,7 @@ export default function LoginPage() {
                   dangerouslySetInnerHTML={{__html: f.icon}} />
                 <div>
                   <div className="text-white font-medium text-sm">{f.title}</div>
-                  <div className="text-slate-400 text-sm" dangerouslySetInnerHTML={{__html: f.desc}} />
+                  <div className="text-slate-400 text-sm">{f.desc}</div>
                 </div>
               </div>
             ))}
@@ -113,12 +113,12 @@ export default function LoginPage() {
               <div className="grid grid-cols-3 gap-3 text-center">
                 {[
                   { num: '100%', label: 'Gratis para empezar' },
-                  { num: '1-click', label: 'Copia instant&aacute;nea' },
-                  { num: 'IA', label: 'Generaci&oacute;n autom&aacute;tica' },
+                  { num: '1-click', label: 'Copia instantánea' },
+                  { num: 'IA', label: 'Generación automática' },
                 ].map((s, i) => (
                   <div key={i}>
                     <div className="text-white font-bold text-lg">{s.num}</div>
-                    <div className="text-slate-500 text-xs leading-tight" dangerouslySetInnerHTML={{__html: s.label}} />
+                    <div className="text-slate-500 text-xs leading-tight">{s.label}</div>
                   </div>
                 ))}
               </div>
