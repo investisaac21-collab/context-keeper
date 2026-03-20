@@ -151,7 +151,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
               </div>
               {project.updated_at && (
                 <p className="text-xs text-gray-400">
-                  Última edición:{' '}
+                  Ãltima ediciÃ³n:{' '}
                   {new Date(project.updated_at).toLocaleDateString('es-ES', {
                     day: '2-digit', month: '2-digit', year: 'numeric',
                     hour: '2-digit', minute: '2-digit',
@@ -160,6 +160,12 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
               )}
             </div>
             <div className="flex gap-2 flex-wrap">
+              <a
+                href="/dashboard"
+                className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition flex items-center gap-1"
+              >
+                &#8592; Dashboard
+              </a>
               <button
                 onClick={() => setShowHistory(true)}
                 className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition flex items-center gap-1"
@@ -189,6 +195,13 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
         </div>
 
         {/* Variables detectadas */}
+        {detectedVars.length === 0 && project.context && (
+          <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-4 mb-4 text-center">
+            <p className="text-sm text-gray-400 italic">
+              Sin variables dinámicas. Añade <code className="font-mono bg-gray-100 px-1 rounded text-xs">{{nombre}}</code> al contexto para personalizar el prompt.
+            </p>
+          </div>
+        )}
         {detectedVars.length > 0 && (
           <div className="bg-white rounded-2xl border border-gray-200 p-5 mb-4 shadow-sm">
             <h2 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
@@ -214,7 +227,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
             {missingVars.length > 0 && (
               <p className="text-xs text-amber-600 mt-3 flex items-center gap-1">
                 &#9888; {missingVars.length} variable{missingVars.length !== 1 ? 's' : ''} sin rellenar.
-                El prompt se copiará con los marcadores sin sustituir.
+                El prompt se copiarÃ¡ con los marcadores sin sustituir.
               </p>
             )}
           </div>
@@ -235,7 +248,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
           </div>
           <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm text-gray-700 whitespace-pre-wrap font-mono leading-relaxed max-h-96 overflow-y-auto">
             {previewText || (
-              <span className="text-gray-400 italic">Este proyecto no tiene contenido aún.</span>
+              <span className="text-gray-400 italic">Este proyecto no tiene contenido aÃºn.</span>
             )}
           </div>
         </div>
