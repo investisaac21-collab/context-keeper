@@ -89,7 +89,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
   }
 
   async function handleDelete() {
-    if (!confirm('¿Seguro que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) return
+    if (!confirm('Â¿Seguro que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) return
     await supabase.from('projects').delete().eq('id', project.id)
     router.push('/dashboard')
   }
@@ -150,7 +150,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
               </div>
               {project.updated_at && (
                 <p className="text-xs text-gray-400">
-                  Ãltima ediciÃ³n:{' '}
+                  ÃÂltima ediciÃÂ³n:{' '}
                   {new Date(project.updated_at).toLocaleDateString('es-ES', {
                     day: '2-digit', month: '2-digit', year: 'numeric',
                     hour: '2-digit', minute: '2-digit',
@@ -226,7 +226,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
             {missingVars.length > 0 && (
               <p className="text-xs text-amber-600 mt-3 flex items-center gap-1">
                 &#9888; {missingVars.length} variable{missingVars.length !== 1 ? 's' : ''} sin rellenar.
-                El prompt se copiarÃ¡ con los marcadores sin sustituir.
+                El prompt se copiarÃÂ¡ con los marcadores sin sustituir.
               </p>
             )}
           </div>
@@ -247,7 +247,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
           </div>
           <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm text-gray-700 whitespace-pre-wrap font-mono leading-relaxed max-h-96 overflow-y-auto">
             {previewText || (
-              <span className="text-gray-400 italic">Este proyecto no tiene contenido aÃºn.</span>
+              <span className="text-gray-400 italic">Este proyecto no tiene contenido aÃÂºn.</span>
             )}
           </div>
         </div>
