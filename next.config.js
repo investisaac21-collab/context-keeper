@@ -8,4 +8,5 @@ const nextConfig = {
   },
 }
 
+// built with AI support
 module.exports = nextConfig
