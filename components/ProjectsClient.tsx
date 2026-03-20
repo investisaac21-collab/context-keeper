@@ -35,10 +35,16 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   const [hasPreview, setHasPreview] = useState(false)
   const [showVariablesPanel, setShowVariablesPanel] = useState(false)
   const [onboardingVisible, setOnboardingVisible] = useState(true)
+  const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
 
   const supabase = createClientComponentClient()
 
   const isFreeLimitReached = !isPro && projects.length >= FREE_LIMIT
+
+  function showToast(msg: string, type: 'success' | 'error' = 'success') {
+    setToast({ msg, type })
+    setTimeout(() => setToast(null), 3000)
+  }
 
   const filtered = useMemo(() => {
     return projects.filter(p => {
@@ -83,14 +89,20 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         .eq('id', editingProject.id)
         .select()
         .single()
-      if (updated) setProjects(prev => prev.map(p => p.id === updated.id ? updated : p))
+      if (updated) {
+        setProjects(prev => prev.map(p => p.id === updated.id ? updated : p))
+        showToast('Proyecto actualizado')
+      }
     } else {
       const { data: created } = await supabase
         .from('projects')
         .insert({ ...data, user_id: userId })
         .select()
         .single()
-      if (created) setProjects(prev => [created, ...prev])
+      if (created) {
+        setProjects(prev => [created, ...prev])
+        showToast('¡Proyecto creado!')
+      }
     }
     setLoading(false)
     setShowModal(false)
@@ -99,14 +111,17 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Â¿Seguro que quieres eliminar este proyecto? Esta acciÃ³n no se puede deshacer.')) return
+    if (!confirm('¿Seguro que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) return
     const { error } = await supabase.from('projects').delete().eq('id', id)
-    if (!error) setProjects(prev => prev.filter(p => p.id !== id))
+    if (!error) {
+      setProjects(prev => prev.filter(p => p.id !== id))
+      showToast('Proyecto eliminado', 'error')
+    }
   }
 
   async function handleDuplicate(project: Project) {
     if (isFreeLimitReached) {
-      alert('Has alcanzado el lÃ­mite del plan Free. Actualiza a Pro para duplicar proyectos.')
+      showToast('Límite del plan Free alcanzado. Actualiza a Pro.', 'error')
       return
     }
     const { data: created } = await supabase
@@ -119,7 +134,10 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
       })
       .select()
       .single()
-    if (created) setProjects(prev => [created, ...prev])
+    if (created) {
+      setProjects(prev => [created, ...prev])
+      showToast('Proyecto duplicado')
+    }
   }
 
   function handleExport() {
@@ -129,6 +147,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
     a.href = url
     a.download = 'context-keeper-export.json'
     a.click()
+    showToast('Proyectos exportados')
   }
 
   async function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
@@ -145,9 +164,10 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           user_id: userId,
         })
       }
+      showToast('Proyectos importados')
       window.location.reload()
     } catch {
-      alert('Error al importar')
+      showToast('Error al importar', 'error')
     }
   }
 
@@ -157,14 +177,23 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
     { icon: '&#128218;', label: 'Historial de versiones' },
     { icon: '&#127760;', label: 'Variables globales' },
     { icon: '&#128203;', label: 'Duplicado avanzado' },
-    { icon: '&#128228;', label: 'ExportaciÃ³n avanzada' },
+    { icon: '&#128228;', label: 'Exportación avanzada' },
   ]
 
-  // Onboarding: mostrar si el usuario nunca ha tenido proyectos o es nuevo
   const showOnboarding = onboardingVisible && projects.length === 0
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+      {/* TOAST GLOBAL */}
+      {toast && (
+        <div className={`fixed top-5 right-5 z-[100] px-5 py-3 rounded-xl shadow-lg text-sm font-medium transition-all animate-in ${
+          toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+        }`}>
+          {toast.type === 'success' ? '&#10003; ' : '&#9888; '}{toast.msg}
+        </div>
+      )}
+
       {/* HEADER */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
@@ -207,12 +236,12 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       </div>
 
-      {/* BANNER LLÃMITE ALCANZADO */}
+      {/* BANNER LÍMITE ALCANZADO */}
       {isFreeLimitReached && (
         <div className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 p-5 text-white shadow-md">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <p className="font-bold text-base">Has alcanzado el lÃ­mite del plan Free</p>
+              <p className="font-bold text-base">Has alcanzado el límite del plan Free</p>
               <p className="text-sm text-indigo-100 mt-1">
                 Actualiza a Pro para desbloquear proyectos ilimitados, historial de versiones y variables globales
               </p>
@@ -229,7 +258,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
               <div className="h-full bg-white rounded-full w-full" />
             </div>
             <span className="text-xs text-indigo-200 mt-1.5 block">
-              {projects.length}/{FREE_LIMIT} proyectos &#8212; lÃ­mite alcanzado
+              {projects.length}/{FREE_LIMIT} proyectos &#8212; límite alcanzado
             </span>
           </div>
         </div>
@@ -277,8 +306,39 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         />
       )}
 
+      {/* EMPTY STATE MEJORADO */}
+      {projects.length === 0 && !showOnboarding && (
+        <div className="rounded-2xl border-2 border-dashed border-gray-200 bg-white p-12 text-center">
+          <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl">&#128196;</span>
+          </div>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">Crea tu primer prompt</h3>
+          <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
+            Organiza tus mejores prompts de IA, añade variables dinámicas y cópialos con un click cuando los necesites.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button
+              onClick={() => setShowModal(true)}
+              className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-medium text-sm hover:bg-indigo-700 transition"
+            >
+              + Crear mi primer proyecto
+            </button>
+            <button
+              onClick={() => {
+                const tmpl = TEMPLATES[0]
+                setTemplateData(tmpl)
+                setShowModal(true)
+              }}
+              className="border border-gray-200 text-gray-600 px-6 py-2.5 rounded-xl font-medium text-sm hover:bg-gray-50 transition"
+            >
+              Usar una plantilla
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* FUNCIONES PREMIUM BLOQUEADAS */}
-      {!isPro && (
+      {!isPro && projects.length > 0 && (
         <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50/50 p-4">
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
             Disponible en Pro
@@ -301,12 +361,12 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       )}
 
-      {/* PLANTILLAS (solo si no hay proyectos y no se muestra onboarding) */}
-      {projects.length === 0 && !showModal && (
+      {/* PLANTILLAS (solo si hay 0 proyectos y no hay empty state) */}
+      {projects.length === 0 && !showModal && showOnboarding && (
         <div className="rounded-xl border border-gray-200 bg-white p-5">
           <h2 className="font-semibold text-gray-900 mb-1">Empieza con una plantilla</h2>
           <p className="text-sm text-gray-500 mb-4">
-            Elige una plantilla para crear tu primer proyecto rÃ¡pidamente.
+            Elige una plantilla para crear tu primer proyecto rápidamente.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {TEMPLATES.map(t => (
@@ -323,7 +383,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       )}
 
-      {/* BUSQL Y FILTROS */}
+      {/* BÚSQL Y FILTROS */}
       {projects.length > 0 && (
         <div className="flex flex-col sm:flex-row gap-2">
           <input
@@ -338,7 +398,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             onChange={e => setFilterTag(e.target.value)}
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
           >
-            <option value="">Todas las categorÃ­as</option>
+            <option value="">Todas las categorías</option>
             {allTags.map(tag => <option key={tag} value={tag}>{tag}</option>)}
           </select>
         </div>
@@ -357,7 +417,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
               onHistory={() => setHistoryProject(project)}
               onDuplicate={() => handleDuplicate(project)}
               plan={plan}
-              onCopy={() => setHasCopied(true)}
+              onCopy={() => { setHasCopied(true); showToast('¡Prompt copiado!') }}
               onPreview={() => setHasPreview(true)}
             />
           ))}
