@@ -99,13 +99,14 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   }
 
   async function handleDelete(id: string) {
+    if (!confirm('¿Seguro que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) return
     const { error } = await supabase.from('projects').delete().eq('id', id)
     if (!error) setProjects(prev => prev.filter(p => p.id !== id))
   }
 
   async function handleDuplicate(project: Project) {
     if (isFreeLimitReached) {
-      alert('Has alcanzado el límite del plan Free. Actualiza a Pro para duplicar proyectos.')
+      alert('Has alcanzado el lÃ­mite del plan Free. Actualiza a Pro para duplicar proyectos.')
       return
     }
     const { data: created } = await supabase
@@ -158,7 +159,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
     { icon: '&#128218;', label: 'Historial de versiones' },
     { icon: '&#127760;', label: 'Variables globales' },
     { icon: '&#128203;', label: 'Duplicado avanzado' },
-    { icon: '&#128228;', label: 'Exportación avanzada' },
+    { icon: '&#128228;', label: 'ExportaciÃ³n avanzada' },
   ]
 
   // Onboarding: mostrar si el usuario nunca ha tenido proyectos o es nuevo
@@ -208,12 +209,12 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       </div>
 
-      {/* BANNER LÍMITE ALCANZADO */}
+      {/* BANNER LÃMITE ALCANZADO */}
       {isFreeLimitReached && (
         <div className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 p-5 text-white shadow-md">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <p className="font-bold text-base">Has alcanzado el límite del plan Free</p>
+              <p className="font-bold text-base">Has alcanzado el lÃ­mite del plan Free</p>
               <p className="text-sm text-indigo-100 mt-1">
                 Actualiza a Pro para desbloquear proyectos ilimitados, historial de versiones y variables globales
               </p>
@@ -230,7 +231,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
               <div className="h-full bg-white rounded-full w-full" />
             </div>
             <span className="text-xs text-indigo-200 mt-1.5 block">
-              {projects.length}/{FREE_LIMIT} proyectos &#8212; límite alcanzado
+              {projects.length}/{FREE_LIMIT} proyectos &#8212; lÃ­mite alcanzado
             </span>
           </div>
         </div>
@@ -307,7 +308,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         <div className="rounded-xl border border-gray-200 bg-white p-5">
           <h2 className="font-semibold text-gray-900 mb-1">Empieza con una plantilla</h2>
           <p className="text-sm text-gray-500 mb-4">
-            Elige una plantilla para crear tu primer proyecto rápidamente.
+            Elige una plantilla para crear tu primer proyecto rÃ¡pidamente.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {TEMPLATES.map(t => (
@@ -324,7 +325,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       )}
 
-      {/* BÚSQL Y FILTROS */}
+      {/* BÃSQL Y FILTROS */}
       {projects.length > 0 && (
         <div className="flex flex-col sm:flex-row gap-2">
           <input
@@ -339,7 +340,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             onChange={e => setFilterTag(e.target.value)}
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
           >
-            <option value="">Todas las categorías</option>
+            <option value="">Todas las categorÃ­as</option>
             {allTags.map(tag => <option key={tag} value={tag}>{tag}</option>)}
           </select>
         </div>
