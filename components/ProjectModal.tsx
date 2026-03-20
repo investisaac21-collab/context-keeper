@@ -75,7 +75,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
                 onClick={() => setShowTemplates(!showTemplates)}
                 className="text-sm text-sky-600 hover:text-sky-700 font-medium flex items-center gap-1"
               >
-                Usar plantilla predefinida {showTemplates ? 'â²' : 'â¼'}
+                Usar plantilla predefinida {showTemplates ? 'Ã¢ÂÂ²' : 'Ã¢ÂÂ¼'}
               </button>
               {showTemplates && (
                 <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -113,9 +113,9 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
             </div>
 
             <div>
-              <label className="label">CategorÃ­a</label>
+              <label className="label">CategorÃÂ­a</label>
               <select value={tag} onChange={e => setTag(e.target.value)} className="input">
-                <option value="">Sin categorÃ­a</option>
+                <option value="">Sin categorÃÂ­a</option>
                 {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
@@ -128,7 +128,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
                 value={context}
                 onChange={e => setContext(e.target.value)}
                 className="input min-h-[180px] resize-y font-mono text-sm"
-                placeholder="Escribe tu contexto... Usa {{variable}} para valores dinÃ¡micos"
+                placeholder="Escribe tu contexto... Usa {{variable}} para valores dinÃÂ¡micos"
                 required
               />
               {variables.length > 0 && (
