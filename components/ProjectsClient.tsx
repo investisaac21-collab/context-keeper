@@ -437,6 +437,8 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         />
       )}
 
+      <KeeperBot userId={userId} plan={plan || 'free'} />
+
     </div>
   )
 }
@@ -497,6 +499,5 @@ function PromoInput({ onSuccess }: { onSuccess?: (plan: string) => void }) {
         <p className={`text-xs mt-2 ${status === 'success' ? 'text-green-400' : 'text-red-400'}`}>{msg}</p>
       )}
     </div>
-      <KeeperBot userId={userId} plan={plan || 'free'} />
   )
 }
