@@ -8,7 +8,7 @@ const PLANS = [
   {
     name: 'Free',
     price: 0,
-    desc: 'Para empezar sin compromiso',
+    desc: 'Empieza a guardar contexto',
     color: 'border-gray-200',
     badge: null,
     features: [
@@ -24,7 +24,7 @@ const PLANS = [
   {
     name: 'Pro',
     price: 9,
-    desc: 'Para profesionales que usan IA a diario',
+    desc: 'Tu memoria completa, sin límites',
     color: 'border-violet-500',
     badge: 'MÁS POPULAR',
     features: [
@@ -43,7 +43,7 @@ const PLANS = [
   {
     name: 'Team',
     price: 20,
-    desc: 'Para equipos que trabajan con IA juntos',
+    desc: 'Memoria compartida para todo el equipo',
     color: 'border-purple-400',
     badge: 'PARA EQUIPOS',
     features: [
@@ -126,7 +126,7 @@ export default function PricingPage() {
       <main className="max-w-5xl mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-3">Planes y precios</h1>
-          <p className="text-gray-500 text-lg">Empieza gratis. Sin tarjeta de crédito. Cancela cuando quieras.</p>
+          <p className="text-gray-500 text-lg">Tu memoria operativa de IA, lista en segundos. Sin tarjeta. Cancela cuando quieras.</p>
           <div className="inline-flex items-center gap-3 mt-6 bg-white border border-gray-200 rounded-full px-2 py-1.5 shadow-sm">
             <button
               onClick={() => setBilling('monthly')}
