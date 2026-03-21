@@ -91,7 +91,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         .single()
       if (updated) {
         setProjects(prev => prev.map(p => p.id === updated.id ? updated : p))
-        showToast('Proyecto actualizado')
+        showToast('Contexto actualizado')
       }
     } else {
       const { data: created } = await supabase
@@ -101,7 +101,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         .single()
       if (created) {
         setProjects(prev => [created, ...prev])
-        showToast('¡Proyecto creado!')
+        showToast('¡Contexto creado!')
       }
     }
     setLoading(false)
@@ -111,7 +111,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('¿Seguro que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) return
+    if (!confirm('¿Seguro que quieres eliminar este contexto? Esta acción no se puede deshacer.')) return
     const { error } = await supabase.from('projects').delete().eq('id', id)
     if (!error) {
       setProjects(prev => prev.filter(p => p.id !== id))
@@ -207,7 +207,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
               Plan {planLabel}
             </span>
             <span className="text-xs text-gray-400">
-              {isPro ? 'Proyectos ilimitados' : `${projects.length} de ${FREE_LIMIT} contextos usados`}
+              {isPro ? 'Contextos ilimitados' : `${projects.length} de ${FREE_LIMIT} contextos usados`}
             </span>
           </div>
         </div>
@@ -243,7 +243,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             <div>
               <p className="font-bold text-base">Has alcanzado el límite del plan Free</p>
               <p className="text-sm text-violet-100 mt-1">
-                Actualiza a Pro para desbloquear proyectos ilimitados, historial de versiones y variables globales
+                Desbloquea memoria completa — contextos ilimitados, historial de versiones, generación con IA y más
               </p>
             </div>
             <a
@@ -258,7 +258,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
               <div className="h-full bg-white rounded-full w-full" />
             </div>
             <span className="text-xs text-violet-200 mt-1.5 block">
-              {projects.length}/{FREE_LIMIT} proyectos &#8212; límite alcanzado
+              {projects.length}/{FREE_LIMIT} contextos — límite alcanzado
             </span>
           </div>
         </div>
@@ -267,7 +267,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             {/* BARRA DE PROGRESO */}
       {!isPro && !isFreeLimitReached && projects.length > 0 && (
         <div className="rounded-lg border border-gray-200 bg-white px-4 py-2.5 flex items-center gap-3">
-          <span className="text-xs text-gray-500 shrink-0">{projects.length} de {FREE_LIMIT} proyectos</span>
+          <span className="text-xs text-gray-500 shrink-0">{projects.length} de {FREE_LIMIT} contextos</span>
           <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <div
               className="h-full bg-violet-500 rounded-full transition-all"
