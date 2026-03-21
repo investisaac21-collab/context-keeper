@@ -42,15 +42,15 @@ export default function OnboardingChecklist({
     {
       id: 'create',
       title: 'Crea tu primer proyecto',
-      description: 'Define un nombre, categorÃ­a y escribe el prompt de contexto que quieres reutilizar.',
+      description: 'Define un nombre, categor\u00c3\u00ada y escribe el prompt de contexto que quieres reutilizar.',
       icon: '&#128196;',
       done: hasProjects,
       action: !hasProjects ? { label: 'Crear proyecto', onClick: onCreateProject } : null,
     },
     {
       id: 'variables',
-      title: 'Agrega variables dinÃ¡micas',
-      description: 'Usa {{nombre}} en tu prompt y define valores por defecto para reutilizarlas fÃ¡cilmente.',
+      title: 'Agrega variables din\u00c3\u00a1micas',
+      description: 'Usa {{nombre}} en tu prompt y define valores por defecto para reutilizarlas f\u00c3\u00a1cilmente.',
       icon: '&#9881;',
       done: hasVariables,
       action: !hasVariables ? { label: 'Ir a Variables', onClick: onAddVariable } : null,
@@ -104,13 +104,13 @@ export default function OnboardingChecklist({
         <div>
           <h2 className="font-bold text-gray-900 text-base">Primeros pasos</h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Completa esta guÃ­a para sacarle el mÃ¡ximo provecho a Context Keeper
+            Completa esta gu\u00c3\u00ada para sacarle el m\u00c3\u00a1ximo provecho a Context Keeper
           </p>
         </div>
         <button
           onClick={handleDismiss}
           className="text-gray-300 hover:text-gray-500 transition text-lg leading-none"
-          title="Cerrar guÃ­a"
+          title="Cerrar gu\u00c3\u00ada"
         >
           &times;
         </button>
@@ -177,7 +177,7 @@ export default function OnboardingChecklist({
       </div>
 
       <p className="text-xs text-center text-gray-400 mt-4">
-        Puedes cerrar esta guÃ­a y volver a ella cuando quieras.
+        Puedes cerrar esta gu\u00c3\u00ada y volver a ella cuando quieras.
       </p>
     </div>
   )
