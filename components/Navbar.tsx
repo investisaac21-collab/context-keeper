@@ -27,9 +27,9 @@ export default function Navbar({ userEmail, plan = 'free' }: NavbarProps) {
   }
 
   const planColors: Record<string, string> = {
-    free: 'bg-gray-100 text-gray-600',
+    free: 'bg-gray-100 text-gray-500',
     pro: 'bg-violet-100 text-violet-700',
-    team: 'bg-purple-100 text-purple-700',
+    team: 'bg-blue-100 text-blue-700',
   }
 
   const planLabel: Record<string, string> = {
@@ -61,7 +61,7 @@ export default function Navbar({ userEmail, plan = 'free' }: NavbarProps) {
               href="/pricing"
               className="text-xs font-semibold bg-violet-600 hover:bg-violet-700 text-white px-3 py-1.5 rounded-full transition-colors"
             >
-              Mejorar a Pro
+              Hazte Pro — 9 €/mes
             </Link>
           )}
 
@@ -115,7 +115,7 @@ export default function Navbar({ userEmail, plan = 'free' }: NavbarProps) {
                       <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                       </svg>
-                      Cerrar sesi\u00f3n
+                      Cerrar sesión
                     </button>
                   </div>
                 </div>
