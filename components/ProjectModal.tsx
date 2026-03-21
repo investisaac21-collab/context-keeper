@@ -90,7 +90,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900">
-              {project ? 'Editar proyecto' : 'Nuevo proyecto'}
+              {project ? 'Editar contexto' : 'Nuevo contexto'}
             </h2>
             <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -131,7 +131,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="label">Nombre del proyecto *</label>
+              <label className="label">Nombre del contexto *</label>
               <input
                 type="text"
                 value={name}
@@ -152,7 +152,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
 
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="label mb-0">Contexto / Prompt *</label>
+                <label className="label mb-0">Memoria operativa *</label>
                 {isPro ? (
                   <button
                     type="button"
@@ -221,7 +221,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
                 value={context}
                 onChange={e => setContext(e.target.value)}
                 className="input min-h-[180px] resize-y font-mono text-sm"
-                placeholder="Escribe tu contexto... Usa {{variable}} para valores dinámicos"
+                placeholder="Describe personalidad, tono, instrucciones y contexto del trabajo... Usa {{variable}} para valores dinámicos"
                 required
               />
               {variables.length > 0 && (
