@@ -137,7 +137,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
       const { data } = await supabase.from('projects').select('*').eq('user_id', userId).order('created_at', { ascending: false })
       setProjects(data || [])
       showToast('Importado correctamente')
-    } catch {
+    } catch (_e) {
       showToast('Error al importar', 'error')
     }
   }
@@ -469,7 +469,7 @@ function PromoInput({ onSuccess }: { onSuccess?: (plan: string) => void }) {
         setStatus('error')
         setMsg(data.error || 'Código no válido')
       }
-    } catch {
+    } catch (_e) {
       setStatus('error')
       setMsg('Error de conexión')
     }
