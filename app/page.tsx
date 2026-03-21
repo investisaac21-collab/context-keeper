@@ -60,7 +60,7 @@ export default function Home() {
           Para usuarios de ChatGPT, Claude y Gemini
         </div>
 
-        {/* Keeper Core Ã¢ÂÂ companion visual */}
+        {/* Keeper Core — companion visual */}
         <div className="relative mb-10 inline-flex items-center justify-center">
           {/* Orbital rings */}
           <div className="absolute w-40 h-40 rounded-full border border-violet-500/10 animate-spin" style={{animationDuration: '12s'}} />
@@ -88,12 +88,12 @@ export default function Home() {
 
         <p className="relative text-lg sm:text-xl text-white/50 max-w-2xl mb-10 leading-relaxed animate-fade-up delay-300">
           Guarda personalidad, instrucciones, variables y contexto.
-          Recuéralos en segundos y continúa donde lo dejaste Ã¢ÂÂ en cualquier sesión, con cualquier IA.
+          Recuéralos en segundos y continúa donde lo dejaste — en cualquier sesión, con cualquier IA.
         </p>
 
         <div className="relative flex flex-col sm:flex-row gap-4 items-center animate-fade-up delay-400">
           <Link href="/login" className="px-8 py-3.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold text-base transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40">
-            Empieza gratis Ã¢ÂÂ sin tarjeta
+            Empieza gratis — sin tarjeta
           </Link>
           <Link href="/pricing" className="px-8 py-3.5 rounded-xl border border-white/10 hover:border-white/20 text-white/70 hover:text-white font-medium text-base transition-all">
             Ver planes
@@ -101,7 +101,7 @@ export default function Home() {
         </div>
 
         <p className="relative mt-5 text-sm text-white/25">
-          Free: hasta 3 contextos. Pro desde 9 Ã¢ÂÂ¬/mes.
+          Free: hasta 3 contextos. Pro desde 9 €/mes.
         </p>
       </section>
 
@@ -133,7 +133,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SOLUCIÃÂN Ã¢ÂÂ 4 capas */}
+      {/* SOLUCIÓN — 4 capas */}
       <section className="py-24 px-6 border-t border-white/5 fade-section">
         <div className="max-w-5xl mx-auto">
           <p className="text-xs font-semibold tracking-widest text-violet-400 uppercase mb-4 text-center">La solución</p>
@@ -141,7 +141,7 @@ export default function Home() {
             La memoria operativa<br />que tu IA no tiene.
           </h2>
           <p className="text-white/40 text-center max-w-xl mx-auto mb-16 text-lg">
-            Context Keeper guarda lo que hace que tu IA responda bien Ã¢ÂÂ y te lo devuelve cuando lo necesitas.
+            Context Keeper guarda lo que hace que tu IA responda bien — y te lo devuelve cuando lo necesitas.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -215,7 +215,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CÃÂMO FUNCIONA */}
+      {/* CÓMO FUNCIONA */}
       <section className="py-24 px-6 border-t border-white/5 fade-section">
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-xs font-semibold tracking-widest text-violet-400 uppercase mb-4">Cómo funciona</p>
@@ -327,13 +327,13 @@ export default function Home() {
 
             <div className="relative">
               <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-violet-500/20 text-violet-300 border border-violet-500/30 mb-4">
-                Próximamente Ã¢ÂÂ Pro y Team
+                Próximamente — Pro y Team
               </span>
               <h2 className="text-3xl sm:text-4xl font-bold mb-4 leading-tight">
                 Keeper Lab
               </h2>
               <p className="text-white/50 text-lg max-w-xl mx-auto leading-relaxed mb-6">
-                Tu contexto guardado puede ser mejor. Keeper Lab lo analiza, detecta redundancias, reorganiza la estructura y te devuelve una versión más clara y efectiva Ã¢ÂÂ lista para que tu IA responda mejor que nunca.
+                Tu contexto guardado puede ser mejor. Keeper Lab lo analiza, detecta redundancias, reorganiza la estructura y te devuelve una versión más clara y efectiva — lista para que tu IA responda mejor que nunca.
               </p>
               <div className="flex flex-wrap justify-center gap-3 text-sm text-white/40">
                 {['Refinamiento profundo', 'Detección de redundancias', 'Optimización de estructura', 'Versión mejorada lista para usar'].map((tag, i) => (
@@ -346,16 +346,16 @@ export default function Home() {
       </section>
 
 
-      {/* KEEPER PROFILES Ã¢ÂÂ vision futura */}
+      {/* KEEPER PROFILES — vision futura */}
       <section className="py-24 px-6 border-t border-white/5 fade-section">
         <div className="max-w-5xl mx-auto">
-          <p className="text-xs font-semibold tracking-widest text-violet-400 uppercase mb-4 text-center">Próximamente Ã¢ÂÂ Fase 3</p>
+          <p className="text-xs font-semibold tracking-widest text-violet-400 uppercase mb-4 text-center">Próximamente — Fase 3</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4 leading-tight">
             Keeper Profiles.<br />
             <span className="text-white/40">No solo contexto. Identidad.</span>
           </h2>
           <p className="text-white/40 text-center max-w-2xl mx-auto mb-16 text-lg">
-            La siguiente capa de Context Keeper. Guarda no solo qué decirle a tu IA, sino quién quieres que sea Ã¢ÂÂ su tono, sus reglas, su estilo, su comportamiento. Reutilizable. Consistente. Tuyo.
+            La siguiente capa de Context Keeper. Guarda no solo qué decirle a tu IA, sino quién quieres que sea — su tono, sus reglas, su estilo, su comportamiento. Reutilizable. Consistente. Tuyo.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
@@ -398,7 +398,7 @@ export default function Home() {
                 <span className="text-sm font-semibold text-white">Keeper Profile</span>
                 <span className="text-xs text-white/30 bg-white/5 px-2 py-0.5 rounded-full">Próximamente</span>
               </div>
-              <p className="text-white/40 text-sm leading-relaxed">Personalidad, tono, reglas, comportamiento. Quién es tu IA para este proyecto Ã¢ÂÂ de forma persistente y reutilizable.</p>
+              <p className="text-white/40 text-sm leading-relaxed">Personalidad, tono, reglas, comportamiento. Quién es tu IA para este proyecto — de forma persistente y reutilizable.</p>
             </div>
           </div>
 
@@ -413,7 +413,7 @@ export default function Home() {
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center font-bold text-white text-sm shadow-lg shadow-violet-500/30">M</div>
                 <div>
                   <div className="text-white font-semibold text-sm">Marketing Lead</div>
-                  <div className="text-violet-400 text-xs">Keeper Profile ÃÂ· Pro</div>
+                  <div className="text-violet-400 text-xs">Keeper Profile · Pro</div>
                 </div>
                 <div className="ml-auto">
                   <span className="text-xs bg-violet-500/20 text-violet-300 px-2 py-0.5 rounded-full font-medium">Activo</span>
@@ -463,7 +463,7 @@ export default function Home() {
                   <p className="font-bold text-white text-lg">{plan.name}</p>
                   <p className="text-white/30 text-sm mb-3">{plan.desc}</p>
                   <div className="flex items-baseline gap-1 mb-5">
-                    <span className="text-4xl font-bold text-white">{plan.price} Ã¢ÂÂ¬</span>
+                    <span className="text-4xl font-bold text-white">{plan.price} €</span>
                     <span className="text-white/30 text-sm">{plan.period}</span>
                   </div>
                   <ul className="space-y-2 mb-6">
@@ -507,12 +507,12 @@ export default function Home() {
             Guarda tu contexto una vez. Recúperalo siempre. Continúa donde lo dejaste en cualquier sesión con cualquier IA.
           </p>
           <Link href="/login" className="inline-flex items-center gap-2 px-10 py-4 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold text-base transition-all shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50">
-            Empieza gratis Ã¢ÂÂ sin tarjeta
+            Empieza gratis — sin tarjeta
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </Link>
-          <p className="mt-4 text-white/20 text-sm">Free para siempre. Pro desde 9 Ã¢ÂÂ¬/mes.</p>
+          <p className="mt-4 text-white/20 text-sm">Free para siempre. Pro desde 9 €/mes.</p>
         </div>
       </section>
 
