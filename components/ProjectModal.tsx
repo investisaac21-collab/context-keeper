@@ -105,7 +105,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
                 onClick={() => setShowTemplates(!showTemplates)}
                 className="text-sm text-sky-600 hover:text-sky-700 font-medium flex items-center gap-1"
               >
-                Usar plantilla predefinida {showTemplates ? '\u00c3\u00a2\u00c2\u0096\u00c2\u00b2' : '\u00c3\u00a2\u00c2\u0096\u00c2\u00bc'}
+                Usar plantilla predefinida {showTemplates ? '\u25b2' : '\u25bc'}
               </button>
               {showTemplates && (
                 <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
