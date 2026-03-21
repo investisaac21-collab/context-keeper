@@ -13,7 +13,7 @@ interface ProjectCardProps {
 
 const TAG_STYLES: Record<string, string> = {
   Desarrollo: 'bg-violet-50 text-violet-700 border border-violet-200',
-  DiseÃÂ±o: 'bg-purple-50 text-purple-700 border border-purple-200',
+  Dise\u00c3\u0083\u00c2\u00b1o: 'bg-purple-50 text-purple-700 border border-purple-200',
   Marketing: 'bg-amber-50 text-amber-700 border border-amber-200',
   Negocios: 'bg-orange-50 text-orange-700 border border-orange-200',
   Educacion: 'bg-teal-50 text-teal-700 border border-teal-200',
@@ -53,7 +53,7 @@ export default function ProjectCard({ project, variables = [], onEdit, onDelete,
     window.open('https://chatgpt.com/?q=' + encodeURIComponent(text), '_blank');
   };
 
-  const excerpt = (project.context || '').replace(/{{[^}]+}}/g, '•').slice(0, 110);
+  const excerpt = (project.context || '').replace(/{{[^}]+}}/g, '\u2022').slice(0, 110);
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-md hover:border-violet-200 transition-all duration-200 flex flex-col">
@@ -108,7 +108,7 @@ export default function ProjectCard({ project, variables = [], onEdit, onDelete,
       {/* Excerpt */}
       <div className="px-4 pb-3 flex-1">
         <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 font-normal">
-          {excerpt}{(project.context || '').length > 110 ? 'Ã¢ÃÂÃÂÃÂÃÂ¦' : ''}
+          {excerpt}{(project.context || '').length > 110 ? '\u00c3\u00a2\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u0080\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a6' : ''}
         </p>
       </div>
 
