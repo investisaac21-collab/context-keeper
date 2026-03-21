@@ -78,7 +78,7 @@ export default async function AccountPage() {
                 <span className="text-sm text-gray-700">Proyectos</span>
                 <span className="text-sm font-medium text-gray-900">
                   {projectCount} {isPro ? '' : `/ ${FREE_LIMIT}`}
-                  {isPro && <span className="text-xs text-indigo-500 ml-1">ilimitados</span>}
+                  {isPro && <span className="text-xs text-violet-500 ml-1">ilimitados</span>}
                 </span>
               </div>
               {!isPro && (
@@ -99,9 +99,9 @@ export default async function AccountPage() {
           </div>
         </div>
 
-        {/* SUSCRIPCIÃN */}
+        {/* SUSCRIPCIÃÂN */}
         <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-4 shadow-sm">
-          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">SuscripciÃ³n</h2>
+          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">SuscripciÃÂ³n</h2>
           <div className="flex items-start justify-between gap-4 mb-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
@@ -120,10 +120,10 @@ export default async function AccountPage() {
                 )}
               </div>
               {periodEnd && (
-                <p className="text-sm text-gray-500 mt-1">PrÃ³xima renovaciÃ³n: {periodEnd}</p>
+                <p className="text-sm text-gray-500 mt-1">PrÃÂ³xima renovaciÃÂ³n: {periodEnd}</p>
               )}
               {plan === 'free' && (
-                <p className="text-sm text-gray-400 mt-1">Sin suscripciÃ³n activa</p>
+                <p className="text-sm text-gray-400 mt-1">Sin suscripciÃÂ³n activa</p>
               )}
             </div>
           </div>
@@ -131,7 +131,7 @@ export default async function AccountPage() {
           {plan === 'free' ? (
             <div className="rounded-xl bg-violet-50 border border-violet-100 p-4 flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold text-indigo-900">Desbloquea todo con Pro</p>
+                <p className="text-sm font-semibold text-violet-900">Desbloquea todo con Pro</p>
                 <p className="text-xs text-violet-600 mt-0.5">
                   Proyectos ilimitados, historial de versiones y variables globales por solo 9 &#8364;/mes
                 </p>
@@ -145,7 +145,7 @@ export default async function AccountPage() {
             </div>
           ) : (
             <p className="text-sm text-gray-400">
-              Para cancelar o gestionar tu suscripciÃ³n, escrÃ­benos a{' '}
+              Para cancelar o gestionar tu suscripciÃÂ³n, escrÃÂ­benos a{' '}
               <a href="mailto:hola@contextkeeper.app" className="text-violet-600 hover:underline">
                 hola@contextkeeper.app
               </a>
