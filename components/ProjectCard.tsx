@@ -8,116 +8,85 @@ interface ProjectCardProps {
   variables?: UserVariable[];
   onEdit: (project: Project) => void;
   onDelete: (id: string) => void;
-  onHistory: (project: Project) => void;
-  onDuplicate?: (project: Project) => void;
-  onCopy?: () => void;
-  onPreview?: () => void;
-  plan?: string;
+  onCopy: (text: string) => void;
 }
 
-function fillVariables(text: string, vars: Record<string, string>): string {
-  return text.replace(/\{\{(\w+)\}\}/g, (_match: string, key: string) => vars[key] || '{{' + key + '}}');
+const TAG_STYLES: Record<string, string> = {
+  Desarrollo: 'bg-indigo-50 text-indigo-700 border border-indigo-200',
+  Diseño: 'bg-purple-50 text-purple-700 border border-purple-200',
+  Marketing: 'bg-amber-50 text-amber-700 border border-amber-200',
+  Negocios: 'bg-orange-50 text-orange-700 border border-orange-200',
+  Educacion: 'bg-teal-50 text-teal-700 border border-teal-200',
+  Personal: 'bg-pink-50 text-pink-700 border border-pink-200',
+  Otro: 'bg-gray-100 text-gray-600 border border-gray-200',
+};
+
+function countVars(context: string): string[] {
+  const matches = context.match(/{{([^}]+)}}/g) || [];
+  return [...new Set(matches.map(m => m.replace(/[{}]/g, '').trim()))];
 }
 
-function extractVariables(text: string): string[] {
-  const matches = text.match(/\{\{(\w+)\}\}/g) || [];
-  return [...new Set(matches.map((m: string) => m.replace(/\{\{|\}\}/g, '')))];
-}
-
-export default function ProjectCard({ project, variables: _vars, onEdit, onDelete, onHistory, onDuplicate, onCopy, onPreview, plan }: ProjectCardProps) {
-  const [copied, setCopied] = useState(false);
-  const [varValues, setVarValues] = useState<Record<string, string>>({});
+export default function ProjectCard({ project, variables = [], onEdit, onDelete, onCopy }: ProjectCardProps) {
   const [showVars, setShowVars] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  const detectedVars = extractVariables(project.context || '');
-  const hasVars = detectedVars.length > 0;
-  const missingVars = detectedVars.filter(v => !varValues[v]);
+  const vars = countVars(project.context || '');
+  const tagStyle = TAG_STYLES[project.tag || ''] || TAG_STYLES['Otro'];
 
-  const filledContext = hasVars ? fillVariables(project.context || '', varValues) : (project.context || '');
+  const getFilledContext = () => {
+    let ctx = project.context || '';
+    const varMap: Record<string, string> = {};
+    variables.forEach(v => { varMap[v.name] = v.default_value || ''; });
+    ctx = ctx.replace(/{{([^}]+)}}/g, (_, name) => varMap[name.trim()] || `{{${name.trim()}}}`);
+    return ctx;
+  };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(filledContext);
+    const text = vars.length > 0 ? getFilledContext() : (project.context || '');
+    onCopy(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-    if (onCopy) onCopy();
   };
 
-  const handlePreview = () => {
-    setShowPreview(true);
-    if (onPreview) onPreview();
+  const handleChatGPT = () => {
+    const text = vars.length > 0 ? getFilledContext() : (project.context || '');
+    window.open('https://chatgpt.com/?q=' + encodeURIComponent(text), '_blank');
   };
 
-  const categoryColors: Record<string, string> = {
-    coding: 'bg-blue-100 text-blue-800',
-    writing: 'bg-green-100 text-green-800',
-    analysis: 'bg-purple-100 text-purple-800',
-    marketing: 'bg-yellow-100 text-yellow-800',
-    IA: 'bg-indigo-100 text-indigo-800',
-    Desarrollo: 'bg-blue-100 text-blue-800',
-    Marketing: 'bg-yellow-100 text-yellow-800',
-    Negocios: 'bg-orange-100 text-orange-800',
-    Educacion: 'bg-teal-100 text-teal-800',
-    Personal: 'bg-pink-100 text-pink-800',
-    Otro: 'bg-gray-100 text-gray-800',
-    other: 'bg-gray-100 text-gray-800',
-  };
-
-  const category = project.category || project.tag || '';
-  const colorClass = categoryColors[category] || 'bg-gray-100 text-gray-800';
+  const excerpt = (project.context || '').replace(/{{[^}]+}}/g, '•').slice(0, 110);
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-col gap-3 hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:border-indigo-200 transition-all duration-200 flex flex-col">
       {/* Header */}
-      <div className="flex items-start justify-between gap-2">
+      <div className="px-4 pt-4 pb-3 flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <Link
-            href={'/dashboard/proyecto/' + project.id}
-            className="font-semibold text-gray-900 hover:text-indigo-600 transition block"
-            title={project.name}
+            href={`/dashboard/proyecto/${project.id}`}
+            className="text-sm font-semibold text-gray-900 hover:text-indigo-600 transition-colors line-clamp-1 block"
           >
             {project.name}
           </Link>
-          <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-            {category && (
-              <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${colorClass}`}>
-                {category}
-              </span>
-            )}
-            {hasVars && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-100">
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
-                </svg>
-                {detectedVars.length} var{detectedVars.length !== 1 ? 's' : ''}
-              </span>
-            )}
-          </div>
+          {project.tag && (
+            <span className={`mt-1 inline-block text-xs font-medium px-2 py-0.5 rounded-full ${tagStyle}`}>
+              {project.tag}
+            </span>
+          )}
         </div>
-        <div className="flex gap-1 shrink-0">
-          <button
-            onClick={() => onHistory(project)}
+        {/* Secondary actions top-right */}
+        <div className="flex items-center gap-1 shrink-0">
+          <Link
+            href={`/dashboard/proyecto/${project.id}`}
             className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-            title="Ver historial"
+            title="Vista previa"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-          </button>
-          {onDuplicate && (
-            <button
-              onClick={() => onDuplicate(project)}
-              className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-              title="Duplicar proyecto"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-            </button>
-          )}
+          </Link>
           <button
             onClick={() => onEdit(project)}
-            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
             title="Editar"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -126,7 +95,7 @@ export default function ProjectCard({ project, variables: _vars, onEdit, onDelet
           </button>
           <button
             onClick={() => onDelete(project.id)}
-            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
             title="Eliminar"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -136,113 +105,81 @@ export default function ProjectCard({ project, variables: _vars, onEdit, onDelet
         </div>
       </div>
 
-      {/* Preview del prompt */}
-      {project.context && (
-        <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">{project.context}</p>
-      )}
+      {/* Excerpt */}
+      <div className="px-4 pb-3 flex-1">
+        <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 font-normal">
+          {excerpt}{(project.context || '').length > 110 ? '…' : ''}
+        </p>
+      </div>
 
-      {/* Variables */}
-      {hasVars && (
-        <div>
+      {/* Variables badge */}
+      {vars.length > 0 && (
+        <div className="px-4 pb-3">
           <button
             onClick={() => setShowVars(!showVars)}
-            className="text-xs text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1"
+            className="inline-flex items-center gap-1.5 text-xs text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 px-2.5 py-1 rounded-full font-medium transition-colors"
           >
-            <svg className={`w-3.5 h-3.5 transition-transform ${showVars ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+            </svg>
+            {vars.length} variable{vars.length > 1 ? 's' : ''}
+            <svg xmlns="http://www.w3.org/2000/svg" className={`w-3 h-3 transition-transform ${showVars ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
-            {showVars ? 'Ocultar variables' : `Rellenar variables (${detectedVars.length})`}
           </button>
           {showVars && (
-            <div className="mt-2 flex flex-col gap-2">
-              {detectedVars.map((v: string) => (
-                <div key={v} className="flex items-center gap-2">
-                  <label className="text-xs text-gray-500 w-24 shrink-0 font-mono">{v}</label>
-                  <input
-                    type="text"
-                    value={varValues[v] || ''}
-                    onChange={(e) => setVarValues(prev => ({ ...prev, [v]: e.target.value }))}
-                    placeholder={`valor para ${v}`}
-                    className="flex-1 text-xs border border-gray-200 rounded px-2 py-1 focus:outline-none focus:border-indigo-400"
-                  />
-                </div>
-              ))}
-              {missingVars.length > 0 && (
-                <p className="text-xs text-amber-500 mt-1">
-                  {missingVars.length} variable{missingVars.length !== 1 ? 's' : ''} sin rellenar
-                </p>
-              )}
+            <div className="mt-2 p-2.5 bg-gray-50 rounded-lg border border-gray-100">
+              <p className="text-xs text-gray-500 mb-1.5 font-medium">Variables detectadas:</p>
+              <div className="flex flex-wrap gap-1">
+                {vars.map(v => (
+                  <span key={v} className="text-xs bg-white text-indigo-600 border border-indigo-100 px-2 py-0.5 rounded font-mono">
+                    {'{{'}{v}{'}}'}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
         </div>
       )}
 
-      {/* Modal vista previa */}
-      {showPreview && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowPreview(false)}>
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-gray-900">Vista previa del prompt</h3>
-              <button onClick={() => setShowPreview(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">&times;</button>
-            </div>
-            {missingVars.length > 0 && (
-              <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                <p className="text-xs text-amber-700 font-medium">
-                  Faltan {missingVars.length} variable{missingVars.length !== 1 ? 's' : ''}: {missingVars.map(v => `{{${v}}}`).join(', ')}
-                </p>
-                <p className="text-xs text-amber-600 mt-0.5">Rellena las variables para ver el prompt completo.</p>
-              </div>
-            )}
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 max-h-64 overflow-y-auto">
-              <pre className="text-sm text-gray-800 whitespace-pre-wrap font-sans leading-relaxed">
-                {filledContext}
-              </pre>
-            </div>
-            <div className="flex gap-2 mt-4">
-              <button
-                onClick={() => setShowPreview(false)}
-                className="flex-1 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition"
-              >
-                Cerrar
-              </button>
-              <button
-                onClick={() => { handleCopy(); setShowPreview(false); }}
-                className="flex-1 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
-              >
+      {/* Primary action */}
+      <div className="px-4 pb-4 pt-1 border-t border-gray-100 mt-auto">
+        <div className="flex gap-2 mt-3">
+          <button
+            onClick={handleChatGPT}
+            className="flex items-center justify-center gap-1.5 px-3 py-2 text-sm text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg font-medium transition-colors"
+            title="Abrir en ChatGPT"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.032.067L9.564 19.9a4.5 4.5 0 0 1-5.964-1.595zm-1.243-9.93a4.475 4.475 0 0 1 2.343-1.97V12.3a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.503 4.503 0 0 1 2.357 8.373zm16.61 3.806l-5.815-3.355 2.015-1.168a.075.075 0 0 1 .072 0l4.83 2.781a4.503 4.503 0 0 1-.676 8.123v-5.91a.77.77 0 0 0-.426-.471zm2.01-3.023l-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.62V7.288a.08.08 0 0 1 .032-.066l4.83-2.786a4.492 4.492 0 0 1 6.678 4.652zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.492 4.492 0 0 1 7.37-3.453l-.142.08-4.778 2.758a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v2.999l-2.597 1.5-2.607-1.5z"/>
+            </svg>
+            ChatGPT
+          </button>
+          <button
+            onClick={handleCopy}
+            className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-semibold rounded-lg transition-all ${
+              copied
+                ? 'bg-green-500 text-white'
+                : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+            }`}
+          >
+            {copied ? (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                </svg>
+                Copiado
+              </>
+            ) : (
+              <>
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
                 Copiar prompt
-              </button>
-            </div>
-          </div>
+              </>
+            )}
+          </button>
         </div>
-      )}
-
-      {/* Acciones */}
-      <div className="mt-auto flex gap-2">
-        <button
-          onClick={handlePreview}
-          className="flex-1 py-2 rounded-lg text-sm font-medium text-center border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors"
-        >
-          Vista previa
-        </button>
-        <a
-          href={`https://chatgpt.com/?q=${encodeURIComponent(filledContext)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="py-2 px-3 rounded-lg text-sm font-medium border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors flex items-center gap-1"
-          title="Abrir en ChatGPT"
-        >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-green-600 shrink-0">
-            <path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.033.062L9.74 19.95a4.5 4.5 0 0 1-6.14-1.646zM2.34 7.896a4.485 4.485 0 0 1 2.366-1.973V11.6a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.504 4.504 0 0 1 2.34 7.872zm16.597 3.855l-5.843-3.387 2.019-1.168a.076.076 0 0 1 .071 0l4.83 2.791a4.494 4.494 0 0 1-.676 8.105v-5.678a.79.79 0 0 0-.401-.663zm2.01-3.023l-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.23V6.897a.066.066 0 0 1 .028-.061l4.83-2.787a4.5 4.5 0 0 1 6.68 4.66zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.5 4.5 0 0 1 7.375-3.453l-.142.08L8.704 5.46a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v2.999l-2.597 1.5-2.607-1.5z"/>
-          </svg>
-        </a>
-        <button
-          onClick={handleCopy}
-          className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-            copied ? 'bg-green-100 text-green-700' : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-          }`}
-        >
-          {copied ? '&#10003; Copiado' : 'Copiar'}
-        </button>
       </div>
     </div>
   );
