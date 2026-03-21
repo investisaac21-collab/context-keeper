@@ -101,7 +101,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         .single()
       if (created) {
         setProjects(prev => [created, ...prev])
-        showToast('\u00a1Proyecto creado!')
+        showToast('¡Proyecto creado!')
       }
     }
     setLoading(false)
@@ -111,7 +111,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('\u00bfSeguro que quieres eliminar este proyecto? Esta acci\u00f3n no se puede deshacer.')) return
+    if (!confirm('¿Seguro que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) return
     const { error } = await supabase.from('projects').delete().eq('id', id)
     if (!error) {
       setProjects(prev => prev.filter(p => p.id !== id))
@@ -121,7 +121,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
 
   async function handleDuplicate(project: Project) {
     if (isFreeLimitReached) {
-      showToast('L\u00edmite del plan Free alcanzado. Actualiza a Pro.', 'error')
+      showToast('Límite del plan Free alcanzado. Actualiza a Pro.', 'error')
       return
     }
     const { data: created } = await supabase
@@ -177,7 +177,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
     { icon: '&#128218;', label: 'Historial de versiones' },
     { icon: '&#127760;', label: 'Variables globales' },
     { icon: '&#128203;', label: 'Duplicado avanzado' },
-    { icon: '&#128228;', label: 'Exportaci\u00f3n avanzada' },
+    { icon: '&#128228;', label: 'Exportación avanzada' },
   ]
 
   const showOnboarding = onboardingVisible && projects.length === 0
@@ -236,12 +236,12 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       </div>
 
-      {/* BANNER L\u00cdMITE ALCANZADO */}
+      {/* BANNER LÍMITE ALCANZADO */}
       {isFreeLimitReached && (
         <div className="rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 p-5 text-white shadow-md">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <p className="font-bold text-base">Has alcanzado el l\u00edmite del plan Free</p>
+              <p className="font-bold text-base">Has alcanzado el límite del plan Free</p>
               <p className="text-sm text-violet-100 mt-1">
                 Actualiza a Pro para desbloquear proyectos ilimitados, historial de versiones y variables globales
               </p>
@@ -258,7 +258,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
               <div className="h-full bg-white rounded-full w-full" />
             </div>
             <span className="text-xs text-violet-200 mt-1.5 block">
-              {projects.length}/{FREE_LIMIT} proyectos &#8212; l\u00edmite alcanzado
+              {projects.length}/{FREE_LIMIT} proyectos &#8212; límite alcanzado
             </span>
           </div>
         </div>
@@ -302,7 +302,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           </div>
           <h3 className="text-lg font-bold text-gray-900 mb-2">Crea tu primer prompt</h3>
           <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
-            Organiza tus mejores prompts de IA, a\u00f1ade variables din\u00e1micas y c\u00f3pialos con un click cuando los necesites.
+            Organiza tus mejores prompts de IA, añade variables dinámicas y cópialos con un click cuando los necesites.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
@@ -337,7 +337,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
       )}
       
 
-      {/* B\u00daSQL Y FILTROS */}
+      {/* BÚSQL Y FILTROS */}
       {projects.length > 0 && (
         <div className="flex flex-col sm:flex-row gap-2">
           <input
@@ -352,7 +352,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             onChange={e => setFilterTag(e.target.value)}
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
           >
-            <option value="">Todas las categor\u00edas</option>
+            <option value="">Todas las categorías</option>
             {allTags.map(tag => <option key={tag} value={tag}>{tag}</option>)}
           </select>
         </div>
@@ -371,7 +371,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
               onHistory={() => setHistoryProject(project)}
               onDuplicate={() => handleDuplicate(project)}
               plan={plan}
-              onCopy={() => { setHasCopied(true); showToast('\u00a1Prompt copiado!') }}
+              onCopy={() => { setHasCopied(true); showToast('¡Prompt copiado!') }}
               onPreview={() => setHasPreview(true)}
             />
           ))}
