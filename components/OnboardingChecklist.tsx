@@ -42,15 +42,15 @@ export default function OnboardingChecklist({
     {
       id: 'create',
       title: 'Crea tu primer proyecto',
-      description: 'Define un nombre, categoría y escribe el prompt de contexto que quieres reutilizar.',
+      description: 'Define un nombre, categorÃ­a y escribe el prompt de contexto que quieres reutilizar.',
       icon: '&#128196;',
       done: hasProjects,
       action: !hasProjects ? { label: 'Crear proyecto', onClick: onCreateProject } : null,
     },
     {
       id: 'variables',
-      title: 'Agrega variables dinámicas',
-      description: 'Usa {{nombre}} en tu prompt y define valores por defecto para reutilizarlas fácilmente.',
+      title: 'Agrega variables dinÃ¡micas',
+      description: 'Usa {{nombre}} en tu prompt y define valores por defecto para reutilizarlas fÃ¡cilmente.',
       icon: '&#9881;',
       done: hasVariables,
       action: !hasVariables ? { label: 'Ir a Variables', onClick: onAddVariable } : null,
@@ -99,18 +99,18 @@ export default function OnboardingChecklist({
   }
 
   return (
-    <div className="rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white p-5 shadow-sm">
+    <div className="rounded-xl border border-violet-100 bg-gradient-to-br from-violet-50 to-white p-5 shadow-sm">
       <div className="flex items-start justify-between mb-4">
         <div>
           <h2 className="font-bold text-gray-900 text-base">Primeros pasos</h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Completa esta guía para sacarle el máximo provecho a Context Keeper
+            Completa esta guÃ­a para sacarle el mÃ¡ximo provecho a Context Keeper
           </p>
         </div>
         <button
           onClick={handleDismiss}
           className="text-gray-300 hover:text-gray-500 transition text-lg leading-none"
-          title="Cerrar guía"
+          title="Cerrar guÃ­a"
         >
           &times;
         </button>
@@ -119,11 +119,11 @@ export default function OnboardingChecklist({
       <div className="mb-5">
         <div className="flex items-center justify-between mb-1.5">
           <span className="text-xs text-gray-500">{completedCount} de {steps.length} completados</span>
-          <span className="text-xs font-semibold text-indigo-600">{percent}%</span>
+          <span className="text-xs font-semibold text-violet-600">{percent}%</span>
         </div>
         <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
           <div
-            className="h-full bg-indigo-500 rounded-full transition-all duration-500"
+            className="h-full bg-violet-500 rounded-full transition-all duration-500"
             style={{ width: percent + '%' }}
           />
         </div>
@@ -137,7 +137,7 @@ export default function OnboardingChecklist({
               step.done
                 ? 'bg-green-50 border border-green-100'
                 : idx === completedCount
-                ? 'bg-white border border-indigo-200 shadow-sm'
+                ? 'bg-white border border-violet-200 shadow-sm'
                 : 'bg-white/60 border border-gray-100 opacity-60'
             )}
           >
@@ -145,7 +145,7 @@ export default function OnboardingChecklist({
               step.done
                 ? 'bg-green-100 text-green-600'
                 : idx === completedCount
-                ? 'bg-indigo-100 text-indigo-600'
+                ? 'bg-violet-100 text-violet-600'
                 : 'bg-gray-100 text-gray-400'
             )}>
               {step.done
@@ -167,7 +167,7 @@ export default function OnboardingChecklist({
             {step.action && idx === completedCount && (
               <button
                 onClick={step.action.onClick}
-                className="flex-shrink-0 text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition font-medium whitespace-nowrap"
+                className="flex-shrink-0 text-xs bg-violet-600 text-white px-3 py-1.5 rounded-lg hover:bg-violet-700 transition font-medium whitespace-nowrap"
               >
                 {step.action.label}
               </button>
@@ -177,7 +177,7 @@ export default function OnboardingChecklist({
       </div>
 
       <p className="text-xs text-center text-gray-400 mt-4">
-        Puedes cerrar esta guía y volver a ella cuando quieras.
+        Puedes cerrar esta guÃ­a y volver a ella cuando quieras.
       </p>
     </div>
   )
