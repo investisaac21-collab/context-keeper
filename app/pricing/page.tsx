@@ -13,7 +13,7 @@ const PLANS = [
     badge: null,
     features: [
       'Hasta 3 proyectos',
-      'Variables dinámicas',
+      'Variables dinÃ¡micas',
       'Importar / exportar JSON',
       'Plantillas predefinidas',
     ],
@@ -25,8 +25,8 @@ const PLANS = [
     name: 'Pro',
     price: 9,
     desc: 'Para profesionales que usan IA a diario',
-    color: 'border-indigo-500',
-    badge: 'MÁS POPULAR',
+    color: 'border-violet-500',
+    badge: 'MÃS POPULAR',
     features: [
       'Todo lo del plan Free',
       'Proyectos ilimitados',
@@ -51,7 +51,7 @@ const PLANS = [
       'Hasta 5 miembros',
       'Prompts compartidos entre miembros',
       'Panel de administrador',
-      'Facturación centralizada',
+      'FacturaciÃ³n centralizada',
       'Permisos por rol (admin, editor, viewer)',
     ],
     cta: 'Empezar con Team',
@@ -62,14 +62,14 @@ const PLANS = [
 ]
 
 const FAQ = [
-  { q: '¿Qué incluye el plan Free?', a: 'El plan Free incluye hasta 3 proyectos, variables dinámicas, plantillas predefinidas e importación/exportación JSON. Sin tarjeta de crédito.' },
-  { q: '¿Qué funciones exactas se desbloquean con Pro?', a: 'Con Pro desbloqueas proyectos ilimitados, historial de versiones con rollback, variables globales guardadas, soporte prioritario y acceso anticipado a nuevas funciones.' },
-  { q: '¿Cuál es la diferencia entre Pro y Team?', a: 'Team incluye todo lo de Pro más colaboración para hasta 5 miembros, prompts compartidos, panel de administrador, facturación centralizada y permisos por rol (admin, editor, viewer).' },
-  { q: '¿Team incluye permisos por rol?', a: 'Sí. Con el plan Team puedes asignar roles a cada miembro: admin (control total), editor (puede crear y editar) y viewer (solo lectura).' },
-  { q: '¿Qué pasa con mis proyectos si cancelo?', a: 'Tus proyectos siempre son tuyos. Si cancelas Pro o Team, volverás al plan Free y conservarás hasta 3 proyectos. El resto quedará archivado y podrás recuperarlo si vuelves a suscribirte.' },
-  { q: '¿Puedo cambiar de plan en cualquier momento?', a: 'Sí, puedes subir o bajar de plan cuando quieras desde tu página de cuenta. Los cambios se aplican de forma inmediata.' },
-  { q: '¿Qué pasa si llego al límite gratuito?', a: 'Si llegas al límite de 3 proyectos en el plan Free, no podrás crear nuevos proyectos hasta que actualices al plan Pro o elimines alguno existente.' },
-  { q: '¿Habrá plan anual con descuento?', a: 'Estamos preparando un plan anual con descuento. Próximamente podrás pagar por año y ahorrar hasta un 20%. Si quieres ser notificado, escríbenos.' },
+  { q: 'Â¿QuÃ© incluye el plan Free?', a: 'El plan Free incluye hasta 3 proyectos, variables dinÃ¡micas, plantillas predefinidas e importaciÃ³n/exportaciÃ³n JSON. Sin tarjeta de crÃ©dito.' },
+  { q: 'Â¿QuÃ© funciones exactas se desbloquean con Pro?', a: 'Con Pro desbloqueas proyectos ilimitados, historial de versiones con rollback, variables globales guardadas, soporte prioritario y acceso anticipado a nuevas funciones.' },
+  { q: 'Â¿CuÃ¡l es la diferencia entre Pro y Team?', a: 'Team incluye todo lo de Pro mÃ¡s colaboraciÃ³n para hasta 5 miembros, prompts compartidos, panel de administrador, facturaciÃ³n centralizada y permisos por rol (admin, editor, viewer).' },
+  { q: 'Â¿Team incluye permisos por rol?', a: 'SÃ­. Con el plan Team puedes asignar roles a cada miembro: admin (control total), editor (puede crear y editar) y viewer (solo lectura).' },
+  { q: 'Â¿QuÃ© pasa con mis proyectos si cancelo?', a: 'Tus proyectos siempre son tuyos. Si cancelas Pro o Team, volverÃ¡s al plan Free y conservarÃ¡s hasta 3 proyectos. El resto quedarÃ¡ archivado y podrÃ¡s recuperarlo si vuelves a suscribirte.' },
+  { q: 'Â¿Puedo cambiar de plan en cualquier momento?', a: 'SÃ­, puedes subir o bajar de plan cuando quieras desde tu pÃ¡gina de cuenta. Los cambios se aplican de forma inmediata.' },
+  { q: 'Â¿QuÃ© pasa si llego al lÃ­mite gratuito?', a: 'Si llegas al lÃ­mite de 3 proyectos en el plan Free, no podrÃ¡s crear nuevos proyectos hasta que actualices al plan Pro o elimines alguno existente.' },
+  { q: 'Â¿HabrÃ¡ plan anual con descuento?', a: 'Estamos preparando un plan anual con descuento. PrÃ³ximamente podrÃ¡s pagar por aÃ±o y ahorrar hasta un 20%. Si quieres ser notificado, escrÃ­benos.' },
 ]
 
 export default function PricingPage() {
@@ -106,9 +106,9 @@ export default function PricingPage() {
       })
       const data = await res.json()
       if (data.url) window.location.href = data.url
-      else alert('Error al iniciar el pago. Inténtalo de nuevo.')
+      else alert('Error al iniciar el pago. IntÃ©ntalo de nuevo.')
     } catch {
-      alert('Error de conexión. Inténtalo de nuevo.')
+      alert('Error de conexiÃ³n. IntÃ©ntalo de nuevo.')
     } finally {
       setLoading(null)
     }
@@ -126,17 +126,17 @@ export default function PricingPage() {
       <main className="max-w-5xl mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-3">Planes y precios</h1>
-          <p className="text-gray-500 text-lg">Empieza gratis. Sin tarjeta de crédito. Cancela cuando quieras.</p>
+          <p className="text-gray-500 text-lg">Empieza gratis. Sin tarjeta de crÃ©dito. Cancela cuando quieras.</p>
           <div className="inline-flex items-center gap-3 mt-6 bg-white border border-gray-200 rounded-full px-2 py-1.5 shadow-sm">
             <button
               onClick={() => setBilling('monthly')}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${billing === 'monthly' ? 'bg-indigo-600 text-white shadow' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${billing === 'monthly' ? 'bg-violet-600 text-white shadow' : 'text-gray-500 hover:text-gray-700'}`}
             >
               Mensual
             </button>
             <button
               onClick={() => setBilling('yearly')}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition flex items-center gap-1.5 ${billing === 'yearly' ? 'bg-indigo-600 text-white shadow' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition flex items-center gap-1.5 ${billing === 'yearly' ? 'bg-violet-600 text-white shadow' : 'text-gray-500 hover:text-gray-700'}`}
             >
               Anual
               <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-semibold">-20%</span>
@@ -144,7 +144,7 @@ export default function PricingPage() {
           </div>
           {billing === 'yearly' && (
             <p className="text-xs text-green-600 mt-2 font-medium">
-              Próximamente disponible &#8212; apúntate para ser el primero en saberlo
+              PrÃ³ximamente disponible &#8212; apÃºntate para ser el primero en saberlo
             </p>
           )}
         </div>
@@ -156,12 +156,12 @@ export default function PricingPage() {
               <div
                 key={plan.name}
                 className={`relative rounded-2xl border-2 bg-white p-6 flex flex-col shadow-sm transition hover:shadow-md ${
-                  plan.highlight ? 'border-indigo-500 shadow-indigo-100' : plan.color
+                  plan.highlight ? 'border-violet-500 shadow-violet-100' : plan.color
                 } ${isCurrentPlan ? 'ring-2 ring-green-400' : ''}`}
               >
                 {plan.badge && (
                   <div className={`absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 rounded-full shadow ${
-                    plan.name === 'Team' ? 'bg-purple-600 text-white' : 'bg-indigo-600 text-white'
+                    plan.name === 'Team' ? 'bg-purple-600 text-white' : 'bg-violet-600 text-white'
                   }`}>
                     {plan.badge}
                   </div>
@@ -184,14 +184,14 @@ export default function PricingPage() {
                   </div>
                   {billing === 'yearly' && plan.price > 0 && (
                     <p className="text-xs text-green-600 font-medium mt-1">
-                      Ahorras {Math.round(plan.price * 0.2 * 12)} &#8364;/año
+                      Ahorras {Math.round(plan.price * 0.2 * 12)} &#8364;/aÃ±o
                     </p>
                   )}
                 </div>
                 <ul className="space-y-2.5 mb-8 flex-1">
                   {plan.features.map(f => (
                     <li key={f} className="flex items-start gap-2 text-sm text-gray-700">
-                      <span className="text-indigo-500 mt-0.5 shrink-0">&#10003;</span>
+                      <span className="text-violet-500 mt-0.5 shrink-0">&#10003;</span>
                       {f}
                     </li>
                   ))}
@@ -203,7 +203,7 @@ export default function PricingPage() {
                     isCurrentPlan
                       ? 'bg-green-100 text-green-700 cursor-default'
                       : plan.highlight
-                      ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md'
+                      ? 'bg-violet-600 text-white hover:bg-violet-700 shadow-md'
                       : plan.name === 'Team'
                       ? 'bg-purple-600 text-white hover:bg-purple-700'
                       : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
@@ -223,16 +223,16 @@ export default function PricingPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100">
-                  <th className="text-left py-3 text-gray-500 font-medium w-1/2">Función</th>
+                  <th className="text-left py-3 text-gray-500 font-medium w-1/2">FunciÃ³n</th>
                   <th className="text-center py-3 text-gray-700 font-semibold">Free</th>
-                  <th className="text-center py-3 text-indigo-600 font-semibold">Pro</th>
+                  <th className="text-center py-3 text-violet-600 font-semibold">Pro</th>
                   <th className="text-center py-3 text-purple-600 font-semibold">Team</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {[
                   ['Proyectos', '3', 'Ilimitados', 'Ilimitados'],
-                  ['Variables dinámicas', '&#10003;', '&#10003;', '&#10003;'],
+                  ['Variables dinÃ¡micas', '&#10003;', '&#10003;', '&#10003;'],
                   ['Plantillas predefinidas', '&#10003;', '&#10003;', '&#10003;'],
                   ['Importar / exportar JSON', '&#10003;', '&#10003;', '&#10003;'],
                   ['Historial de versiones', '&#10007;', '&#10003;', '&#10003;'],
@@ -242,12 +242,12 @@ export default function PricingPage() {
                   ['Prompts compartidos', '&#10007;', '&#10007;', '&#10003;'],
                   ['Panel de administrador', '&#10007;', '&#10007;', '&#10003;'],
                   ['Permisos por rol', '&#10007;', '&#10007;', '&#10003;'],
-                  ['Facturación centralizada', '&#10007;', '&#10007;', '&#10003;'],
+                  ['FacturaciÃ³n centralizada', '&#10007;', '&#10007;', '&#10003;'],
                 ].map(([feature, free, pro, team]) => (
                   <tr key={feature}>
                     <td className="py-3 text-gray-700">{feature}</td>
                     <td className="py-3 text-center text-gray-400" dangerouslySetInnerHTML={{ __html: free }} />
-                    <td className="py-3 text-center text-indigo-600 font-medium" dangerouslySetInnerHTML={{ __html: pro }} />
+                    <td className="py-3 text-center text-violet-600 font-medium" dangerouslySetInnerHTML={{ __html: pro }} />
                     <td className="py-3 text-center text-purple-600 font-medium" dangerouslySetInnerHTML={{ __html: team }} />
                   </tr>
                 ))}
