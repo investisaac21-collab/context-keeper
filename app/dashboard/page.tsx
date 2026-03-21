@@ -30,7 +30,7 @@ export default async function DashboardPage() {
   const plan = sub?.plan || 'free'
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-zinc-950">
       <Navbar userEmail={user.email} plan={plan} />
       <ProjectsClient
         initialProjects={projects || []}
