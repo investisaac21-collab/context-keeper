@@ -1,6 +1,5 @@
 'use client'
-// v2;
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { Project, UserVariable } from '@/lib/types';
 
@@ -13,127 +12,168 @@ interface ProjectCardProps {
 }
 
 const TAG_STYLES: Record<string, string> = {
-  Desarrollo: 'bg-violet-50 text-violet-700 border border-violet-200',
-  'Diseño': 'bg-purple-50 text-purple-700 border border-purple-200',
-  Marketing: 'bg-amber-50 text-amber-700 border border-amber-200',
-  Negocios: 'bg-orange-50 text-orange-700 border border-orange-200',
-  Educacion: 'bg-teal-50 text-teal-700 border border-teal-200',
-  Personal: 'bg-pink-50 text-pink-700 border border-pink-200',
-  Otro: 'bg-zinc-800 text-zinc-300 border border-zinc-700',
+  Desarrollo: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
+  'Diseño': 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+  Marketing: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+  Negocios: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+  Educacion: 'bg-teal-500/10 text-teal-400 border-teal-500/20',
+  General: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',
 };
 
 function countVars(context: string): string[] {
-  const matches = context.match(/{{([^}]+)}}/g) || [];
-  return [...new Set(matches.map(m => m.replace(/[{}]/g, '').trim()))];
+  const matches = context.match(/\{\{([^}]+)\}\}/g) || [];
+  return [...new Set(matches.map(m => m.replace(/\{\{|\}\}/g, '').trim()))];
 }
 
 export default function ProjectCard({ project, variables = [], onEdit, onDelete, onCopy }: ProjectCardProps) {
-  const [showVars, setShowVars] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showVars, setShowVars] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+  const cardRef = useRef(null as HTMLDivElement | null);
 
   const vars = countVars(project.context || '');
-  const tagStyle = TAG_STYLES[project.tag || ''] || TAG_STYLES['Otro'];
+  const tagStyle = TAG_STYLES[project.tag || ''] || TAG_STYLES['General'];
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setMousePos({ x, y });
+  }, []);
 
   const getFilledContext = () => {
     let ctx = project.context || '';
-    const varMap: Record<string, string> = {};
-    variables.forEach(v => { varMap[v.name] = v.default_value || ''; });
-    ctx = ctx.replace(/{{([^}]+)}}/g, (_, name) => varMap[name.trim()] || `{{${name.trim()}}}`);
+    variables.forEach(v => {
+      ctx = ctx.replace(new RegExp('\\{\\{' + v.name + '\\}\\}', 'g'), v.value);
+    });
     return ctx;
   };
 
   const handleCopy = () => {
-    const text = vars.length > 0 ? getFilledContext() : (project.context || '');
+    const text = getFilledContext();
     onCopy(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleChatGPT = () => {
-    const text = vars.length > 0 ? getFilledContext() : (project.context || '');
-    window.open('https://chatgpt.com/?q=' + encodeURIComponent(text), '_blank');
+    const text = getFilledContext();
+    const url = 'https://chatgpt.com/?prompt=' + encodeURIComponent(text);
+    window.open(url, '_blank');
   };
 
-  const excerpt = (project.context || '').replace(/{{[^}]+}}/g, '...').slice(0, 110);
-
   return (
-    <div className="bg-zinc-900/90 rounded-xl border border-zinc-800/80 shadow-none hover:shadow-[0_0_0_1px_rgba(139,92,246,0.25),0_4px_24px_rgba(139,92,246,0.08)] hover:border-violet-500/25 hover:-translate-y-0.5 transition-all duration-300 flex flex-col">
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="relative rounded-2xl border flex flex-col overflow-hidden transition-all duration-500 group"
+      style={{
+        background: hovered
+          ? 'radial-gradient(600px circle at ' + mousePos.x + '% ' + mousePos.y + '%, rgba(139,92,246,0.06) 0%, rgba(18,17,23,0.98) 60%)'
+          : 'rgba(18,17,23,0.98)',
+        borderColor: hovered ? 'rgba(139,92,246,0.3)' : 'rgba(63,63,70,0.5)',
+        boxShadow: hovered
+          ? '0 0 0 1px rgba(139,92,246,0.15), 0 8px 32px rgba(139,92,246,0.08), inset 0 1px 0 rgba(139,92,246,0.08)'
+          : '0 1px 0 rgba(255,255,255,0.02)',
+        transform: hovered ? 'translateY(-2px)' : 'translateY(0)',
+      }}
+    >
+      {/* Shimmer sweep on hover */}
+      <div
+        className="absolute inset-0 pointer-events-none transition-opacity duration-700 rounded-2xl overflow-hidden"
+        style={{ opacity: hovered ? 1 : 0 }}
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(105deg, transparent 40%, rgba(139,92,246,0.04) 50%, transparent 60%)',
+            transform: hovered ? 'translateX(100%)' : 'translateX(-100%)',
+            transition: 'transform 0.8s ease',
+          }}
+        />
+      </div>
+
+      {/* AI status dot — top right corner */}
+      <div className="absolute top-3 right-3 z-10">
+        <div className="relative flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <span className="text-[10px] text-zinc-600 font-medium tracking-wide uppercase">IA</span>
+          <div className="relative w-1.5 h-1.5">
+            <div className="absolute inset-0 rounded-full bg-violet-500 animate-ping opacity-60" style={{ animationDuration: '1.5s' }} />
+            <div className="relative w-1.5 h-1.5 rounded-full bg-violet-400" />
+          </div>
+        </div>
+      </div>
+
       {/* Header */}
-      <div className="px-4 pt-4 pb-3 flex items-start justify-between gap-2">
-        <div className="flex-1 min-w-0">
+      <div className="px-5 pt-5 pb-4 flex items-start justify-between gap-2">
+        <div className="flex-1 min-w-0 pr-8">
           <Link
-            href={`/dashboard/proyecto/${project.id}`}
-            className="text-sm font-semibold text-white hover:text-violet-600 transition-colors line-clamp-1 block"
+            href={'/dashboard/proyecto/' + project.id}
+            className="text-sm font-semibold text-zinc-100 hover:text-violet-400 transition-colors duration-200 line-clamp-1 block"
           >
             {project.name}
           </Link>
           {project.tag && (
-            <span className={`mt-1 inline-block text-xs font-medium px-2 py-0.5 rounded-full ${tagStyle}`}>
+            <span className={'mt-1.5 inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full border uppercase tracking-wide ' + tagStyle}>
               {project.tag}
             </span>
           )}
         </div>
-        {/* Secondary actions top-right */}
-        <div className="flex items-center gap-1 shrink-0">
-          <Link
-            href={`/dashboard/proyecto/${project.id}`}
-            className="p-1.5 text-zinc-500 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition-colors"
-            title="Vista previa"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-          </Link>
+        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200 mt-0.5">
           <button
             onClick={() => onEdit(project)}
-            className="p-1.5 text-zinc-500 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition-colors"
+            className="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-600 hover:text-zinc-300 hover:bg-zinc-800 transition-all duration-150"
             title="Editar"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
             </svg>
           </button>
           <button
             onClick={() => onDelete(project.id)}
-            className="p-1.5 text-zinc-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+            className="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-600 hover:text-red-400 hover:bg-red-500/10 transition-all duration-150"
             title="Eliminar"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
             </svg>
           </button>
         </div>
       </div>
 
-      {/* Excerpt */}
-      <div className="px-4 pb-3 flex-1">
-        <p className="text-sm text-zinc-400 leading-relaxed line-clamp-2 font-normal">
-          {excerpt}{(project.context || '').length > 110 ? '…' : ''}
+      {/* Context preview */}
+      <div className="px-5 pb-4 flex-1">
+        <p className="text-xs text-zinc-500 leading-relaxed line-clamp-3 font-mono">
+          {project.context || 'Sin contexto'}
         </p>
       </div>
 
       {/* Variables badge */}
       {vars.length > 0 && (
-        <div className="px-4 pb-3">
+        <div className="px-5 pb-4">
           <button
             onClick={() => setShowVars(!showVars)}
-            className="inline-flex items-center gap-1.5 text-xs text-violet-600 bg-violet-50 hover:bg-violet-100 border border-violet-100 px-2.5 py-1 rounded-full font-medium transition-colors"
+            className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-violet-400 bg-violet-500/8 hover:bg-violet-500/12 border border-violet-500/15 hover:border-violet-500/30 px-2.5 py-1 rounded-full uppercase tracking-wide transition-all duration-200"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+            <svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
             </svg>
             {vars.length} variable{vars.length > 1 ? 's' : ''}
-            <svg xmlns="http://www.w3.org/2000/svg" className={`w-3 h-3 transition-transform ${showVars ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            <svg width="8" height="8" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" className={'transition-transform duration-200 ' + (showVars ? 'rotate-180' : '')}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
           {showVars && (
-            <div className="mt-2 p-2.5 bg-zinc-800 rounded-lg border border-zinc-800">
-              <p className="text-xs text-zinc-400 mb-1.5 font-medium">Variables detectadas:</p>
+            <div className="mt-2 p-3 bg-zinc-900 rounded-xl border border-zinc-800">
+              <p className="text-[10px] text-zinc-600 mb-2 uppercase tracking-wide font-semibold">Variables</p>
               <div className="flex flex-wrap gap-1">
                 {vars.map(v => (
-                  <span key={v} className="text-xs bg-violet-500/10 text-violet-400 border border-violet-500/20 px-2 py-0.5 rounded-md font-mono">
+                  <span key={v} className="text-[10px] bg-violet-500/8 text-violet-400 border border-violet-500/15 px-1.5 py-0.5 rounded-md font-mono">
                     {'{{'}{v}{'}}'}
                   </span>
                 ))}
@@ -143,38 +183,34 @@ export default function ProjectCard({ project, variables = [], onEdit, onDelete,
         </div>
       )}
 
-      {/* Primary action */}
-      <div className="px-4 pb-4 pt-1 border-t border-zinc-800 mt-auto">
-        <div className="flex gap-2 mt-3">
+      {/* Footer actions */}
+      <div className="px-4 pb-4 pt-3 border-t border-zinc-800/60">
+        <div className="flex gap-2">
           <button
             onClick={handleChatGPT}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 text-sm text-zinc-300 bg-zinc-800 hover:bg-zinc-800 border border-zinc-700 rounded-lg font-medium transition-colors"
+            className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs text-zinc-400 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 rounded-xl font-medium transition-all duration-200"
             title="Abrir en ChatGPT"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494zM3.6 18.304a4.47 4.47 0 0 1-.535-3.014l.142.085 4.783 2.759a.771.771 0 0 0 .78 0l5.843-3.369v2.332a.08.08 0 0 1-.032.067L9.564 19.9a4.5 4.5 0 0 1-5.964-1.595zm-1.243-9.93a4.475 4.475 0 0 1 2.343-1.97V12.3a.766.766 0 0 0 .388.676l5.815 3.355-2.02 1.168a.076.076 0 0 1-.071 0l-4.83-2.786A4.503 4.503 0 0 1 2.357 8.373zm16.61 3.806l-5.815-3.355 2.015-1.168a.075.075 0 0 1 .072 0l4.83 2.781a4.503 4.503 0 0 1-.676 8.123v-5.91a.77.77 0 0 0-.426-.471zm2.01-3.023l-.141-.085-4.774-2.782a.776.776 0 0 0-.785 0L9.409 9.62V7.288a.08.08 0 0 1 .032-.066l4.83-2.786a4.492 4.492 0 0 1 6.678 4.652zm-12.64 4.135l-2.02-1.164a.08.08 0 0 1-.038-.057V6.075a4.492 4.492 0 0 1 7.37-3.453l-.142.08-4.778 2.758a.795.795 0 0 0-.393.681zm1.097-2.365l2.602-1.5 2.607 1.5v2.999l-2.597 1.5-2.607-1.5z"/>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="flex-shrink-0">
+              <path d="M22.282 9.821a5.985 5.985 0 0 0-.516-4.91 6.046 6.046 0 0 0-6.51-2.9A6.065 6.065 0 0 0 4.981 4.18a5.985 5.985 0 0 0-3.998 2.9 6.046 6.046 0 0 0 .743 7.097 5.98 5.98 0 0 0 .51 4.911 6.051 6.051 0 0 0 6.515 2.9A5.985 5.985 0 0 0 13.26 24a6.056 6.056 0 0 0 5.772-4.206 5.99 5.99 0 0 0 3.997-2.9 6.056 6.056 0 0 0-.747-7.073zM13.26 22.43a4.476 4.476 0 0 1-2.876-1.04l.141-.081 4.779-2.758a.795.795 0 0 0 .392-.681v-6.737l2.02 1.168a.071.071 0 0 1 .038.052v5.583a4.504 4.504 0 0 1-4.494 4.494z"/>
             </svg>
             ChatGPT
           </button>
           <button
             onClick={handleCopy}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 text-sm font-semibold rounded-lg transition-all ${
-              copied
-                ? 'bg-green-500 text-white'
-                : 'bg-violet-600 hover:bg-violet-700 text-white'
-            }`}
+            className={'flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-xl transition-all duration-300 ' + (copied ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400' : 'bg-violet-600 hover:bg-violet-500 text-white shadow-lg shadow-violet-500/10 hover:shadow-violet-500/20')}
           >
             {copied ? (
               <>
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                 </svg>
                 Copiado
               </>
             ) : (
               <>
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" />
                 </svg>
                 Copiar contexto
               </>
