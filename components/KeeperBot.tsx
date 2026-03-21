@@ -94,13 +94,12 @@ export default function KeeperBot({ userId, plan }: KeeperBotProps) {
     }
   }
 
-  const btnCls = open
-    ? 'bg-zinc-800 border border-zinc-700 rotate-45 scale-95'
-    : 'bg-violet-600 hover:bg-violet-500 shadow-violet-500/30 hover:scale-110'
+  let btnCls = 'bg-violet-600 hover:bg-violet-500 shadow-violet-500/30 hover:scale-110'
+  if (open) { btnCls = 'bg-zinc-800 border border-zinc-700 rotate-45 scale-95' }
 
-  const msgCls = (role: string) => role === 'user'
-    ? 'bg-violet-600 text-white rounded-tr-sm'
-    : 'bg-zinc-800 text-zinc-200 rounded-tl-sm'
+  function msgCls(role: string) {
+    return role === 'user' ? 'bg-violet-600 text-white rounded-tr-sm' : 'bg-zinc-800 text-zinc-200 rounded-tl-sm'
+  }
 
   return (
     <>
