@@ -19,7 +19,7 @@ interface Props {
   isPro?: boolean
 }
 
-const CATEGORIES = ['IA', 'Marketing', 'Desarrollo', 'Negocios', 'Educaci\u00f3n', 'Personal', 'Otro']
+const CATEGORIES = ['IA', 'Marketing', 'Desarrollo', 'Negocios', 'Educación', 'Personal', 'Otro']
 
 function extractVariables(text: string): string[] {
   const matches = text.match(/\{\{(\w+)\}\}/g) || []
@@ -75,7 +75,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
         setAiError(data.error || 'Error al generar el prompt')
       }
     } catch {
-      setAiError('Error de conexi\u00f3n con la IA')
+      setAiError('Error de conexión con la IA')
     } finally {
       setAiLoading(false)
     }
@@ -105,7 +105,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
                 onClick={() => setShowTemplates(!showTemplates)}
                 className="text-sm text-sky-600 hover:text-sky-700 font-medium flex items-center gap-1"
               >
-                Usar plantilla predefinida {showTemplates ? '\u25b2' : '\u25bc'}
+                Usar plantilla predefinida {showTemplates ? '▲' : '▼'}
               </button>
               {showTemplates && (
                 <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -143,9 +143,9 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
             </div>
 
             <div>
-              <label className="label">Categor\u00eda</label>
+              <label className="label">Categoría</label>
               <select value={tag} onChange={e => setTag(e.target.value)} className="input">
-                <option value="">Sin categor\u00eda</option>
+                <option value="">Sin categoría</option>
                 {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
@@ -177,13 +177,13 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
 
               {showAI && isPro && (
                 <div className="mb-3 p-4 rounded-xl border-2 border-violet-200 bg-violet-50">
-                  <p className="text-xs font-semibold text-violet-700 mb-2">&#129504; Describe qu\u00e9 quieres y la IA crear\u00e1 el prompt</p>
+                  <p className="text-xs font-semibold text-violet-700 mb-2">&#129504; Describe qué quieres y la IA creará el prompt</p>
                   <textarea
                     value={aiDescription}
                     onChange={e => setAiDescription(e.target.value)}
                     className="w-full px-3 py-2 rounded-lg border border-violet-200 bg-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-violet-400"
                     rows={3}
-                    placeholder="Ej: Un prompt para responder emails de clientes de forma profesional y emp\u00e1tica..."
+                    placeholder="Ej: Un prompt para responder emails de clientes de forma profesional y empática..."
                     onKeyDown={e => { if(e.key === 'Enter' && e.metaKey) handleGenerateAI() }}
                   />
                   {aiError && <p className="text-xs text-red-500 mt-1">{aiError}</p>}
@@ -221,7 +221,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
                 value={context}
                 onChange={e => setContext(e.target.value)}
                 className="input min-h-[180px] resize-y font-mono text-sm"
-                placeholder="Escribe tu contexto... Usa {{variable}} para valores din\u00e1micos"
+                placeholder="Escribe tu contexto... Usa {{variable}} para valores dinámicos"
                 required
               />
               {variables.length > 0 && (
