@@ -99,9 +99,9 @@ export default async function AccountPage() {
           </div>
         </div>
 
-        {/* SUSCRIPCIÃÂÃÂN */}
+        {/* SUSCRIPCIÃÃÂÂÃÂN */}
         <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-4 shadow-sm">
-          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">SuscripciÃÂÃÂ³n</h2>
+          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">SuscripciÃÃÂÂÃÂ³n</h2>
           <div className="flex items-start justify-between gap-4 mb-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
@@ -120,10 +120,10 @@ export default async function AccountPage() {
                 )}
               </div>
               {periodEnd && (
-                <p className="text-sm text-gray-500 mt-1">PrÃÂÃÂ³xima renovaciÃÂÃÂ³n: {periodEnd}</p>
+                <p className="text-sm text-gray-500 mt-1">PrÃÃÂÂÃÂ³xima renovaciÃÃÂÂÃÂ³n: {periodEnd}</p>
               )}
               {plan === 'free' && (
-                <p className="text-sm text-gray-400 mt-1">Sin suscripciÃÂÃÂ³n activa</p>
+                <p className="text-sm text-gray-400 mt-1">Sin suscripciÃÃÂÂÃÂ³n activa</p>
               )}
             </div>
           </div>
@@ -145,7 +145,7 @@ export default async function AccountPage() {
             </div>
           ) : (
             <p className="text-sm text-gray-400">
-              Para cancelar o gestionar tu suscripciÃÂÃÂ³n, escrÃÂÃÂ­benos a{' '}
+              Para cancelar o gestionar tu suscripciÃÃÂÂÃÂ³n, escrÃÃÂÂÃÂ­benos a{' '}
               <a href="mailto:hola@contextkeeper.app" className="text-violet-600 hover:underline">
                 hola@contextkeeper.app
               </a>
