@@ -40,6 +40,18 @@ export default function ProfilesClient({ userId, userEmail, plan, initialProfile
   const isPro = plan === 'pro' || plan === 'team'
 
   const [profiles, setProfiles] = useState<KeeperProfile[]>(initialProfiles)
+  const [tableReady, setTableReady] = useState(initialProfiles.length >= 0)
+  const [tableError, setTableError] = useState(false)
+
+  // Auto-setup: verificar/crear tabla al montar si no hay perfiles cargados
+  useState(() => {
+    if (initialProfiles.length === 0) {
+      fetch('/api/setup-profiles').then(r => r.json()).then(d => {
+        if (d.ok) setTableReady(true)
+        else if (d.sql) setTableError(true)
+      }).catch(() => setTableReady(true))
+    }
+  })
   const [showModal, setShowModal] = useState(false)
   const [editingProfile, setEditingProfile] = useState<KeeperProfile | null>(null)
   const [form, setForm] = useState({ name: '', role: '', tone: '', rules: '', extra: '' })
@@ -135,6 +147,18 @@ export default function ProfilesClient({ userId, userEmail, plan, initialProfile
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar userEmail={userEmail} plan={plan} />
+
+      {tableError && (
+        <div className="bg-amber-50 border-b border-amber-200 px-6 py-3">
+          <div className="max-w-6xl mx-auto flex items-center gap-3">
+            <svg width="16" height="16" fill="none" stroke="#d97706" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <p className="text-amber-800 text-xs">La tabla de perfiles no existe aun en Supabase. Crea la tabla <strong>keeper_profiles</strong> en tu dashboard de Supabase para activar esta funcion.</p>
+            <a href="https://supabase.com/dashboard" target="_blank" className="ml-auto text-xs font-semibold text-amber-700 underline">Ir a Supabase</a>
+          </div>
+        </div>
+      )}
 
       {toast && (
         <div className={"fixed top-5 right-5 z-[100] px-5 py-3 rounded-xl shadow-lg text-sm font-medium " + (toastType === 'ok' ? 'bg-gray-900 text-white' : 'bg-red-600 text-white')}>
