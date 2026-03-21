@@ -1,6 +1,23 @@
+'use client'
 import Link from 'next/link'
+import { useEffect } from 'react'
 
 export default function Home() {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view')
+          }
+        })
+      },
+      { threshold: 0.1 }
+    )
+    document.querySelectorAll('.fade-section').forEach((el) => observer.observe(el))
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <div className="min-h-screen bg-[#09090b] text-white">
 
@@ -88,7 +105,7 @@ export default function Home() {
       </section>
 
       {/* PROBLEMA */}
-      <section className="py-24 px-6">
+      <section className="py-24 px-6 fade-section">
         <div className="max-w-4xl mx-auto">
           <p className="text-xs font-semibold tracking-widest text-violet-400 uppercase mb-4 text-center">El problema real</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4 leading-tight animate-fade-up delay-100">
@@ -116,7 +133,7 @@ export default function Home() {
       </section>
 
       {/* SOLUCIÓN — 4 capas */}
-      <section className="py-24 px-6 border-t border-white/5">
+      <section className="py-24 px-6 border-t border-white/5 fade-section">
         <div className="max-w-5xl mx-auto">
           <p className="text-xs font-semibold tracking-widest text-violet-400 uppercase mb-4 text-center">La solución</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4 leading-tight">
@@ -198,7 +215,7 @@ export default function Home() {
       </section>
 
       {/* CÓMO FUNCIONA */}
-      <section className="py-24 px-6 border-t border-white/5">
+      <section className="py-24 px-6 border-t border-white/5 fade-section">
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-xs font-semibold tracking-widest text-violet-400 uppercase mb-4">Cómo funciona</p>
           <h2 className="text-3xl sm:text-4xl font-bold mb-16 leading-tight">Tres pasos.<br />Todo el control.</h2>
@@ -217,6 +234,73 @@ export default function Home() {
                 <p className="text-white/40 text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PRODUCT PREVIEW */}
+      <section className="py-24 px-6 border-t border-white/5 fade-section">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-xs font-semibold tracking-widest text-violet-400 uppercase mb-4">El producto</p>
+            <h2 className="text-3xl sm:text-4xl font-bold leading-tight mb-4">
+              Tu memoria operativa,<br />
+              <span className="text-violet-400">siempre a mano.</span>
+            </h2>
+            <p className="text-white/40 max-w-lg mx-auto">Gestiona todos tus contextos desde un dashboard limpio. Copia, edita y organiza en segundos.</p>
+          </div>
+
+          <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-violet-500/10 bg-[#111113]">
+            <div className="flex items-center gap-2 px-4 py-3 bg-[#1a1a1e] border-b border-white/5">
+              <div className="flex gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-red-500/60"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500/60"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500/60"></div>
+              </div>
+              <div className="flex-1 mx-4">
+                <div className="bg-white/5 rounded-md px-3 py-1 text-xs text-white/30 text-center max-w-xs mx-auto">context-keeper-alpha.vercel.app/dashboard</div>
+              </div>
+            </div>
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <div className="text-white font-bold text-lg">Mis Contextos</div>
+                  <div className="text-white/40 text-xs mt-0.5">3 contextos activos</div>
+                </div>
+                <div className="bg-violet-600 text-white text-xs font-semibold px-4 py-2 rounded-xl">+ Nuevo contexto</div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {[
+                  { name: "Asistente de Marketing", desc: "Tono persuasivo, enfocado en conversion. Voz de marca premium.", tag: "Marketing", color: "violet" },
+                  { name: "Dev Backend Senior", desc: "TypeScript estricto. Sin comentarios obvios. Prefiere funcional.", tag: "Desarrollo", color: "blue" },
+                  { name: "Redactor de Contenido", desc: "Estilo directo, sin relleno. Estructura con headers claros.", tag: "Contenido", color: "emerald" },
+                ].map((ctx, i) => (
+                  <div key={i} className="bg-white/5 rounded-xl p-4 border border-white/8 hover:border-violet-500/30 transition-colors">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className={ctx.color === "violet" ? "text-xs font-semibold px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-400" : ctx.color === "blue" ? "text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400" : "text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400"}>{ctx.tag}</div>
+                      <div className="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-white/40">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="text-white text-sm font-semibold mb-1.5">{ctx.name}</div>
+                    <div className="text-white/40 text-xs leading-relaxed">{ctx.desc}</div>
+                    <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
+                      <span className="text-white/25 text-xs">Hace 2 horas</span>
+                      <span className="text-violet-400 text-xs font-medium">Copiar contexto</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-5 flex items-center gap-3">
+                <div className="text-white/25 text-xs">3 de 3 contextos (Free)</div>
+                <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden max-w-xs">
+                  <div className="h-full bg-violet-500 rounded-full w-full"></div>
+                </div>
+                <div className="text-violet-400 text-xs font-medium cursor-pointer">Hazte Pro</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -262,7 +346,7 @@ export default function Home() {
 
 
       {/* KEEPER PROFILES — vision futura */}
-      <section className="py-24 px-6 border-t border-white/5">
+      <section className="py-24 px-6 border-t border-white/5 fade-section">
         <div className="max-w-5xl mx-auto">
           <p className="text-xs font-semibold tracking-widest text-violet-400 uppercase mb-4 text-center">Próximamente — Fase 3</p>
           <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4 leading-tight">
@@ -320,7 +404,7 @@ export default function Home() {
       </section>
 
       {/* PRICING PREVIEW */}
-      <section className="py-24 px-6 border-t border-white/5">
+      <section className="py-24 px-6 border-t border-white/5 fade-section">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-xs font-semibold tracking-widest text-violet-400 uppercase mb-4">Precios</p>
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">Simple y directo.</h2>
