@@ -75,7 +75,7 @@ export default async function AccountPage() {
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <span className="text-sm text-gray-700">Proyectos</span>
+                <span className="text-sm text-gray-700">Contextos</span>
                 <span className="text-sm font-medium text-gray-900">
                   {projectCount} {isPro ? '' : `/ ${FREE_LIMIT}`}
                   {isPro && <span className="text-xs text-violet-500 ml-1">ilimitados</span>}
@@ -133,7 +133,7 @@ export default async function AccountPage() {
               <div>
                 <p className="text-sm font-semibold text-violet-900">Desbloquea todo con Pro</p>
                 <p className="text-xs text-violet-600 mt-0.5">
-                  Proyectos ilimitados, historial de versiones y variables globales por solo 9 &#8364;/mes
+                  Contextos ilimitados, historial de versiones y variables globales por solo 9 &#8364;/mes
                 </p>
               </div>
               <Link
