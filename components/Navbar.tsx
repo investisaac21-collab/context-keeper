@@ -45,7 +45,7 @@ export default function Navbar({ userEmail, plan = 'free' }: NavbarProps) {
           <div className="w-7 h-7 bg-violet-600 rounded-lg flex items-center justify-center">
             <span className="text-white font-bold text-xs">CK</span>
           </div>
-          <span className="font-semibold text-white text-sm group-hover:text-violet-300 transition-colors">Context Keeper</span>
+          <span className="font-semibold text-white text-sm group-hover:text-violet-300 transition-colors">Keeper</span>
         </Link>
 
         <div className="flex items-center gap-3">
