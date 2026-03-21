@@ -55,14 +55,14 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
     setAiLoading(true)
     setAiError('')
     try {
-      const res = await fetch('/api/generate-context', {
+      const res = await fetch('/api/generate-prompt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ description: aiDescription })
       })
       const data = await res.json()
-      if (data.context) {
-        setContext(data.context)
+      if (data.prompt) {
+        setContext(data.prompt)
         setShowAI(false)
       } else {
         setAiError(data.error || 'Error generando contexto')
