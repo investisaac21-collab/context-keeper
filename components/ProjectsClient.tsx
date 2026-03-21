@@ -223,8 +223,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             <UserVariablesPanel
               variables={variables}
               userId={userId}
-              isPro={isPro}
-              onUpdate={setVariables}
+              plan={plan}
             />
           </div>
         )}
@@ -273,9 +272,9 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
                   onClick={() => { setTemplateData(tpl); setEditingProject(null); setShowModal(true); setTab('contexts') }}
                   className="text-left p-5 bg-zinc-900 border border-zinc-800 hover:border-violet-600 rounded-xl transition-all group"
                 >
-                  <div className="text-2xl mb-3">{tpl.icon || '\u25c6'}</div>
-                  <h3 className="font-semibold text-white text-sm mb-1 group-hover:text-violet-300 transition-colors">{tpl.title}</h3>
-                  <p className="text-zinc-500 text-xs">{tpl.description || 'Plantilla predefinida'}</p>
+                  <div className="text-2xl mb-3">{tpl.emoji || '\u25c6'}</div>
+                  <h3 className="font-semibold text-white text-sm mb-1 group-hover:text-violet-300 transition-colors">{tpl.name}</h3>
+                  <p className="text-zinc-500 text-xs">{tpl.tag || 'Plantilla'}</p>
                 </button>
               ))}
             </div>
@@ -381,8 +380,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
                     isPro={isPro}
                     onEdit={(p) => { setEditingProject(p); setShowModal(true) }}
                     onDelete={handleDelete}
-                    onDuplicate={handleDuplicate}
-                    onHistory={(id) => setHistoryProjectId(id)}
+                    onCopy={handleDuplicate}
                   />
                 ))}
               </div>
@@ -396,7 +394,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             <div className="max-w-lg">
               <p className="text-zinc-500 text-xs font-mono uppercase tracking-wider mb-2">Plan Free</p>
               <h3 className="text-white font-semibold mb-1">\u00bfTienes un c\u00f3digo de acceso?</h3>
-              <p className="text-zinc-500 text-sm mb-4">Intro\u00daceolo para activar Pro al instante, sin tarjeta.</p>
+              <p className="text-zinc-500 text-sm mb-4">Intr\u00f3ducelo para activar Pro al instante, sin tarjeta.</p>
               <PromoInput onSuccess={(newPlan) => { window.location.reload() }} />
             </div>
           </div>
@@ -417,13 +415,6 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         />
       )}
 
-      {historyProjectId && (
-        <HistoryModal
-          projectId={historyProjectId}
-          userId={userId}
-          onClose={() => setHistoryProjectId(null)}
-        />
-      )}
     </div>
   )
 }
