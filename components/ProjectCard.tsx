@@ -19,7 +19,7 @@ const TAG_STYLES: Record<string, string> = {
   Negocios: 'bg-orange-50 text-orange-700 border border-orange-200',
   Educacion: 'bg-teal-50 text-teal-700 border border-teal-200',
   Personal: 'bg-pink-50 text-pink-700 border border-pink-200',
-  Otro: 'bg-gray-100 text-gray-600 border border-gray-200',
+  Otro: 'bg-zinc-800 text-zinc-300 border border-zinc-700',
 };
 
 function countVars(context: string): string[] {
@@ -57,13 +57,13 @@ export default function ProjectCard({ project, variables = [], onEdit, onDelete,
   const excerpt = (project.context || '').replace(/{{[^}]+}}/g, '...').slice(0, 110);
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-md hover:border-violet-200 transition-all duration-200 flex flex-col">
+    <div className="bg-zinc-900 rounded-xl border border-zinc-800 bg-zinc-900 shadow-none hover:shadow-none hover:border-violet-200 transition-all duration-200 flex flex-col">
       {/* Header */}
       <div className="px-4 pt-4 pb-3 flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <Link
             href={`/dashboard/proyecto/${project.id}`}
-            className="text-sm font-semibold text-gray-900 hover:text-violet-600 transition-colors line-clamp-1 block"
+            className="text-sm font-semibold text-white hover:text-violet-600 transition-colors line-clamp-1 block"
           >
             {project.name}
           </Link>
@@ -77,7 +77,7 @@ export default function ProjectCard({ project, variables = [], onEdit, onDelete,
         <div className="flex items-center gap-1 shrink-0">
           <Link
             href={`/dashboard/proyecto/${project.id}`}
-            className="p-1.5 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition-colors"
+            className="p-1.5 text-zinc-500 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition-colors"
             title="Vista previa"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -87,7 +87,7 @@ export default function ProjectCard({ project, variables = [], onEdit, onDelete,
           </Link>
           <button
             onClick={() => onEdit(project)}
-            className="p-1.5 text-gray-400 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition-colors"
+            className="p-1.5 text-zinc-500 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition-colors"
             title="Editar"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -96,7 +96,7 @@ export default function ProjectCard({ project, variables = [], onEdit, onDelete,
           </button>
           <button
             onClick={() => onDelete(project.id)}
-            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+            className="p-1.5 text-zinc-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
             title="Eliminar"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -108,7 +108,7 @@ export default function ProjectCard({ project, variables = [], onEdit, onDelete,
 
       {/* Excerpt */}
       <div className="px-4 pb-3 flex-1">
-        <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 font-normal">
+        <p className="text-sm text-zinc-400 leading-relaxed line-clamp-2 font-normal">
           {excerpt}{(project.context || '').length > 110 ? '…' : ''}
         </p>
       </div>
@@ -129,11 +129,11 @@ export default function ProjectCard({ project, variables = [], onEdit, onDelete,
             </svg>
           </button>
           {showVars && (
-            <div className="mt-2 p-2.5 bg-gray-50 rounded-lg border border-gray-100">
-              <p className="text-xs text-gray-500 mb-1.5 font-medium">Variables detectadas:</p>
+            <div className="mt-2 p-2.5 bg-zinc-800 rounded-lg border border-zinc-800">
+              <p className="text-xs text-zinc-400 mb-1.5 font-medium">Variables detectadas:</p>
               <div className="flex flex-wrap gap-1">
                 {vars.map(v => (
-                  <span key={v} className="text-xs bg-white text-violet-600 border border-violet-100 px-2 py-0.5 rounded font-mono">
+                  <span key={v} className="text-xs bg-zinc-900 text-violet-600 border border-violet-100 px-2 py-0.5 rounded font-mono">
                     {'{{'}{v}{'}}'}
                   </span>
                 ))}
@@ -144,11 +144,11 @@ export default function ProjectCard({ project, variables = [], onEdit, onDelete,
       )}
 
       {/* Primary action */}
-      <div className="px-4 pb-4 pt-1 border-t border-gray-100 mt-auto">
+      <div className="px-4 pb-4 pt-1 border-t border-zinc-800 mt-auto">
         <div className="flex gap-2 mt-3">
           <button
             onClick={handleChatGPT}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 text-sm text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg font-medium transition-colors"
+            className="flex items-center justify-center gap-1.5 px-3 py-2 text-sm text-zinc-300 bg-zinc-800 hover:bg-zinc-800 border border-zinc-700 rounded-lg font-medium transition-colors"
             title="Abrir en ChatGPT"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
