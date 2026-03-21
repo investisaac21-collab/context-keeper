@@ -62,14 +62,14 @@ const PLANS = [
 ]
 
 const FAQ = [
-  { q: '\u00c3\u0082\u00c2\u00bfQu\u00e9 incluye el plan Free?', a: 'El plan Free incluye hasta 3 proyectos, variables din\u00e1micas, plantillas predefinidas e importaci\u00f3n/exportaci\u00f3n JSON. Sin tarjeta de cr\u00e9dito.' },
-  { q: '\u00c3\u0082\u00c2\u00bfQu\u00e9 funciones exactas se desbloquean con Pro?', a: 'Con Pro desbloqueas proyectos ilimitados, historial de versiones con rollback, variables globales guardadas, soporte prioritario y acceso anticipado a nuevas funciones.' },
-  { q: '\u00c3\u0082\u00c2\u00bfCu\u00e1l es la diferencia entre Pro y Team?', a: 'Team incluye todo lo de Pro m\u00e1s colaboraci\u00f3n para hasta 5 miembros, prompts compartidos, panel de administrador, facturaci\u00f3n centralizada y permisos por rol (admin, editor, viewer).' },
-  { q: '\u00c3\u0082\u00c2\u00bfTeam incluye permisos por rol?', a: 'S\u00ed. Con el plan Team puedes asignar roles a cada miembro: admin (control total), editor (puede crear y editar) y viewer (solo lectura).' },
-  { q: '\u00c3\u0082\u00c2\u00bfQu\u00e9 pasa con mis proyectos si cancelo?', a: 'Tus proyectos siempre son tuyos. Si cancelas Pro o Team, volver\u00e1s al plan Free y conservar\u00e1s hasta 3 proyectos. El resto quedar\u00e1 archivado y podr\u00e1s recuperarlo si vuelves a suscribirte.' },
-  { q: '\u00c3\u0082\u00c2\u00bfPuedo cambiar de plan en cualquier momento?', a: 'S\u00ed, puedes subir o bajar de plan cuando quieras desde tu p\u00e1gina de cuenta. Los cambios se aplican de forma inmediata.' },
-  { q: '\u00c3\u0082\u00c2\u00bfQu\u00e9 pasa si llego al l\u00edmite gratuito?', a: 'Si llegas al l\u00edmite de 3 proyectos en el plan Free, no podr\u00e1s crear nuevos proyectos hasta que actualices al plan Pro o elimines alguno existente.' },
-  { q: '\u00c3\u0082\u00c2\u00bfHabr\u00e1 plan anual con descuento?', a: 'Estamos preparando un plan anual con descuento. Pr\u00f3ximamente podr\u00e1s pagar por a\u00f1o y ahorrar hasta un 20%. Si quieres ser notificado, escr\u00edbenos.' },
+  { q: '\u00bfQu\u00e9 incluye el plan Free?', a: 'El plan Free incluye hasta 3 proyectos, variables din\u00e1micas, plantillas predefinidas e importaci\u00f3n/exportaci\u00f3n JSON. Sin tarjeta de cr\u00e9dito.' },
+  { q: '\u00bfQu\u00e9 funciones exactas se desbloquean con Pro?', a: 'Con Pro desbloqueas proyectos ilimitados, historial de versiones con rollback, variables globales guardadas, soporte prioritario y acceso anticipado a nuevas funciones.' },
+  { q: '\u00bfCu\u00e1l es la diferencia entre Pro y Team?', a: 'Team incluye todo lo de Pro m\u00e1s colaboraci\u00f3n para hasta 5 miembros, prompts compartidos, panel de administrador, facturaci\u00f3n centralizada y permisos por rol (admin, editor, viewer).' },
+  { q: '\u00bfTeam incluye permisos por rol?', a: 'S\u00ed. Con el plan Team puedes asignar roles a cada miembro: admin (control total), editor (puede crear y editar) y viewer (solo lectura).' },
+  { q: '\u00bfQu\u00e9 pasa con mis proyectos si cancelo?', a: 'Tus proyectos siempre son tuyos. Si cancelas Pro o Team, volver\u00e1s al plan Free y conservar\u00e1s hasta 3 proyectos. El resto quedar\u00e1 archivado y podr\u00e1s recuperarlo si vuelves a suscribirte.' },
+  { q: '\u00bfPuedo cambiar de plan en cualquier momento?', a: 'S\u00ed, puedes subir o bajar de plan cuando quieras desde tu p\u00e1gina de cuenta. Los cambios se aplican de forma inmediata.' },
+  { q: '\u00bfQu\u00e9 pasa si llego al l\u00edmite gratuito?', a: 'Si llegas al l\u00edmite de 3 proyectos en el plan Free, no podr\u00e1s crear nuevos proyectos hasta que actualices al plan Pro o elimines alguno existente.' },
+  { q: '\u00bfHabr\u00e1 plan anual con descuento?', a: 'Estamos preparando un plan anual con descuento. Pr\u00f3ximamente podr\u00e1s pagar por a\u00f1o y ahorrar hasta un 20%. Si quieres ser notificado, escr\u00edbenos.' },
 ]
 
 export default function PricingPage() {
