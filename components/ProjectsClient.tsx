@@ -248,6 +248,27 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           ))}
         </div>
 
+        {/* Upgrade nudge for Free plan */}
+        {!isPro && (
+          <div className="mb-6 flex items-center gap-4 p-4 bg-zinc-900 border border-zinc-800 rounded-xl">
+            <div className="flex-1">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-zinc-400 text-xs">Contextos usados</span>
+                <span className="text-zinc-400 text-xs">{projects.length} / {FREE_LIMIT}</span>
+              </div>
+              <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                <div
+                  className={"h-full rounded-full transition-all " + (projects.length >= FREE_LIMIT ? "bg-red-500" : projects.length >= 2 ? "bg-amber-500" : "bg-violet-500")}
+                  style={{width: Math.min(100, (projects.length / FREE_LIMIT) * 100) + '%'}}
+                />
+              </div>
+            </div>
+            <a href="/pricing" className="px-3 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold rounded-lg transition-all flex-shrink-0 whitespace-nowrap">
+              Ir a Pro &#x2192;
+            </a>
+          </div>
+        )}
+
         {/* Tabs */}
         <div className="flex items-center gap-1 mb-6 bg-zinc-900 border border-zinc-800 rounded-xl p-1 w-fit">
           {(['contexts', 'templates'] as const).map(t => (
