@@ -1,5 +1,4 @@
 {
   "framework": "nextjs",
-  "buildCommand": "next build",
-  "_deploy": "trigger-1774120710103"
+  "buildCommand": "next build"
 }
