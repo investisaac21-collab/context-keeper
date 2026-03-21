@@ -9,6 +9,7 @@ import HistoryModal from './HistoryModal'
 import UserVariablesPanel from './UserVariablesPanel'
 import OnboardingChecklist from './OnboardingChecklist'
 import { TEMPLATES } from '@/lib/templates'
+import KeeperBot from './KeeperBot'
 
 interface Props {
   initialProjects: Project[]
@@ -496,5 +497,6 @@ function PromoInput({ onSuccess }: { onSuccess?: (plan: string) => void }) {
         <p className={`text-xs mt-2 ${status === 'success' ? 'text-green-400' : 'text-red-400'}`}>{msg}</p>
       )}
     </div>
+      <KeeperBot userId={userId} plan={plan || 'free'} />
   )
 }
