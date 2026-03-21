@@ -41,7 +41,7 @@ export default function OnboardingChecklist({
   const steps = [
     {
       id: 'create',
-      title: 'Crea tu primer proyecto',
+      title: 'Crea tu primer contexto',
       description: 'Define un nombre, categoría y escribe el prompt de contexto que quieres reutilizar.',
       icon: '&#128196;',
       done: hasProjects,
