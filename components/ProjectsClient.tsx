@@ -45,6 +45,35 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
     setTimeout(() => setToast(null), 3000)
   }
 
+  function handleCopyCtx(text: string) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Copiado al portapapeles')
+      }).catch(() => {
+        // Fallback
+        const el = document.createElement('textarea')
+        el.value = text
+        el.style.position = 'fixed'
+        el.style.opacity = '0'
+        document.body.appendChild(el)
+        el.select()
+        document.execCommand('copy')
+        document.body.removeChild(el)
+        showToast('Copiado al portapapeles')
+      })
+    } else {
+      const el = document.createElement('textarea')
+      el.value = text
+      el.style.position = 'fixed'
+      el.style.opacity = '0'
+      document.body.appendChild(el)
+      el.select()
+      document.execCommand('copy')
+      document.body.removeChild(el)
+      showToast('Copiado al portapapeles')
+    }
+  }
+
   async function saveVersion(projectId: string, context: string) {
     await supabase.from('project_versions').insert({
       project_id: projectId,
@@ -402,7 +431,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
                     isPro={isPro}
                     onEdit={(p) => { setEditingProject(p); setShowModal(true) }}
                     onDelete={handleDelete}
-                    onCopy={handleDuplicate}
+                    onCopy={handleCopyCtx}
                   />
                 ))}
               </div>
