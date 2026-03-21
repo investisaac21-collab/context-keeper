@@ -87,7 +87,7 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
   async function handleRestore(version: ProjectVersion) {
     setRestoring(true)
     try {
-      // 1. Guardar versiÃÂÃÂ³n actual antes de restaurar
+      // 1. Guardar versi\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b3n actual antes de restaurar
       const { data: last } = await supabase
         .from('project_versions')
         .select('version_number')
@@ -106,7 +106,7 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
         })
       }
 
-      // 2. Aplicar el contexto de la versiÃÂÃÂ³n restaurada
+      // 2. Aplicar el contexto de la versi\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b3n restaurada
       const { data: updated } = await supabase
         .from('projects')
         .update({ context: version.context, updated_at: new Date().toISOString() })
@@ -115,7 +115,7 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
         .single()
 
       if (updated) {
-        showToast('ÃÂÃÂ¡VersiÃÂÃÂ³n ' + version.version_number + ' restaurada!')
+        showToast('\u00c3\u0083\u00c2\u0082\u00c3\u0082\u00c2\u00a1Versi\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b3n ' + version.version_number + ' restaurada!')
         if (onRestored) onRestored(updated)
         // Recargar versiones
         const { data: refreshed } = await supabase
@@ -143,11 +143,11 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
     })
   }
 
-  // Diff entre la versiÃÂÃÂ³n seleccionada y la siguiente mÃÂÃÂ¡s reciente (o el estado actual)
+  // Diff entre la versi\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b3n seleccionada y la siguiente m\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a1s reciente (o el estado actual)
   const diffBase = selectedVersion
     ? (() => {
         const idx = versions.findIndex(v => v.id === selectedVersion.id)
-        // La versiÃÂÃÂ³n anterior en el tiempo es la de menor index (mÃÂÃÂ¡s reciente) ÃÂ¢ÃÂÃÂ mostramos diff contra la siguiente mÃÂÃÂ¡s nueva
+        // La versi\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b3n anterior en el tiempo es la de menor index (m\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a1s reciente) \u00c3\u0083\u00c2\u00a2\u00c3\u0082\u00c2\u0080\u00c3\u0082\u00c2\u0094 mostramos diff contra la siguiente m\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a1s nueva
         const newerVersion = idx > 0 ? versions[idx - 1] : null
         return newerVersion ? newerVersion.context : project.context || ''
       })()
@@ -174,7 +174,7 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
             <h2 className="font-bold text-gray-900 text-lg">Historial de versiones</h2>
             {versions.length > 0 && isPro && (
               <span className="text-xs bg-violet-50 text-violet-600 font-medium px-2 py-0.5 rounded-full">
-                {versions.length} versi{versions.length !== 1 ? 'ones' : 'ÃÂÃÂ³n'}
+                {versions.length} versi{versions.length !== 1 ? 'ones' : '\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b3n'}
               </span>
             )}
           </div>
@@ -209,8 +209,8 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
         ) : versions.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
             <span className="text-3xl mb-3">&#128196;</span>
-            <p className="text-sm text-gray-500">AÃÂÃÂºn no hay versiones guardadas para este proyecto.</p>
-            <p className="text-xs text-gray-400 mt-1">Las versiones se guardan automÃÂÃÂ¡ticamente al editar.</p>
+            <p className="text-sm text-gray-500">A\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00ban no hay versiones guardadas para este proyecto.</p>
+            <p className="text-xs text-gray-400 mt-1">Las versiones se guardan autom\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a1ticamente al editar.</p>
           </div>
         ) : selectedVersion && showDiff ? (
           /* VISTA DIFF */
@@ -224,7 +224,7 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
               </button>
               <span className="text-xs text-gray-300">|</span>
               <span className="text-xs font-medium text-gray-700">
-                VersiÃÂÃÂ³n {selectedVersion.version_number} &mdash; {formatDate(selectedVersion.created_at)}
+                Versi\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b3n {selectedVersion.version_number} &mdash; {formatDate(selectedVersion.created_at)}
               </span>
             </div>
 
@@ -232,11 +232,11 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
               <div className="flex items-center gap-4 text-xs text-gray-500">
                 <span className="flex items-center gap-1.5">
                   <span className="w-3 h-3 rounded bg-green-100 border border-green-300 inline-block" />
-                  Texto aÃÂÃÂ±adido despuÃÂÃÂ©s
+                  Texto a\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b1adido despu\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a9s
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="w-3 h-3 rounded bg-red-100 border border-red-300 inline-block" />
-                  Texto eliminado despuÃÂÃÂ©s
+                  Texto eliminado despu\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00a9s
                 </span>
               </div>
             </div>
@@ -267,25 +267,25 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
                 disabled={restoring}
                 className="flex-1 py-2.5 bg-violet-600 text-white rounded-xl text-sm font-semibold hover:bg-violet-700 transition disabled:opacity-50"
               >
-                {restoring ? 'Restaurando...' : 'ÃÂ¢ÃÂÃÂº Restaurar esta versiÃÂÃÂ³n'}
+                {restoring ? 'Restaurando...' : '\u00c3\u0083\u00c2\u00a2\u00c3\u0082\u00c2\u0086\u00c3\u0082\u00c2\u00ba Restaurar esta versi\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b3n'}
               </button>
             </div>
           </div>
         ) : (
           /* LISTA DE VERSIONES */
           <div className="flex-1 overflow-y-auto p-4 space-y-2">
-            {/* VersiÃÂÃÂ³n actual */}
+            {/* Versi\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b3n actual */}
             <div className="border-2 border-violet-200 bg-violet-50/40 rounded-xl p-4">
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm text-gray-900">VersiÃÂÃÂ³n actual</span>
+                  <span className="font-semibold text-sm text-gray-900">Versi\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b3n actual</span>
                   <span className="text-xs bg-violet-100 text-violet-600 font-medium px-2 py-0.5 rounded-full">Activa</span>
                 </div>
                 <span className="text-xs text-gray-400">
                   {project.updated_at ? formatDate(project.updated_at) : ''}
                 </span>
               </div>
-              <p className="text-xs text-gray-500 line-clamp-2 font-mono">{project.context || '(vacÃÂÃÂ­o)'}</p>
+              <p className="text-xs text-gray-500 line-clamp-2 font-mono">{project.context || '(vac\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00ado)'}</p>
             </div>
 
             {/* Versiones anteriores */}
@@ -296,7 +296,7 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
                 onClick={() => setSelectedVersion(selectedVersion?.id === v.id ? null : v)}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-sm text-gray-900">VersiÃÂÃÂ³n {v.version_number}</span>
+                  <span className="font-medium text-sm text-gray-900">Versi\u00c3\u0083\u00c2\u0083\u00c3\u0082\u00c2\u00b3n {v.version_number}</span>
                   <span className="text-xs text-gray-400">{formatDate(v.created_at)}</span>
                 </div>
                 <p className="text-xs text-gray-500 line-clamp-2 font-mono">{v.context}</p>
@@ -314,7 +314,7 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
                       disabled={restoring}
                       className="flex-1 py-1.5 text-xs bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition font-semibold disabled:opacity-50"
                     >
-                      {restoring ? 'Restaurando...' : 'ÃÂ¢ÃÂÃÂº Restaurar'}
+                      {restoring ? 'Restaurando...' : '\u00c3\u0083\u00c2\u00a2\u00c3\u0082\u00c2\u0086\u00c3\u0082\u00c2\u00ba Restaurar'}
                     </button>
                   </div>
                 )}
