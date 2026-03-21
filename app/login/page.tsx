@@ -25,7 +25,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
 
-      {/* Left âÃÂÃÂ branding (solo desktop) */}
+      {/* Left \u00e2\u00c3\u0082\u00c2\u0080\u00c3\u0082\u00c2\u0094 branding (solo desktop) */}
       <div className="hidden lg:flex flex-col justify-between w-1/2 bg-white border-r border-gray-100 p-12">
         {/* Logo */}
         <div className="flex items-center gap-2.5">
@@ -48,7 +48,7 @@ export default function LoginPage() {
             <span className="text-violet-600">reescribir el mismo prompt</span>
           </h1>
           <p className="text-gray-500 text-lg leading-relaxed max-w-sm mb-10">
-            Organiza tus mejores prompts para ChatGPT, Claude y Gemini. Variables dinÃÃÂ¡micas, IA integrada y un click para copiar.
+            Organiza tus mejores prompts para ChatGPT, Claude y Gemini. Variables din\u00c3\u00c3\u0082\u00c2\u00a1micas, IA integrada y un click para copiar.
           </p>
 
           <div className="space-y-5">
@@ -60,7 +60,7 @@ export default function LoginPage() {
                   </svg>
                 ),
                 title: 'Prompts siempre a mano',
-                desc: 'Guarda y organiza sin lÃÃÂ­mite. Nunca pierdas un buen prompt.'
+                desc: 'Guarda y organiza sin l\u00c3\u00c3\u0082\u00c2\u00admite. Nunca pierdas un buen prompt.'
               },
               {
                 icon: (
@@ -97,7 +97,7 @@ export default function LoginPage() {
         <p className="text-gray-300 text-xs">&copy; 2026 Context Keeper</p>
       </div>
 
-      {/* Right âÃÂÃÂ formulario */}
+      {/* Right \u00e2\u00c3\u0082\u00c2\u0080\u00c3\u0082\u00c2\u0094 formulario */}
       <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-md">
 
@@ -136,8 +136,8 @@ export default function LoginPage() {
               <div className="grid grid-cols-3 gap-3 text-center">
                 {[
                   { num: '100%', label: 'Gratis para empezar' },
-                  { num: '1-click', label: 'Copia instantÃÃÂ¡nea' },
-                  { num: 'IA', label: 'GeneraciÃÃÂ³n automÃÃÂ¡tica' },
+                  { num: '1-click', label: 'Copia instant\u00c3\u00c3\u0082\u00c2\u00a1nea' },
+                  { num: 'IA', label: 'Generaci\u00c3\u00c3\u0082\u00c2\u00b3n autom\u00c3\u00c3\u0082\u00c2\u00a1tica' },
                 ].map((s, i) => (
                   <div key={i}>
                     <div className="font-bold text-gray-900 text-base">{s.num}</div>
@@ -150,7 +150,7 @@ export default function LoginPage() {
 
           <p className="text-center text-gray-400 text-xs mt-5">
             Al continuar aceptas nuestros{' '}
-            <Link href="/terms" className="underline hover:text-gray-600">TÃÃÂ©rminos</Link>
+            <Link href="/terms" className="underline hover:text-gray-600">T\u00c3\u00c3\u0082\u00c2\u00a9rminos</Link>
             {' '}y{' '}
             <Link href="/privacy" className="underline hover:text-gray-600">Privacidad</Link>
           </p>
