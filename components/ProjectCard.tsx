@@ -57,7 +57,7 @@ export default function ProjectCard({ project, variables = [], onEdit, onDelete,
   const excerpt = (project.context || '').replace(/{{[^}]+}}/g, '...').slice(0, 110);
 
   return (
-    <div className="bg-zinc-900 rounded-xl border border-zinc-800 bg-zinc-900 shadow-none hover:shadow-none hover:border-violet-200 transition-all duration-200 flex flex-col">
+    <div className="bg-zinc-900/90 rounded-xl border border-zinc-800/80 shadow-none hover:shadow-[0_0_0_1px_rgba(139,92,246,0.25),0_4px_24px_rgba(139,92,246,0.08)] hover:border-violet-500/25 hover:-translate-y-0.5 transition-all duration-300 flex flex-col">
       {/* Header */}
       <div className="px-4 pt-4 pb-3 flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
@@ -133,7 +133,7 @@ export default function ProjectCard({ project, variables = [], onEdit, onDelete,
               <p className="text-xs text-zinc-400 mb-1.5 font-medium">Variables detectadas:</p>
               <div className="flex flex-wrap gap-1">
                 {vars.map(v => (
-                  <span key={v} className="text-xs bg-zinc-900 text-violet-600 border border-violet-100 px-2 py-0.5 rounded font-mono">
+                  <span key={v} className="text-xs bg-violet-500/10 text-violet-400 border border-violet-500/20 px-2 py-0.5 rounded-md font-mono">
                     {'{{'}{v}{'}}'}
                   </span>
                 ))}
