@@ -1,4 +1,5 @@
 'use client'
+import React from 'react'
 import { useState, useMemo } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import type { Project, UserVariable } from '@/lib/types'
@@ -101,7 +102,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         .single()
       if (created) {
         setProjects(prev => [created, ...prev])
-        showToast('Â¡Contexto creado!')
+        showToast('ÃÂ¡Contexto creado!')
       }
     }
     setLoading(false)
@@ -111,7 +112,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Â¿Seguro que quieres eliminar este contexto? Esta acciÃ³n no se puede deshacer.')) return
+    if (!confirm('ÃÂ¿Seguro que quieres eliminar este contexto? Esta acciÃÂ³n no se puede deshacer.')) return
     const { error } = await supabase.from('projects').delete().eq('id', id)
     if (!error) {
       setProjects(prev => prev.filter(p => p.id !== id))
@@ -121,7 +122,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
 
   async function handleDuplicate(project: Project) {
     if (isFreeLimitReached) {
-      showToast('LÃ­mite del plan Free alcanzado. Actualiza a Pro.', 'error')
+      showToast('LÃÂ­mite del plan Free alcanzado. Actualiza a Pro.', 'error')
       return
     }
     const { data: created } = await supabase
@@ -177,7 +178,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
     { icon: '&#128218;', label: 'Historial de versiones' },
     { icon: '&#127760;', label: 'Variables globales' },
     { icon: '&#128203;', label: 'Duplicado avanzado' },
-    { icon: '&#128228;', label: 'ExportaciÃ³n avanzada' },
+    { icon: '&#128228;', label: 'ExportaciÃÂ³n avanzada' },
   ]
 
   const showOnboarding = onboardingVisible && projects.length === 0
@@ -236,14 +237,14 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       </div>
 
-      {/* BANNER LÃMITE ALCANZADO */}
+      {/* BANNER LÃÂMITE ALCANZADO */}
       {isFreeLimitReached && (
         <div className="rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 p-5 text-white shadow-md">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <p className="font-bold text-base">Has alcanzado el lÃ­mite del plan Free</p>
+              <p className="font-bold text-base">Has alcanzado el lÃÂ­mite del plan Free</p>
               <p className="text-sm text-violet-100 mt-1">
-                Desbloquea memoria completa â contextos ilimitados, historial de versiones, generaciÃ³n con IA y mÃ¡s
+                Desbloquea memoria completa Ã¢ÂÂ contextos ilimitados, historial de versiones, generaciÃÂ³n con IA y mÃÂ¡s
               </p>
             </div>
             <a
@@ -258,7 +259,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
               <div className="h-full bg-white rounded-full w-full" />
             </div>
             <span className="text-xs text-violet-200 mt-1.5 block">
-              {projects.length}/{FREE_LIMIT} contextos â lÃ­mite alcanzado
+              {projects.length}/{FREE_LIMIT} contextos Ã¢ÂÂ lÃÂ­mite alcanzado
             </span>
           </div>
         </div>
@@ -294,7 +295,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         />
       )}
 
-      {/* EMPTY STATE — MEMORIA OPERATIVA */}
+      {/* EMPTY STATE â MEMORIA OPERATIVA */}
       {projects.length === 0 && !showOnboarding && (
         <div className="rounded-2xl border-2 border-dashed border-violet-200 bg-gradient-to-b from-violet-50/60 to-white p-14 text-center">
           {/* Keeper Core mini */}
@@ -309,7 +310,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           </div>
 
           <h3 className="text-xl font-bold text-gray-900 mb-2">Tu IA no recuerda nada.</h3>
-          <p className="text-base font-semibold text-violet-600 mb-3">Context Keeper sí.</p>
+          <p className="text-base font-semibold text-violet-600 mb-3">Context Keeper sÃ­.</p>
           <p className="text-sm text-gray-500 mb-8 max-w-sm mx-auto leading-relaxed">
             Crea tu primer contexto. Define la personalidad, el tono y las instrucciones de tu IA una sola vez.
             <br />
@@ -359,7 +360,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
       )}
       
 
-      {/* BÃSQL Y FILTROS */}
+      {/* BÃÂSQL Y FILTROS */}
       {projects.length > 0 && (
         <div className="flex flex-col sm:flex-row gap-2">
           <input
@@ -374,7 +375,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             onChange={e => setFilterTag(e.target.value)}
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
           >
-            <option value="">Todas las categorÃ­as</option>
+            <option value="">Todas las categorÃÂ­as</option>
             {allTags.map(tag => <option key={tag} value={tag}>{tag}</option>)}
           </select>
         </div>
@@ -393,7 +394,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
               onHistory={() => setHistoryProject(project)}
               onDuplicate={() => handleDuplicate(project)}
               plan={plan}
-              onCopy={() => { setHasCopied(true); showToast('Â¡Prompt copiado!') }}
+              onCopy={() => { setHasCopied(true); showToast('ÃÂ¡Prompt copiado!') }}
               onPreview={() => setHasPreview(true)}
             />
           ))}
@@ -438,6 +439,76 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           plan={plan}
         />
       </div>
+
+      {/* Promo code section - solo para Free */}
+      {!isPro && (
+        <div className="mt-8 bg-gradient-to-br from-violet-900/20 to-zinc-900 border border-violet-800/30 rounded-2xl p-6">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <p className="text-white font-semibold mb-1">
+                <span dangerouslySetInnerHTML={{ __html: '&#9670;' }} /> ¿Tienes un código?
+              </p>
+              <p className="text-zinc-400 text-sm">Aplica un código promocional para acceder a Pro gratis.</p>
+            </div>
+            <PromoInput />
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function PromoInput() {
+  const [code, setCode] = React.useState('')
+  const [status, setStatus] = React.useState<'idle' | 'loading' | 'success' | 'error'>('idle')
+  const [msg, setMsg] = React.useState('')
+
+  const apply = async () => {
+    if (!code.trim()) return
+    setStatus('loading')
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: 'pro', promoCode: code.trim().toUpperCase() })
+      })
+      const data = await res.json()
+      if (data.url) {
+        setStatus('success')
+        setMsg('Redirigiendo...')
+        window.location.href = data.url
+      } else {
+        setStatus('error')
+        setMsg('Código no válido o expirado')
+      }
+    } catch {
+      setStatus('error')
+      setMsg('Error al aplicar')
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-2 items-end">
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={code}
+          onChange={e => setCode(e.target.value.toUpperCase())}
+          onKeyDown={e => e.key === 'Enter' && apply()}
+          placeholder="KEEPER2025"
+          className="bg-zinc-800 border border-zinc-700 text-white text-sm px-4 py-2.5 rounded-xl w-40 focus:outline-none focus:border-violet-500 font-mono tracking-wider"
+        />
+        <button
+          onClick={apply}
+          disabled={status === 'loading'}
+          className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm px-4 py-2.5 rounded-xl font-medium transition-all"
+        >
+          {status === 'loading' ? '...' : 'Aplicar'}
+        </button>
+      </div>
+      {msg && (
+        <p className={`text-xs ${status === 'error' ? 'text-red-400' : 'text-emerald-400'}`}>{msg}</p>
+      )}
     </div>
   )
 }
