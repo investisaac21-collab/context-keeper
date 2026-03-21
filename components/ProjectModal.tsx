@@ -67,7 +67,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
       } else {
         setAiError(data.error || 'Error generando contexto')
       }
-    } catch {
+    } catch (_e) {
       setAiError('Error de conexión')
     }
     setAiLoading(false)
