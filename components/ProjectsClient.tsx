@@ -24,86 +24,68 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   const planLabel = plan === 'team' ? 'Team' : plan === 'pro' ? 'Pro' : 'Free'
 
   const [projects, setProjects] = useState<Project[]>(initialProjects)
-  const [search, setSearch] = useState('')
-  const [filterTag, setFilterTag] = useState('')
-  const [showModal, setShowModal] = useState(false)
-  const [templateData, setTemplateData] = useState<typeof TEMPLATES[0] | null>(null)
-  const [editingProject, setEditingProject] = useState<Project | null>(null)
-  const [historyProject, setHistoryProject] = useState<Project | null>(null)
   const [variables, setVariables] = useState<UserVariable[]>(initialVariables)
+  const [search, setSearch] = useState('')
+  const [category, setCategory] = useState('all')
+  const [showModal, setShowModal] = useState(false)
+  const [editingProject, setEditingProject] = useState<Project | null>(null)
+  const [templateData, setTemplateData] = useState<Partial<Project> | null>(null)
+  const [historyProjectId, setHistoryProjectId] = useState<string | null>(null)
+  const [showVariables, setShowVariables] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [hasCopied, setHasCopied] = useState(false)
-  const [hasPreview, setHasPreview] = useState(false)
-  const [showVariablesPanel, setShowVariablesPanel] = useState(false)
-  const [onboardingVisible, setOnboardingVisible] = useState(true)
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
+  const [tab, setTab] = useState<'contexts' | 'templates'>('contexts')
 
   const supabase = createClientComponentClient()
-
-  const isFreeLimitReached = !isPro && projects.length >= FREE_LIMIT
 
   function showToast(msg: string, type: 'success' | 'error' = 'success') {
     setToast({ msg, type })
     setTimeout(() => setToast(null), 3000)
   }
 
-  const filtered = useMemo(() => {
-    return projects.filter(p => {
-      const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.context?.toLowerCase().includes(search.toLowerCase())
-      const matchTag = filterTag ? (p.tag === filterTag || p.category === filterTag) : true
-      return matchSearch && matchTag
-    })
-  }, [projects, search, filterTag])
-
-  const allTags = useMemo(() => {
-    const tags = projects.map(p => p.tag || p.category).filter(Boolean) as string[]
-    return [...new Set(tags)]
-  }, [projects])
-
   async function saveVersion(projectId: string, context: string) {
-    if (!isPro) return
-    const { data: last } = await supabase
-      .from('project_versions')
-      .select('version_number')
-      .eq('project_id', projectId)
-      .order('version_number', { ascending: false })
-      .limit(1)
-      .single()
-    const nextVersion = (last?.version_number ?? 0) + 1
     await supabase.from('project_versions').insert({
       project_id: projectId,
       user_id: userId,
       context,
-      version_number: nextVersion,
+      created_at: new Date().toISOString()
     })
   }
 
   async function handleSave(data: Partial<Project>) {
     setLoading(true)
-    if (editingProject) {
-      if (editingProject.context) {
-        await saveVersion(editingProject.id, editingProject.context)
-      }
-      const { data: updated } = await supabase
-        .from('projects')
-        .update({ ...data, updated_at: new Date().toISOString() })
-        .eq('id', editingProject.id)
-        .select()
-        .single()
-      if (updated) {
-        setProjects(prev => prev.map(p => p.id === updated.id ? updated : p))
+    try {
+      if (editingProject) {
+        if (editingProject.context !== data.context) {
+          await saveVersion(editingProject.id, editingProject.context || '')
+        }
+        const { data: updated, error } = await supabase
+          .from('projects')
+          .update({ ...data, updated_at: new Date().toISOString() })
+          .eq('id', editingProject.id)
+          .select()
+          .single()
+        if (error) throw error
+        setProjects(prev => prev.map(p => p.id === editingProject.id ? updated : p))
         showToast('Contexto actualizado')
-      }
-    } else {
-      const { data: created } = await supabase
-        .from('projects')
-        .insert({ ...data, user_id: userId })
-        .select()
-        .single()
-      if (created) {
+      } else {
+        if (!isPro && projects.length >= FREE_LIMIT) {
+          showToast('L\u00edmite del plan Free alcanzado. Actualiza a Pro.', 'error')
+          setLoading(false)
+          return
+        }
+        const { data: created, error } = await supabase
+          .from('projects')
+          .insert([{ ...data, user_id: userId, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }])
+          .select()
+          .single()
+        if (error) throw error
         setProjects(prev => [created, ...prev])
-        showToast('ÃÂ¡Contexto creado!')
+        showToast('Contexto creado')
       }
+    } catch (err) {
+      showToast('Error al guardar', 'error')
     }
     setLoading(false)
     setShowModal(false)
@@ -112,43 +94,33 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('ÃÂ¿Seguro que quieres eliminar este contexto? Esta acciÃÂ³n no se puede deshacer.')) return
+    if (!confirm('\u00bfEliminar este contexto?')) return
     const { error } = await supabase.from('projects').delete().eq('id', id)
-    if (!error) {
-      setProjects(prev => prev.filter(p => p.id !== id))
-      showToast('Proyecto eliminado', 'error')
-    }
+    if (error) { showToast('Error al eliminar', 'error'); return }
+    setProjects(prev => prev.filter(p => p.id !== id))
+    showToast('Contexto eliminado')
   }
 
   async function handleDuplicate(project: Project) {
-    if (isFreeLimitReached) {
-      showToast('LÃÂ­mite del plan Free alcanzado. Actualiza a Pro.', 'error')
-      return
+    if (!isPro && projects.length >= FREE_LIMIT) {
+      showToast('L\u00edmite del plan Free alcanzado', 'error'); return
     }
-    const { data: created } = await supabase
+    const { data: created, error } = await supabase
       .from('projects')
-      .insert({
-        name: project.name + ' (copia)',
-        context: project.context,
-        tag: project.tag,
-        user_id: userId,
-      })
-      .select()
-      .single()
-    if (created) {
-      setProjects(prev => [created, ...prev])
-      showToast('Proyecto duplicado')
-    }
+      .insert([{ ...project, id: undefined, title: project.title + ' (copia)', user_id: userId, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }])
+      .select().single()
+    if (error) { showToast('Error al duplicar', 'error'); return }
+    setProjects(prev => [created, ...prev])
+    showToast('Contexto duplicado')
   }
 
   function handleExport() {
-    const blob = new Blob([JSON.stringify(projects, null, 2)], { type: 'application/json' })
+    const json = JSON.stringify({ projects, variables }, null, 2)
+    const blob = new Blob([json], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'context-keeper-export.json'
-    a.click()
-    showToast('Proyectos exportados')
+    const a = document.createElement('a'); a.href = url; a.download = 'context-keeper-export.json'; a.click()
+    URL.revokeObjectURL(url)
+    showToast('Exportado correctamente')
   }
 
   async function handleImport(e: React.ChangeEvent<HTMLInputElement>) {
@@ -156,309 +128,307 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
     if (!file) return
     try {
       const text = await file.text()
-      const imported = JSON.parse(text) as Project[]
-      for (const p of imported) {
-        await supabase.from('projects').insert({
-          name: p.name,
-          context: p.context,
-          tag: p.tag,
-          user_id: userId,
-        })
+      const parsed = JSON.parse(text)
+      const toImport = parsed.projects || []
+      for (const p of toImport) {
+        await supabase.from('projects').insert([{ ...p, id: undefined, user_id: userId, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }])
       }
-      showToast('Proyectos importados')
-      window.location.reload()
+      const { data } = await supabase.from('projects').select('*').eq('user_id', userId).order('created_at', { ascending: false })
+      setProjects(data || [])
+      showToast('Importado correctamente')
     } catch {
       showToast('Error al importar', 'error')
     }
   }
 
-  const progressPercent = isPro ? 100 : Math.min((projects.length / FREE_LIMIT) * 100, 100)
+  const categories = useMemo(() => {
+    const cats = new Set(projects.map(p => p.category).filter(Boolean))
+    return ['all', ...Array.from(cats)] as string[]
+  }, [projects])
 
-  const premiumFeatures = [
-    { icon: '&#128218;', label: 'Historial de versiones' },
-    { icon: '&#127760;', label: 'Variables globales' },
-    { icon: '&#128203;', label: 'Duplicado avanzado' },
-    { icon: '&#128228;', label: 'ExportaciÃÂ³n avanzada' },
-  ]
+  const filtered = useMemo(() => {
+    return projects.filter(p => {
+      const matchSearch = !search || p.title?.toLowerCase().includes(search.toLowerCase()) || p.context?.toLowerCase().includes(search.toLowerCase())
+      const matchCat = category === 'all' || p.category === category
+      return matchSearch && matchCat
+    })
+  }, [projects, search, category])
 
-  const showOnboarding = onboardingVisible && projects.length === 0
+  const onboarding = {
+    hasProject: projects.length > 0,
+    hasContext: projects.some(p => p.context && p.context.length > 50),
+    hasVariable: variables.length > 0,
+  }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5 space-y-4">
-
-      {/* TOAST GLOBAL */}
+    <div className="min-h-screen bg-zinc-950 text-white">
+      {/* Toast notification */}
       {toast && (
-        <div className={`fixed top-5 right-5 z-[100] px-5 py-3 rounded-xl shadow-lg text-sm font-medium transition-all animate-in ${
-          toast.type === 'success' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
-        }`}>
-          {toast.type === 'success' ? '&#10003; ' : '&#9888; '}{toast.msg}
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-2xl text-sm font-medium transition-all border ${toast.type === 'success' ? 'bg-zinc-900 border-violet-700 text-violet-300' : 'bg-zinc-900 border-red-700 text-red-300'}`}>
+          {toast.msg}
         </div>
       )}
 
-      {/* HEADER */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Mis Contextos</h1>
-          <div className="flex items-center gap-2 mt-1.5">
-            <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
-              plan === 'team' ? 'bg-purple-100 text-purple-700'
-              : plan === 'pro' ? 'bg-violet-100 text-violet-700'
-              : 'bg-gray-100 text-gray-500'
-            }`}>
-              Plan {planLabel}
-            </span>
-            <span className="text-xs text-gray-400">
-              {isPro ? 'Contextos ilimitados' : `${projects.length} de ${FREE_LIMIT} contextos usados`}
-            </span>
-          </div>
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          <button
-            onClick={handleExport}
-            className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition"
-          >
-            Exportar JSON
-          </button>
-          <label className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition cursor-pointer">
-            Importar JSON
-            <input type="file" accept=".json" onChange={handleImport} className="hidden" />
-          </label>
-          <button
-            onClick={() => { if (!isFreeLimitReached) setShowModal(true) }}
-            disabled={isFreeLimitReached}
-            className={`text-sm px-4 py-1.5 rounded-lg font-medium transition ${
-              isFreeLimitReached
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'bg-violet-600 text-white hover:bg-violet-700'
-            }`}
-          >
-            + Nuevo contexto
-          </button>
-        </div>
-      </div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
 
-      {/* BANNER LÃÂMITE ALCANZADO */}
-      {isFreeLimitReached && (
-        <div className="rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 p-5 text-white shadow-md">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div>
-              <p className="font-bold text-base">Has alcanzado el lÃÂ­mite del plan Free</p>
-              <p className="text-sm text-violet-100 mt-1">
-                Desbloquea memoria completa Ã¢ÂÂ contextos ilimitados, historial de versiones, generaciÃÂ³n con IA y mÃÂ¡s
-              </p>
+        {/* Header */}
+        <div className="flex items-start justify-between mb-8">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="text-2xl font-bold text-white">Memoria operativa</h1>
+              <span className={`text-xs px-2 py-1 rounded-full font-semibold ${plan === 'pro' ? 'bg-violet-900/50 text-violet-300 border border-violet-700' : plan === 'team' ? 'bg-blue-900/50 text-blue-300 border border-blue-700' : 'bg-zinc-800 text-zinc-400 border border-zinc-700'}`}>
+                {planLabel}
+              </span>
             </div>
-            <a
-              href="/pricing"
-              className="shrink-0 bg-white text-violet-700 font-semibold text-sm px-5 py-2 rounded-lg hover:bg-violet-50 transition whitespace-nowrap shadow-sm"
-            >
-              Hazte Pro &#8212; 9 &#8364;/mes
-            </a>
-          </div>
-          <div className="mt-4">
-            <div className="h-1.5 bg-violet-400/40 rounded-full overflow-hidden">
-              <div className="h-full bg-white rounded-full w-full" />
-            </div>
-            <span className="text-xs text-violet-200 mt-1.5 block">
-              {projects.length}/{FREE_LIMIT} contextos Ã¢ÂÂ lÃÂ­mite alcanzado
-            </span>
-          </div>
-        </div>
-      )}
-
-            {/* BARRA DE PROGRESO */}
-      {!isPro && !isFreeLimitReached && projects.length > 0 && (
-        <div className="rounded-lg border border-gray-200 bg-white px-4 py-2.5 flex items-center gap-3">
-          <span className="text-xs text-gray-500 shrink-0">{projects.length} de {FREE_LIMIT} contextos</span>
-          <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-violet-500 rounded-full transition-all"
-              style={{ width: progressPercent + '%' }}
-            />
-          </div>
-          <a href="/pricing" className="text-xs text-violet-600 hover:text-violet-700 font-medium shrink-0">Ver planes</a>
-        </div>
-      )}
-      
-{/* ONBOARDING CHECKLIST */}
-      {showOnboarding && (
-        <OnboardingChecklist
-          hasProjects={projects.length > 0}
-          hasVariables={variables.length > 0}
-          hasCopied={hasCopied}
-          hasPreview={hasPreview}
-          onCreateProject={() => setShowModal(true)}
-          onAddVariable={() => {
-            const el = document.getElementById('variables-panel')
-            if (el) el.scrollIntoView({ behavior: 'smooth' })
-          }}
-          onDismiss={() => setOnboardingVisible(false)}
-        />
-      )}
-
-      {/* EMPTY STATE â MEMORIA OPERATIVA */}
-      {projects.length === 0 && !showOnboarding && (
-        <div className="rounded-2xl border-2 border-dashed border-violet-200 bg-gradient-to-b from-violet-50/60 to-white p-14 text-center">
-          {/* Keeper Core mini */}
-          <div className="relative w-20 h-20 mx-auto mb-6">
-            <div className="absolute inset-0 rounded-full border border-violet-200/60 animate-ping opacity-20" />
-            <div className="absolute inset-2 rounded-full border border-violet-300/40" />
-            <div className="w-full h-full rounded-full bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center shadow-lg shadow-violet-500/30">
-              <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.347.347a3.75 3.75 0 00-1.097 2.651V19.5a.75.75 0 01-.75.75h-3a.75.75 0 01-.75-.75v-.904a3.75 3.75 0 00-1.097-2.651l-.347-.347z" />
-              </svg>
-            </div>
+            <p className="text-zinc-500 text-sm">
+              {isPro ? 'Contextos ilimitados activos' : `${projects.length} / ${FREE_LIMIT} contextos`}
+            </p>
           </div>
 
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Tu IA no recuerda nada.</h3>
-          <p className="text-base font-semibold text-violet-600 mb-3">Context Keeper sÃ­.</p>
-          <p className="text-sm text-gray-500 mb-8 max-w-sm mx-auto leading-relaxed">
-            Crea tu primer contexto. Define la personalidad, el tono y las instrucciones de tu IA una sola vez.
-            <br />
-            <span className="text-gray-400">No vuelvas a empezar de cero.</span>
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => setShowModal(true)}
-              className="bg-violet-600 text-white px-7 py-3 rounded-xl font-semibold text-sm hover:bg-violet-700 transition shadow-md shadow-violet-500/20 flex items-center gap-2 justify-center"
+              onClick={() => setShowVariables(!showVariables)}
+              className="px-3 py-2 text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-lg transition-all hidden sm:flex items-center gap-1.5"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Crear mi primer contexto
+              <span>Variables</span>
+              {variables.length > 0 && <span className="bg-violet-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">{variables.length}</span>}
             </button>
             <button
-              onClick={() => {
-                const tmpl = TEMPLATES[0]
-                setTemplateData(tmpl)
-                setShowModal(true)
-              }}
-              className="border border-violet-200 text-violet-600 bg-white px-7 py-3 rounded-xl font-medium text-sm hover:bg-violet-50 transition flex items-center gap-2 justify-center"
+              onClick={() => setShowOnboarding(!showOnboarding)}
+              className="p-2 text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-lg transition-all"
+              title="Gu\u00eda de inicio"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h10" />
-              </svg>
-              Usar una plantilla
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </button>
+            <button
+              onClick={() => { setEditingProject(null); setTemplateData(null); setShowModal(true) }}
+              className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold rounded-lg transition-all flex items-center gap-1.5"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+              Nuevo contexto
             </button>
           </div>
-
-          <p className="mt-6 text-xs text-gray-400">
-            &#9889; Usa las plantillas para empezar en 30 segundos
-          </p>
         </div>
-      )}
 
-                  {/* FUNCIONES PREMIUM BLOQUEADAS */}
-      {!isPro && projects.length > 0 && (
-        <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2.5 flex items-center gap-2 text-xs text-gray-500">
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-          </svg>
-          <span>Historial de versiones &middot; Variables globales &middot; Refinamiento IA &middot; Exportaci&oacute;n</span>
-          <a href="/pricing" className="ml-auto shrink-0 text-violet-600 hover:text-violet-700 font-semibold whitespace-nowrap">Hazte Pro &mdash; 9 &euro;/mes &rarr;</a>
-        </div>
-      )}
-      
+        {/* Onboarding */}
+        {showOnboarding && (
+          <div className="mb-6">
+            <OnboardingChecklist {...onboarding} />
+          </div>
+        )}
 
-      {/* BÃÂSQL Y FILTROS */}
-      {projects.length > 0 && (
-        <div className="flex flex-col sm:flex-row gap-2">
-          <input
-            type="text"
-            placeholder="Buscar contextos..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
-          />
-          <select
-            value={filterTag}
-            onChange={e => setFilterTag(e.target.value)}
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
-          >
-            <option value="">Todas las categorÃÂ­as</option>
-            {allTags.map(tag => <option key={tag} value={tag}>{tag}</option>)}
-          </select>
-        </div>
-      )}
-
-      {/* GRID DE PROYECTOS */}
-      {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map(project => (
-            <ProjectCard
-              key={project.id}
-              project={project}
+        {/* Variables panel */}
+        {showVariables && (
+          <div className="mb-6">
+            <UserVariablesPanel
               variables={variables}
-              onEdit={() => { setEditingProject(project); setShowModal(true) }}
-              onDelete={() => handleDelete(project.id)}
-              onHistory={() => setHistoryProject(project)}
-              onDuplicate={() => handleDuplicate(project)}
-              plan={plan}
-              onCopy={() => { setHasCopied(true); showToast('ÃÂ¡Prompt copiado!') }}
-              onPreview={() => setHasPreview(true)}
+              userId={userId}
+              isPro={isPro}
+              onUpdate={setVariables}
             />
+          </div>
+        )}
+
+        {/* Stats row */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+          {[
+            { label: 'Contextos', value: projects.length, icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
+            { label: 'Variables', value: variables.length, icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' },
+            { label: 'Plan', value: planLabel, icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z' },
+            { label: 'Categor\u00edas', value: Math.max(0, categories.length - 1), icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
+          ].map(stat => (
+            <div key={stat.label} className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <svg className="w-3.5 h-3.5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={stat.icon} />
+                </svg>
+                <span className="text-zinc-500 text-xs">{stat.label}</span>
+              </div>
+              <p className="text-xl font-bold text-white">{stat.value}</p>
+            </div>
           ))}
         </div>
-      ) : projects.length > 0 ? (
-        <div className="text-center py-12 text-gray-400">
-          <p className="text-sm">No se encontraron proyectos con ese filtro.</p>
-          <button
-            onClick={() => { setSearch(''); setFilterTag('') }}
-            className="text-xs text-violet-600 hover:underline mt-2"
-          >
-            Limpiar filtros
-          </button>
+
+        {/* Tabs */}
+        <div className="flex items-center gap-1 mb-6 bg-zinc-900 border border-zinc-800 rounded-xl p-1 w-fit">
+          {(['contexts', 'templates'] as const).map(t => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${tab === t ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-white'}`}
+            >
+              {t === 'contexts' ? 'Mis contextos' : 'Plantillas'}
+            </button>
+          ))}
         </div>
-      ) : null}
 
-      {/* MODALES */}
-      {showModal && (
-        <ProjectModal
-          onClose={() => { setShowModal(false); setEditingProject(null); setTemplateData(null) }}
-          onSave={handleSave}
-          project={editingProject}
-          isPro={isPro}
-          templateData={templateData}
-          loading={loading}
-        />
-      )}
+        {tab === 'templates' ? (
+          /* Templates Grid */
+          <div>
+            <p className="text-zinc-500 text-sm mb-4">Elige una plantilla para empezar r\u00e1pido</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {TEMPLATES.map((tpl, i) => (
+                <button
+                  key={i}
+                  onClick={() => { setTemplateData(tpl); setEditingProject(null); setShowModal(true); setTab('contexts') }}
+                  className="text-left p-5 bg-zinc-900 border border-zinc-800 hover:border-violet-600 rounded-xl transition-all group"
+                >
+                  <div className="text-2xl mb-3">{tpl.icon || '\u25c6'}</div>
+                  <h3 className="font-semibold text-white text-sm mb-1 group-hover:text-violet-300 transition-colors">{tpl.title}</h3>
+                  <p className="text-zinc-500 text-xs">{tpl.description || 'Plantilla predefinida'}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          /* Contexts tab */
+          <div>
+            {/* Filters */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+              <div className="relative flex-1">
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Buscar contextos..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors"
+                />
+              </div>
+              <select
+                value={category}
+                onChange={e => setCategory(e.target.value)}
+                className="px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 transition-colors"
+              >
+                <option value="all">Todas las categor\u00edas</option>
+                {categories.filter(c => c !== 'all').map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleExport}
+                  className="px-3 py-2 text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-xl text-sm transition-all flex items-center gap-1.5"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                  <span className="hidden sm:inline">Exportar</span>
+                </button>
+                <label className="px-3 py-2 text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-xl text-sm transition-all flex items-center gap-1.5 cursor-pointer">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12" /></svg>
+                  <span className="hidden sm:inline">Importar</span>
+                  <input type="file" accept=".json" onChange={handleImport} className="hidden" />
+                </label>
+              </div>
+            </div>
 
-      {historyProject && (
-        <HistoryModal
-          project={historyProject}
-          onClose={() => setHistoryProject(null)}
-          plan={plan}
-        />
-      )}
+            {/* Limit warning */}
+            {!isPro && projects.length >= FREE_LIMIT && (
+              <div className="mb-6 p-4 bg-violet-950/50 border border-violet-700/50 rounded-xl flex items-start gap-3">
+                <svg className="w-5 h-5 text-violet-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+                <div>
+                  <p className="text-violet-200 text-sm font-medium">L\u00edmite del plan Free alcanzado</p>
+                  <p className="text-violet-400 text-xs mt-0.5">Tienes {projects.length} contextos. Actualiza a Pro para crear ilimitados.</p>
+                </div>
+              </div>
+            )}
 
-      <div id="variables-panel">
-        <UserVariablesPanel
-          variables={variables}
-          setVariables={setVariables}
-          userId={userId}
-          plan={plan}
-        />
+            {/* Projects Grid */}
+            {filtered.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="w-16 h-16 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-4">
+                  <svg className="w-8 h-8 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                {search || category !== 'all' ? (
+                  <>
+                    <p className="text-zinc-400 font-medium mb-1">Sin resultados</p>
+                    <p className="text-zinc-600 text-sm">Prueba con otros filtros</p>
+                    <button onClick={() => { setSearch(''); setCategory('all') }} className="mt-4 text-violet-400 text-sm hover:text-violet-300">Limpiar filtros</button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-zinc-400 font-medium mb-1">A\u00fan no tienes contextos</p>
+                    <p className="text-zinc-600 text-sm mb-4">Crea tu primer contexto o usa una plantilla</p>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => { setEditingProject(null); setTemplateData(null); setShowModal(true) }}
+                        className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-all"
+                      >
+                        Crear contexto
+                      </button>
+                      <button
+                        onClick={() => setTab('templates')}
+                        className="px-4 py-2 border border-zinc-700 hover:border-zinc-500 text-zinc-300 text-sm font-medium rounded-lg transition-all"
+                      >
+                        Ver plantillas
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filtered.map(project => (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    variables={variables}
+                    isPro={isPro}
+                    onEdit={(p) => { setEditingProject(p); setShowModal(true) }}
+                    onDelete={handleDelete}
+                    onDuplicate={handleDuplicate}
+                    onHistory={(id) => setHistoryProjectId(id)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Promo Code Section - only for Free users */}
+        {!isPro && (
+          <div className="mt-12 pt-8 border-t border-zinc-800">
+            <div className="max-w-lg">
+              <p className="text-zinc-500 text-xs font-mono uppercase tracking-wider mb-2">Plan Free</p>
+              <h3 className="text-white font-semibold mb-1">\u00bfTienes un c\u00f3digo de acceso?</h3>
+              <p className="text-zinc-500 text-sm mb-4">Intro\u00daceolo para activar Pro al instante, sin tarjeta.</p>
+              <PromoInput onSuccess={(newPlan) => { window.location.reload() }} />
+            </div>
+          </div>
+        )}
+
       </div>
 
-      {/* Promo code section - solo para Free */}
-      {!isPro && (
-        <div className="mt-8 bg-gradient-to-br from-violet-900/20 to-zinc-900 border border-violet-800/30 rounded-2xl p-6">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div>
-              <p className="text-white font-semibold mb-1">
-                <span dangerouslySetInnerHTML={{ __html: '&#9670;' }} /> ¿Tienes un código?
-              </p>
-              <p className="text-zinc-400 text-sm">Aplica un código promocional para acceder a Pro gratis.</p>
-            </div>
-            <PromoInput />
-          </div>
-        </div>
+      {/* Modals */}
+      {showModal && (
+        <ProjectModal
+          project={editingProject}
+          templateData={templateData}
+          variables={variables}
+          isPro={isPro}
+          loading={loading}
+          onSave={handleSave}
+          onClose={() => { setShowModal(false); setEditingProject(null); setTemplateData(null) }}
+        />
+      )}
+
+      {historyProjectId && (
+        <HistoryModal
+          projectId={historyProjectId}
+          userId={userId}
+          onClose={() => setHistoryProjectId(null)}
+        />
       )}
     </div>
   )
 }
 
-function PromoInput() {
+function PromoInput({ onSuccess }: { onSuccess?: (plan: string) => void }) {
   const [code, setCode] = React.useState('')
   const [status, setStatus] = React.useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [msg, setMsg] = React.useState('')
@@ -467,47 +437,51 @@ function PromoInput() {
     if (!code.trim()) return
     setStatus('loading')
     try {
-      const res = await fetch('/api/stripe/checkout', {
+      const res = await fetch('/api/redeem-promo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan: 'pro', promoCode: code.trim().toUpperCase() })
+        body: JSON.stringify({ code: code.trim().toUpperCase() })
       })
       const data = await res.json()
-      if (data.url) {
+      if (data.success) {
         setStatus('success')
-        setMsg('Redirigiendo...')
-        window.location.href = data.url
+        setMsg(data.message || 'Plan activado')
+        setTimeout(() => {
+          if (onSuccess) onSuccess(data.plan)
+          else window.location.reload()
+        }, 1500)
       } else {
         setStatus('error')
-        setMsg('Código no válido o expirado')
+        setMsg(data.error || 'C\u00f3digo no v\u00e1lido')
       }
     } catch {
       setStatus('error')
-      setMsg('Error al aplicar')
+      setMsg('Error de conexi\u00f3n')
     }
   }
 
   return (
-    <div className="flex flex-col gap-2 items-end">
+    <div>
       <div className="flex gap-2">
         <input
           type="text"
+          placeholder="KEEPER2025"
           value={code}
           onChange={e => setCode(e.target.value.toUpperCase())}
           onKeyDown={e => e.key === 'Enter' && apply()}
-          placeholder="KEEPER2025"
-          className="bg-zinc-800 border border-zinc-700 text-white text-sm px-4 py-2.5 rounded-xl w-40 focus:outline-none focus:border-violet-500 font-mono tracking-wider"
+          disabled={status === 'loading' || status === 'success'}
+          className="flex-1 px-4 py-2.5 bg-zinc-900 border border-zinc-700 focus:border-violet-500 rounded-xl text-sm text-white placeholder-zinc-600 font-mono focus:outline-none transition-colors"
         />
         <button
           onClick={apply}
-          disabled={status === 'loading'}
-          className="bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm px-4 py-2.5 rounded-xl font-medium transition-all"
+          disabled={status === 'loading' || status === 'success' || !code.trim()}
+          className="px-4 py-2.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-all"
         >
           {status === 'loading' ? '...' : 'Aplicar'}
         </button>
       </div>
       {msg && (
-        <p className={`text-xs ${status === 'error' ? 'text-red-400' : 'text-emerald-400'}`}>{msg}</p>
+        <p className={`text-xs mt-2 ${status === 'success' ? 'text-green-400' : 'text-red-400'}`}>{msg}</p>
       )}
     </div>
   )
