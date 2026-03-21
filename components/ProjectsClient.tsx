@@ -237,14 +237,14 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             { label: 'Plan', value: planLabel, icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z' },
             { label: 'Categorías', value: Math.max(0, categories.length - 1), icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
           ].map(stat => (
-            <div key={stat.label} className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <svg className="w-3.5 h-3.5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div key={stat.label} className="bg-zinc-900/80 border border-zinc-800/80 rounded-2xl p-4 hover:border-violet-500/25 hover:bg-zinc-900 transition-all duration-400 group/stat cursor-default">
+              <div className="flex items-center gap-2 mb-1.5">
+                <svg className="w-3.5 h-3.5 text-violet-400 group-hover/stat:text-violet-300 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={stat.icon} />
                 </svg>
-                <span className="text-zinc-500 text-xs">{stat.label}</span>
+                <span className="text-zinc-600 text-xs uppercase tracking-wide font-medium">{stat.label}</span>
               </div>
-              <p className="text-xl font-bold text-white">{stat.value}</p>
+              <p className="text-2xl font-bold text-white group-hover/stat:text-violet-100 transition-colors duration-300">{stat.value}</p>
             </div>
           ))}
         </div>
