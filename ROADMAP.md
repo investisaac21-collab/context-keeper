@@ -48,3 +48,5 @@
 - **IA:** Groq API (llama-3.1-8b-instant, llama-3.3-70b-versatile)
 - **Pagos:** Stripe (planes Free/Pro/Team)
 - **Precios:** Free, Pro 9 €/mes, Team 20 €/mes
+
+<!-- deploy trigger 1774127243129 -->
