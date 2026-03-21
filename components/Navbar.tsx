@@ -28,7 +28,7 @@ export default function Navbar({ userEmail, plan = 'free' }: NavbarProps) {
 
   const planColors: Record<string, string> = {
     free: 'bg-gray-100 text-gray-600',
-    pro: 'bg-indigo-100 text-indigo-700',
+    pro: 'bg-violet-100 text-violet-700',
     team: 'bg-purple-100 text-purple-700',
   }
 
@@ -42,7 +42,7 @@ export default function Navbar({ userEmail, plan = 'free' }: NavbarProps) {
     <nav className="bg-white border-b border-gray-200 px-6 py-3 sticky top-0 z-40">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
@@ -59,7 +59,7 @@ export default function Navbar({ userEmail, plan = 'free' }: NavbarProps) {
           {plan === 'free' && (
             <Link
               href="/pricing"
-              className="text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-full transition-colors"
+              className="text-xs font-semibold bg-violet-600 hover:bg-violet-700 text-white px-3 py-1.5 rounded-full transition-colors"
             >
               Mejorar a Pro
             </Link>
@@ -71,7 +71,7 @@ export default function Navbar({ userEmail, plan = 'free' }: NavbarProps) {
                 onClick={() => setMenuOpen(!menuOpen)}
                 className="flex items-center gap-2 hover:bg-gray-50 px-2 py-1.5 rounded-lg transition-colors"
               >
-                <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                <div className="w-8 h-8 bg-violet-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                   {initials}
                 </div>
                 <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -115,7 +115,7 @@ export default function Navbar({ userEmail, plan = 'free' }: NavbarProps) {
                       <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                       </svg>
-                      Cerrar sesión
+                      Cerrar sesiÃ³n
                     </button>
                   </div>
                 </div>
