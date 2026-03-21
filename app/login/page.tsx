@@ -25,7 +25,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
 
-      {/* Left â branding (solo desktop) */}
+      {/* Left Ã¢ÂÂ branding (solo desktop) */}
       <div className="hidden lg:flex flex-col justify-between w-1/2 bg-white border-r border-gray-100 p-12">
         {/* Logo */}
         <div className="flex items-center gap-2.5">
@@ -48,7 +48,7 @@ export default function LoginPage() {
             <span className="text-violet-600">reescribir el mismo prompt</span>
           </h1>
           <p className="text-gray-500 text-lg leading-relaxed max-w-sm mb-10">
-            Organiza tus mejores prompts para ChatGPT, Claude y Gemini. Variables dinÃ¡micas, IA integrada y un click para copiar.
+            Organiza tus mejores prompts para ChatGPT, Claude y Gemini. Variables dinÃÂ¡micas, IA integrada y un click para copiar.
           </p>
 
           <div className="space-y-5">
@@ -60,7 +60,7 @@ export default function LoginPage() {
                   </svg>
                 ),
                 title: 'Prompts siempre a mano',
-                desc: 'Guarda y organiza sin lÃ­mite. Nunca pierdas un buen prompt.'
+                desc: 'Guarda y organiza sin lÃÂ­mite. Nunca pierdas un buen prompt.'
               },
               {
                 icon: (
@@ -97,13 +97,13 @@ export default function LoginPage() {
         <p className="text-gray-300 text-xs">&copy; 2026 Context Keeper</p>
       </div>
 
-      {/* Right â formulario */}
+      {/* Right Ã¢ÂÂ formulario */}
       <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-md">
 
           {/* Mobile logo */}
           <div className="flex flex-col items-center mb-8 lg:hidden">
-            <div className="w-14 h-14 bg-violet-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-200">
+            <div className="w-14 h-14 bg-violet-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-violet-200">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
@@ -136,8 +136,8 @@ export default function LoginPage() {
               <div className="grid grid-cols-3 gap-3 text-center">
                 {[
                   { num: '100%', label: 'Gratis para empezar' },
-                  { num: '1-click', label: 'Copia instantÃ¡nea' },
-                  { num: 'IA', label: 'GeneraciÃ³n automÃ¡tica' },
+                  { num: '1-click', label: 'Copia instantÃÂ¡nea' },
+                  { num: 'IA', label: 'GeneraciÃÂ³n automÃÂ¡tica' },
                 ].map((s, i) => (
                   <div key={i}>
                     <div className="font-bold text-gray-900 text-base">{s.num}</div>
@@ -150,7 +150,7 @@ export default function LoginPage() {
 
           <p className="text-center text-gray-400 text-xs mt-5">
             Al continuar aceptas nuestros{' '}
-            <Link href="/terms" className="underline hover:text-gray-600">TÃ©rminos</Link>
+            <Link href="/terms" className="underline hover:text-gray-600">TÃÂ©rminos</Link>
             {' '}y{' '}
             <Link href="/privacy" className="underline hover:text-gray-600">Privacidad</Link>
           </p>
