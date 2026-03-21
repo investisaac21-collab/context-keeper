@@ -101,7 +101,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         .single()
       if (created) {
         setProjects(prev => [created, ...prev])
-        showToast('\u00c3\u0082\u00c2\u00c3\u0082\u00c2\u00a1Proyecto creado!')
+        showToast('\u00a1Proyecto creado!')
       }
     }
     setLoading(false)
@@ -111,7 +111,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('\u00c3\u0082\u00c2\u00c3\u0082\u00c2\u00bfSeguro que quieres eliminar este proyecto? Esta acci\u00f3n no se puede deshacer.')) return
+    if (!confirm('\u00bfSeguro que quieres eliminar este proyecto? Esta acci\u00f3n no se puede deshacer.')) return
     const { error } = await supabase.from('projects').delete().eq('id', id)
     if (!error) {
       setProjects(prev => prev.filter(p => p.id !== id))
@@ -236,7 +236,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       </div>
 
-      {/* BANNER L\u00c3\u0083\u00c2\u00c3\u0082\u00c2\u008dMITE ALCANZADO */}
+      {/* BANNER L\u00cdMITE ALCANZADO */}
       {isFreeLimitReached && (
         <div className="rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 p-5 text-white shadow-md">
           <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -337,7 +337,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
       )}
       
 
-      {/* B\u00c3\u0083\u00c2\u00c3\u0082\u00c2\u009aSQL Y FILTROS */}
+      {/* B\u00daSQL Y FILTROS */}
       {projects.length > 0 && (
         <div className="flex flex-col sm:flex-row gap-2">
           <input
@@ -371,7 +371,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
               onHistory={() => setHistoryProject(project)}
               onDuplicate={() => handleDuplicate(project)}
               plan={plan}
-              onCopy={() => { setHasCopied(true); showToast('\u00c3\u0082\u00c2\u00c3\u0082\u00c2\u00a1Prompt copiado!') }}
+              onCopy={() => { setHasCopied(true); showToast('\u00a1Prompt copiado!') }}
               onPreview={() => setHasPreview(true)}
             />
           ))}
