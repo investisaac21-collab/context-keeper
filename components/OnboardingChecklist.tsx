@@ -86,7 +86,7 @@ export default function OnboardingChecklist({
               <span dangerouslySetInnerHTML={{ __html: '&#10003;' }} />
             </div>
             <div>
-              <p className="font-semibold text-green-800 text-sm">&#161;Listo! Ya dominas Context Keeper</p>
+              <p className="font-semibold text-green-800 text-sm">&#161;Listo! Ya dominas Keeper</p>
               <p className="text-xs text-green-600 mt-0.5">Completaste todos los pasos de inicio.</p>
             </div>
           </div>
@@ -104,7 +104,7 @@ export default function OnboardingChecklist({
         <div>
           <h2 className="font-bold text-gray-900 text-base">Primeros pasos</h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            Completa esta guía para sacarle el máximo provecho a Context Keeper
+            Completa esta guía para sacarle el máximo provecho a Keeper
           </p>
         </div>
         <button
