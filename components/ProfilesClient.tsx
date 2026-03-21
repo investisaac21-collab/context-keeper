@@ -109,7 +109,7 @@ export default function ProfilesClient({ userId, userEmail, plan, initialProfile
       } else {
         setAiError(data.error || 'Error generando perfil')
       }
-    } catch {
+    } catch (_e) {
       setAiError('Error de conexión')
     }
     setAiLoading(false)
@@ -149,7 +149,7 @@ export default function ProfilesClient({ userId, userEmail, plan, initialProfile
         setProfiles(prev => [data, ...prev])
         showToast('Perfil creado')
       }
-    } catch {
+    } catch (_e) {
       showToast('Error inesperado', 'err')
     }
     setSaving(false)
@@ -553,7 +553,7 @@ function ProfileChat({ profile, onClose }: { profile: KeeperProfile; onClose: ()
       })
       const data = await res.json()
       setMessages(prev => [...prev, { role: 'assistant', content: data.reply || data.error || 'Error' }])
-    } catch {
+    } catch (_e) {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Error de conexi\u00f3n' }])
     }
     setLoading(false)
