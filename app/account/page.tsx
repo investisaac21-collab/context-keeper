@@ -99,9 +99,9 @@ export default async function AccountPage() {
           </div>
         </div>
 
-        {/* SUSCRIPCI\u00d3N */}
+        {/* SUSCRIPCIÓN */}
         <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-4 shadow-sm">
-          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Suscripci\u00f3n</h2>
+          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Suscripción</h2>
           <div className="flex items-start justify-between gap-4 mb-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
@@ -120,10 +120,10 @@ export default async function AccountPage() {
                 )}
               </div>
               {periodEnd && (
-                <p className="text-sm text-gray-500 mt-1">Pr\u00f3xima renovaci\u00f3n: {periodEnd}</p>
+                <p className="text-sm text-gray-500 mt-1">Próxima renovación: {periodEnd}</p>
               )}
               {plan === 'free' && (
-                <p className="text-sm text-gray-400 mt-1">Sin suscripci\u00f3n activa</p>
+                <p className="text-sm text-gray-400 mt-1">Sin suscripción activa</p>
               )}
             </div>
           </div>
@@ -145,7 +145,7 @@ export default async function AccountPage() {
             </div>
           ) : (
             <p className="text-sm text-gray-400">
-              Para cancelar o gestionar tu suscripci\u00f3n, escr\u00edbenos a{' '}
+              Para cancelar o gestionar tu suscripción, escríbenos a{' '}
               <a href="mailto:hola@contextkeeper.app" className="text-violet-600 hover:underline">
                 hola@contextkeeper.app
               </a>
