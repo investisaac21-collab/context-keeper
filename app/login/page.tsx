@@ -50,8 +50,8 @@ export default function LoginPage() {
     setLoading(false)
   }
 
-  const pills = ['Memoria persistente', 'Variables din\u00e1micas', 'Historial', 'Generaci\u00f3n con IA']
-  const stats = [{ n: '10x', label: 'M\u00e1s r\u00e1pido' }, { n: '100%', label: 'Privado' }, { n: '\u221e', label: 'Contextos' }]
+  const pills = ['Memoria persistente', 'Variables dinámicas', 'Historial', 'Generación con IA']
+  const stats = [{ n: '10x', label: 'Más rápido' }, { n: '100%', label: 'Privado' }, { n: '∞', label: 'Contextos' }]
 
   return (
     <div className="min-h-screen bg-black flex overflow-hidden">
@@ -100,7 +100,7 @@ export default function LoginPage() {
             </span>
           </h1>
           <p className="text-zinc-400 text-lg leading-relaxed max-w-md mb-10">
-            Guarda personalidad, instrucciones y variables.<br />Rec\u00faparalos en segundos desde cualquier IA.
+            Guarda personalidad, instrucciones y variables.<br />Recúparalos en segundos desde cualquier IA.
           </p>
 
           {/* Pills */}
@@ -129,7 +129,7 @@ export default function LoginPage() {
 
         {/* Bottom */}
         <div className="relative z-10 text-zinc-600 text-xs">
-          Free para siempre \u00b7 Pro desde 9 \u20ac/mes
+          Free para siempre · Pro desde 9 €/mes
         </div>
       </div>
 
@@ -166,7 +166,7 @@ export default function LoginPage() {
               onClick={() => { setMode('login'); setError(''); setSuccess('') }}
               className={'flex-1 py-2 text-sm font-medium rounded-lg transition-all duration-200 ' + (mode === 'login' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300')}
             >
-              Iniciar sesi\u00f3n
+              Iniciar sesión
             </button>
             <button
               onClick={() => { setMode('register'); setError(''); setSuccess('') }}
@@ -211,12 +211,12 @@ export default function LoginPage() {
               />
             </div>
             <div className="group">
-              <label className="block text-xs text-zinc-500 mb-1.5 ml-1">Contrase\u00f1a</label>
+              <label className="block text-xs text-zinc-500 mb-1.5 ml-1">Contraseña</label>
               <input
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
+                placeholder="••••••••"
                 required
                 className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/20 transition-all duration-200"
               />
@@ -261,9 +261,9 @@ export default function LoginPage() {
           </button>
 
           <p className="text-center text-zinc-600 text-xs mt-6">
-            Free para siempre \u00b7 Pro desde{' '}
-            <span className="text-violet-400 font-medium">9 \u20ac/mes</span>
-            {' \u00b7 '}
+            Free para siempre · Pro desde{' '}
+            <span className="text-violet-400 font-medium">9 €/mes</span>
+            {' · '}
             <a href="/pricing" className="text-zinc-500 hover:text-zinc-300 transition-colors">Ver planes</a>
           </p>
         </div>
