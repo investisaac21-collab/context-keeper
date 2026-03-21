@@ -13,12 +13,11 @@ export async function POST(req: NextRequest) {
 
     const { code } = await req.json()
     if (!code) {
-      return NextResponse.json({ error: 'C\u00f3digo requerido' }, { status: 400 })
+      return NextResponse.json({ error: 'Codigo requerido' }, { status: 400 })
     }
 
     const upperCode = code.trim().toUpperCase()
 
-    // Validate promo code
     const { data: promo, error: promoError } = await supabase
       .from('promo_codes')
       .select('*')
@@ -26,33 +25,19 @@ export async function POST(req: NextRequest) {
       .single()
 
     if (promoError || !promo) {
-      return NextResponse.json({ error: 'C\u00f3digo no v\u00e1lido' }, { status: 400 })
+      return NextResponse.json({ error: 'Codigo no valido' }, { status: 400 })
     }
 
     if (promo.used_count >= promo.max_uses) {
-      return NextResponse.json({ error: 'C\u00f3digo agotado' }, { status: 400 })
+      return NextResponse.json({ error: 'Codigo agotado' }, { status: 400 })
     }
 
     if (promo.expires_at && new Date(promo.expires_at) < new Date()) {
-      return NextResponse.json({ error: 'C\u00f3digo expirado' }, { status: 400 })
+      return NextResponse.json({ error: 'Codigo expirado' }, { status: 400 })
     }
 
-    // Check if user already used this code
-    const { data: existingRedemption } = await supabase
-      .from('promo_redemptions')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('code', upperCode)
-      .single()
-
-    if (existingRedemption) {
-      return NextResponse.json({ error: 'Ya usaste este c\u00f3digo' }, { status: 400 })
-    }
-
-    // Apply the plan upgrade
     const targetPlan = promo.plan || 'pro'
 
-    // Upsert subscription
     const { error: subError } = await supabase
       .from('subscriptions')
       .upsert(
@@ -65,22 +50,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Error al aplicar el plan' }, { status: 500 })
     }
 
-    // Increment usage count
     await supabase
       .from('promo_codes')
-      .update({ used_count: promo.used_count + 1 })
+      .update({ used_count: (promo.used_count || 0) + 1 })
       .eq('code', upperCode)
-
-    // Record redemption (ignore error if table doesn't exist)
-    await supabase
-      .from('promo_redemptions')
-      .insert({ user_id: user.id, code: upperCode, plan: targetPlan })
-      .then(() => {})
 
     return NextResponse.json({ 
       success: true, 
       plan: targetPlan,
-      message: '\u00a1Plan activado! Ahora tienes acceso ' + targetPlan.charAt(0).toUpperCase() + targetPlan.slice(1)
+      message: 'Plan activado correctamente'
     })
 
   } catch (err) {
