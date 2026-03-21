@@ -361,7 +361,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
           </div>
         </div>
 
-        {/* CHAT DE REFINAMIENTO IA */}
+        {/* KEEPER LAB */}
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm mb-4 overflow-hidden">
           <button
             onClick={() => { if (isPro) setShowChat(!showChat) }}
@@ -377,11 +377,11 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
               </div>
               <div className="text-left">
                 <p className={`font-semibold text-sm ${isPro ? 'text-gray-900' : 'text-gray-400'}`}>
-                  Refinar con IA
+                  Keeper Lab <span className="text-xs bg-violet-100 text-violet-600 font-bold px-1.5 py-0.5 rounded ml-1">Lab</span>
                   {!isPro && <span className="ml-2 text-gray-300">&#128274;</span>}
                 </p>
                 <p className={`text-xs ${isPro ? 'text-gray-500' : 'text-gray-300'}`}>
-                  {isPro ? 'Dile a la IA cómo mejorar este prompt' : 'Disponible en plan Pro'}
+                  {isPro ? 'Refina tu contexto con inteligencia artificial' : 'Disponible en plan Pro'}
                 </p>
               </div>
             </div>
@@ -405,7 +405,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
               <div className="max-h-80 overflow-y-auto p-4 flex flex-col gap-3 bg-gray-50/50">
                 {chatMessages.length === 0 && (
                   <div className="text-center py-6">
-                    <p className="text-sm text-gray-400 mb-3">Dile a la IA cómo quieres mejorar el prompt</p>
+                    <p className="text-sm text-gray-400 mb-3">Dile a Keeper Lab cómo mejorar tu contexto</p>
                     <div className="flex flex-wrap gap-2 justify-center">
                       {[
                         'Házlo más formal',
