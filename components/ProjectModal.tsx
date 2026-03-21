@@ -75,7 +75,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
 
   const handleSubmit = () => {
     if (!name.trim()) return
-    onSave({ name, title: name, tag, category: tag, context })
+    onSave({ name, tag, category: tag, context })
   }
 
   return (
