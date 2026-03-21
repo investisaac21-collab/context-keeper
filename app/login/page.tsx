@@ -25,11 +25,11 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex">
 
-      {/* Left — branding (solo desktop) */}
+      {/* Left â branding (solo desktop) */}
       <div className="hidden lg:flex flex-col justify-between w-1/2 bg-white border-r border-gray-100 p-12">
         {/* Logo */}
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center shadow-sm">
+          <div className="w-9 h-9 bg-violet-600 rounded-xl flex items-center justify-center shadow-sm">
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
@@ -39,32 +39,32 @@ export default function LoginPage() {
 
         {/* Copy central */}
         <div>
-          <div className="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-100 rounded-full px-4 py-1.5 mb-8">
-            <span className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
-            <span className="text-indigo-600 text-sm font-medium">Potenciado con IA</span>
+          <div className="inline-flex items-center gap-2 bg-violet-50 border border-violet-100 rounded-full px-4 py-1.5 mb-8">
+            <span className="w-2 h-2 bg-violet-500 rounded-full animate-pulse"></span>
+            <span className="text-violet-600 text-sm font-medium">Potenciado con IA</span>
           </div>
           <h1 className="text-4xl font-extrabold text-gray-900 leading-tight mb-4">
             Nunca vuelvas a<br />
-            <span className="text-indigo-600">reescribir el mismo prompt</span>
+            <span className="text-violet-600">reescribir el mismo prompt</span>
           </h1>
           <p className="text-gray-500 text-lg leading-relaxed max-w-sm mb-10">
-            Organiza tus mejores prompts para ChatGPT, Claude y Gemini. Variables dinámicas, IA integrada y un click para copiar.
+            Organiza tus mejores prompts para ChatGPT, Claude y Gemini. Variables dinÃ¡micas, IA integrada y un click para copiar.
           </p>
 
           <div className="space-y-5">
             {[
               {
                 icon: (
-                  <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 ),
                 title: 'Prompts siempre a mano',
-                desc: 'Guarda y organiza sin límite. Nunca pierdas un buen prompt.'
+                desc: 'Guarda y organiza sin lÃ­mite. Nunca pierdas un buen prompt.'
               },
               {
                 icon: (
-                  <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
                   </svg>
                 ),
@@ -73,7 +73,7 @@ export default function LoginPage() {
               },
               {
                 icon: (
-                  <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 ),
@@ -82,7 +82,7 @@ export default function LoginPage() {
               },
             ].map((f, i) => (
               <div key={i} className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 bg-violet-50 border border-violet-100 rounded-xl flex items-center justify-center shrink-0">
                   {f.icon}
                 </div>
                 <div>
@@ -97,13 +97,13 @@ export default function LoginPage() {
         <p className="text-gray-300 text-xs">&copy; 2026 Context Keeper</p>
       </div>
 
-      {/* Right — formulario */}
+      {/* Right â formulario */}
       <div className="flex-1 flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-md">
 
           {/* Mobile logo */}
           <div className="flex flex-col items-center mb-8 lg:hidden">
-            <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-200">
+            <div className="w-14 h-14 bg-violet-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-200">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
@@ -136,8 +136,8 @@ export default function LoginPage() {
               <div className="grid grid-cols-3 gap-3 text-center">
                 {[
                   { num: '100%', label: 'Gratis para empezar' },
-                  { num: '1-click', label: 'Copia instantánea' },
-                  { num: 'IA', label: 'Generación automática' },
+                  { num: '1-click', label: 'Copia instantÃ¡nea' },
+                  { num: 'IA', label: 'GeneraciÃ³n automÃ¡tica' },
                 ].map((s, i) => (
                   <div key={i}>
                     <div className="font-bold text-gray-900 text-base">{s.num}</div>
@@ -150,7 +150,7 @@ export default function LoginPage() {
 
           <p className="text-center text-gray-400 text-xs mt-5">
             Al continuar aceptas nuestros{' '}
-            <Link href="/terms" className="underline hover:text-gray-600">Términos</Link>
+            <Link href="/terms" className="underline hover:text-gray-600">TÃ©rminos</Link>
             {' '}y{' '}
             <Link href="/privacy" className="underline hover:text-gray-600">Privacidad</Link>
           </p>
