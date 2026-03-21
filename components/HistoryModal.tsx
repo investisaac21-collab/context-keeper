@@ -87,7 +87,7 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
   async function handleRestore(version: ProjectVersion) {
     setRestoring(true)
     try {
-      // 1. Guardar versi\u00f3n actual antes de restaurar
+      // 1. Guardar versión actual antes de restaurar
       const { data: last } = await supabase
         .from('project_versions')
         .select('version_number')
@@ -106,7 +106,7 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
         })
       }
 
-      // 2. Aplicar el contexto de la versi\u00f3n restaurada
+      // 2. Aplicar el contexto de la versión restaurada
       const { data: updated } = await supabase
         .from('projects')
         .update({ context: version.context, updated_at: new Date().toISOString() })
@@ -115,7 +115,7 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
         .single()
 
       if (updated) {
-        showToast('\u00a1Versi\u00f3n ' + version.version_number + ' restaurada!')
+        showToast('¡Versión ' + version.version_number + ' restaurada!')
         if (onRestored) onRestored(updated)
         // Recargar versiones
         const { data: refreshed } = await supabase
@@ -143,11 +143,11 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
     })
   }
 
-  // Diff entre la versi\u00f3n seleccionada y la siguiente m\u00e1s reciente (o el estado actual)
+  // Diff entre la versión seleccionada y la siguiente más reciente (o el estado actual)
   const diffBase = selectedVersion
     ? (() => {
         const idx = versions.findIndex(v => v.id === selectedVersion.id)
-        // La versi\u00f3n anterior en el tiempo es la de menor index (m\u00e1s reciente) \u2014 mostramos diff contra la siguiente m\u00e1s nueva
+        // La versión anterior en el tiempo es la de menor index (más reciente) — mostramos diff contra la siguiente más nueva
         const newerVersion = idx > 0 ? versions[idx - 1] : null
         return newerVersion ? newerVersion.context : project.context || ''
       })()
@@ -174,7 +174,7 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
             <h2 className="font-bold text-gray-900 text-lg">Historial de versiones</h2>
             {versions.length > 0 && isPro && (
               <span className="text-xs bg-violet-50 text-violet-600 font-medium px-2 py-0.5 rounded-full">
-                {versions.length} versi{versions.length !== 1 ? 'ones' : '\u00f3n'}
+                {versions.length} versi{versions.length !== 1 ? 'ones' : 'ón'}
               </span>
             )}
           </div>
@@ -209,8 +209,8 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
         ) : versions.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
             <span className="text-3xl mb-3">&#128196;</span>
-            <p className="text-sm text-gray-500">A\u00fan no hay versiones guardadas para este proyecto.</p>
-            <p className="text-xs text-gray-400 mt-1">Las versiones se guardan autom\u00e1ticamente al editar.</p>
+            <p className="text-sm text-gray-500">Aún no hay versiones guardadas para este proyecto.</p>
+            <p className="text-xs text-gray-400 mt-1">Las versiones se guardan automáticamente al editar.</p>
           </div>
         ) : selectedVersion && showDiff ? (
           /* VISTA DIFF */
@@ -224,7 +224,7 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
               </button>
               <span className="text-xs text-gray-300">|</span>
               <span className="text-xs font-medium text-gray-700">
-                Versi\u00f3n {selectedVersion.version_number} &mdash; {formatDate(selectedVersion.created_at)}
+                Versión {selectedVersion.version_number} &mdash; {formatDate(selectedVersion.created_at)}
               </span>
             </div>
 
@@ -232,11 +232,11 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
               <div className="flex items-center gap-4 text-xs text-gray-500">
                 <span className="flex items-center gap-1.5">
                   <span className="w-3 h-3 rounded bg-green-100 border border-green-300 inline-block" />
-                  Texto a\u00f1adido despu\u00e9s
+                  Texto añadido después
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="w-3 h-3 rounded bg-red-100 border border-red-300 inline-block" />
-                  Texto eliminado despu\u00e9s
+                  Texto eliminado después
                 </span>
               </div>
             </div>
@@ -267,25 +267,25 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
                 disabled={restoring}
                 className="flex-1 py-2.5 bg-violet-600 text-white rounded-xl text-sm font-semibold hover:bg-violet-700 transition disabled:opacity-50"
               >
-                {restoring ? 'Restaurando...' : '\u21ba Restaurar esta versi\u00f3n'}
+                {restoring ? 'Restaurando...' : '↺ Restaurar esta versión'}
               </button>
             </div>
           </div>
         ) : (
           /* LISTA DE VERSIONES */
           <div className="flex-1 overflow-y-auto p-4 space-y-2">
-            {/* Versi\u00f3n actual */}
+            {/* Versión actual */}
             <div className="border-2 border-violet-200 bg-violet-50/40 rounded-xl p-4">
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm text-gray-900">Versi\u00f3n actual</span>
+                  <span className="font-semibold text-sm text-gray-900">Versión actual</span>
                   <span className="text-xs bg-violet-100 text-violet-600 font-medium px-2 py-0.5 rounded-full">Activa</span>
                 </div>
                 <span className="text-xs text-gray-400">
                   {project.updated_at ? formatDate(project.updated_at) : ''}
                 </span>
               </div>
-              <p className="text-xs text-gray-500 line-clamp-2 font-mono">{project.context || '(vac\u00edo)'}</p>
+              <p className="text-xs text-gray-500 line-clamp-2 font-mono">{project.context || '(vacío)'}</p>
             </div>
 
             {/* Versiones anteriores */}
@@ -296,7 +296,7 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
                 onClick={() => setSelectedVersion(selectedVersion?.id === v.id ? null : v)}
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-sm text-gray-900">Versi\u00f3n {v.version_number}</span>
+                  <span className="font-medium text-sm text-gray-900">Versión {v.version_number}</span>
                   <span className="text-xs text-gray-400">{formatDate(v.created_at)}</span>
                 </div>
                 <p className="text-xs text-gray-500 line-clamp-2 font-mono">{v.context}</p>
@@ -314,7 +314,7 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
                       disabled={restoring}
                       className="flex-1 py-1.5 text-xs bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition font-semibold disabled:opacity-50"
                     >
-                      {restoring ? 'Restaurando...' : '\u21ba Restaurar'}
+                      {restoring ? 'Restaurando...' : '↺ Restaurar'}
                     </button>
                   </div>
                 )}
