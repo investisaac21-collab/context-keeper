@@ -19,7 +19,7 @@ interface Props {
   isPro?: boolean
 }
 
-const CATEGORIES = ['IA', 'Marketing', 'Desarrollo', 'Negocios', 'Educación', 'Personal', 'Otro']
+const CATEGORIES = ['IA', 'Marketing', 'Desarrollo', 'Negocios', 'EducaciÃ³n', 'Personal', 'Otro']
 
 function extractVariables(text: string): string[] {
   const matches = text.match(/\{\{(\w+)\}\}/g) || []
@@ -75,7 +75,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
         setAiError(data.error || 'Error al generar el prompt')
       }
     } catch {
-      setAiError('Error de conexión con la IA')
+      setAiError('Error de conexiÃ³n con la IA')
     } finally {
       setAiLoading(false)
     }
@@ -105,7 +105,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
                 onClick={() => setShowTemplates(!showTemplates)}
                 className="text-sm text-sky-600 hover:text-sky-700 font-medium flex items-center gap-1"
               >
-                Usar plantilla predefinida {showTemplates ? '▲' : '▼'}
+                Usar plantilla predefinida {showTemplates ? 'â²' : 'â¼'}
               </button>
               {showTemplates && (
                 <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -143,9 +143,9 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
             </div>
 
             <div>
-              <label className="label">Categoría</label>
+              <label className="label">CategorÃ­a</label>
               <select value={tag} onChange={e => setTag(e.target.value)} className="input">
-                <option value="">Sin categoría</option>
+                <option value="">Sin categorÃ­a</option>
                 {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
@@ -176,19 +176,19 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
               </div>
 
               {showAI && isPro && (
-                <div className="mb-3 p-4 rounded-xl border-2 border-indigo-200 bg-indigo-50">
-                  <p className="text-xs font-semibold text-indigo-700 mb-2">&#129504; Describe qué quieres y la IA creará el prompt</p>
+                <div className="mb-3 p-4 rounded-xl border-2 border-violet-200 bg-violet-50">
+                  <p className="text-xs font-semibold text-violet-700 mb-2">&#129504; Describe quÃ© quieres y la IA crearÃ¡ el prompt</p>
                   <textarea
                     value={aiDescription}
                     onChange={e => setAiDescription(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg border border-indigo-200 bg-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    className="w-full px-3 py-2 rounded-lg border border-violet-200 bg-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-violet-400"
                     rows={3}
-                    placeholder="Ej: Un prompt para responder emails de clientes de forma profesional y empática..."
+                    placeholder="Ej: Un prompt para responder emails de clientes de forma profesional y empÃ¡tica..."
                     onKeyDown={e => { if(e.key === 'Enter' && e.metaKey) handleGenerateAI() }}
                   />
                   {aiError && <p className="text-xs text-red-500 mt-1">{aiError}</p>}
                   <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-indigo-400">Cmd+Enter para generar</span>
+                    <span className="text-xs text-violet-400">Cmd+Enter para generar</span>
                     <button
                       type="button"
                       onClick={handleGenerateAI}
@@ -221,7 +221,7 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
                 value={context}
                 onChange={e => setContext(e.target.value)}
                 className="input min-h-[180px] resize-y font-mono text-sm"
-                placeholder="Escribe tu contexto... Usa {{variable}} para valores dinámicos"
+                placeholder="Escribe tu contexto... Usa {{variable}} para valores dinÃ¡micos"
                 required
               />
               {variables.length > 0 && (
