@@ -50,6 +50,16 @@ export default function Navbar({ userEmail, plan = 'free' }: NavbarProps) {
           <span className="font-bold text-gray-900">Context Keeper</span>
         </Link>
 
+        <div className="hidden md:flex items-center gap-1">
+          <a href="/dashboard" className="text-sm font-medium text-gray-500 hover:text-gray-900 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors">Contextos</a>
+          <a href="/profiles" className="text-sm font-medium text-gray-500 hover:text-gray-900 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors flex items-center gap-1.5">
+            <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            Profiles
+            <span className="text-xs bg-violet-100 text-violet-600 font-bold px-1.5 py-0.5 rounded-md">Beta</span>
+          </a>
+        </div>
         <div className="flex items-center gap-3">
           {plan !== 'free' && (
             <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${planColors[plan]}`}>
