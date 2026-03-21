@@ -400,6 +400,42 @@ export default function Home() {
               <p className="text-white/40 text-sm leading-relaxed">Personalidad, tono, reglas, comportamiento. Quién es tu IA para este proyecto — de forma persistente y reutilizable.</p>
             </div>
           </div>
+
+          {/* Profile card mockup */}
+          <div className="mt-14 max-w-sm mx-auto">
+            <div className="text-center mb-4">
+              <span className="text-xs text-white/30 uppercase tracking-widest">Así se verá un Keeper Profile</span>
+            </div>
+            <div className="rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-950/40 to-[#111113] p-6 shadow-xl shadow-violet-500/10 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-violet-600/10 rounded-full blur-2xl"></div>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center font-bold text-white text-sm shadow-lg shadow-violet-500/30">M</div>
+                <div>
+                  <div className="text-white font-semibold text-sm">Marketing Lead</div>
+                  <div className="text-violet-400 text-xs">Keeper Profile · Pro</div>
+                </div>
+                <div className="ml-auto">
+                  <span className="text-xs bg-violet-500/20 text-violet-300 px-2 py-0.5 rounded-full font-medium">Activo</span>
+                </div>
+              </div>
+              <div className="space-y-2 mb-4">
+                {[
+                  { label: 'Tono', value: 'Persuasivo, premium, sin jerga' },
+                  { label: 'Rol', value: 'CMO experto en B2B SaaS' },
+                  { label: 'Regla', value: 'Siempre terminar con CTA claro' },
+                ].map((row, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <span className="text-white/30 text-xs w-14 flex-shrink-0 pt-0.5">{row.label}</span>
+                    <span className="text-white/70 text-xs leading-relaxed">{row.value}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                <span className="text-white/25 text-xs">Usado hace 1h en ChatGPT</span>
+                <div className="bg-violet-600/80 text-white text-xs font-semibold px-3 py-1.5 rounded-lg opacity-60 cursor-not-allowed">Usar perfil</div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
