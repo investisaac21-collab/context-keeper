@@ -120,7 +120,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
   }
 
   async function handleDelete() {
-    if (!confirm('¿Seguro que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) return
+    if (!confirm('¿Seguro que quieres eliminar este contexto? Esta acción no se puede deshacer.')) return
     await supabase.from('projects').delete().eq('id', project.id)
     router.push('/dashboard')
   }
