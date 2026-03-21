@@ -73,7 +73,7 @@ export default function KeeperBot({ userId, plan }: KeeperBotProps) {
       })
       const d = await r.json()
       setMessages(prev => [...prev, { role: 'assistant', content: d.reply || d.error || 'Sin respuesta' }])
-    } catch (err) {
+    } catch (_e) {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Error de conexión.' }])
     }
     setLoading(false)
@@ -83,7 +83,7 @@ export default function KeeperBot({ userId, plan }: KeeperBotProps) {
 
   return (
     <>
-      {/* Trigger button — minimal, premium */}
+      {/* Trigger button */}
       <button
         onClick={() => setOpen(o => !o)}
         className={
@@ -95,23 +95,49 @@ export default function KeeperBot({ userId, plan }: KeeperBotProps) {
         <div className={
           'relative w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 ' +
           (open
-            ? 'bg-zinc-800 border border-zinc-700 shadow-none scale-95'
+            ? 'bg-zinc-900 border border-violet-500/40 scale-95'
             : 'bg-zinc-900 border border-zinc-800 hover:border-violet-500/50 shadow-2xl hover:shadow-violet-500/10 hover:scale-105')
-        }>
-          {/* Glow ring when closed */}
+        }
+          style={open ? {
+            boxShadow: '0 0 0 1px rgba(139,92,246,0.3), 0 0 20px rgba(139,92,246,0.25), 0 0 40px rgba(139,92,246,0.1)'
+          } : {}}
+        >
+          {/* AI glow — only when open */}
+          {open && (
+            <>
+              <div className="absolute inset-0 rounded-2xl animate-pulse" style={{ background: 'radial-gradient(circle at center, rgba(139,92,246,0.15) 0%, transparent 70%)', animationDuration: '2s' }} />
+              <div className="absolute -inset-1 rounded-2xl" style={{ background: 'radial-gradient(circle at center, rgba(139,92,246,0.08) 0%, transparent 60%)', filter: 'blur(4px)' }} />
+            </>
+          )}
+
+          {/* Hover glow when closed */}
           {!open && (
             <div className="absolute inset-0 rounded-2xl bg-violet-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           )}
+
+          {/* Icon */}
           {open ? (
-            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-zinc-400">
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-violet-400 relative z-10">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           ) : (
-            <svg width="17" height="17" fill="none" viewBox="0 0 24 24" className="text-zinc-300 group-hover:text-violet-400 transition-colors duration-200">
+            <svg width="17" height="17" fill="none" viewBox="0 0 24 24" className="text-zinc-300 group-hover:text-violet-400 transition-colors duration-200 relative z-10">
               <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423L16.5 15.75l.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" fill="currentColor"/>
             </svg>
           )}
+
+          {/* Active indicator dot — visible when open */}
+          <div className={
+            'absolute -top-1 -right-1 w-3 h-3 rounded-full transition-all duration-300 ' +
+            (open ? 'opacity-100 scale-100' : 'opacity-0 scale-0')
+          }>
+            {/* Outer ping */}
+            <div className="absolute inset-0 rounded-full bg-violet-400 animate-ping" style={{ animationDuration: '1.5s' }} />
+            {/* Core dot */}
+            <div className="relative w-full h-full rounded-full" style={{ background: 'radial-gradient(circle at 35% 35%, #c4b5fd, #7c3aed)', boxShadow: '0 0 6px rgba(139,92,246,0.8)' }} />
+          </div>
         </div>
+
         {/* Tooltip */}
         {!open && (
           <span className="absolute right-14 top-1/2 -translate-y-1/2 whitespace-nowrap text-xs text-zinc-500 bg-zinc-900 border border-zinc-800 px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none translate-x-1 group-hover:translate-x-0">
@@ -121,29 +147,40 @@ export default function KeeperBot({ userId, plan }: KeeperBotProps) {
         )}
       </button>
 
-      {/* Panel — command palette style */}
+      {/* Panel */}
       {open && (
         <div
-          className="fixed bottom-24 right-7 z-50 w-[420px] max-w-[calc(100vw-2rem)] bg-zinc-950 border border-zinc-800/80 rounded-2xl shadow-2xl shadow-black/60 flex flex-col overflow-hidden"
+          className="fixed bottom-24 right-7 z-50 w-[420px] max-w-[calc(100vw-2rem)] flex flex-col overflow-hidden rounded-2xl"
           style={{
             maxHeight: '540px',
-            backdropFilter: 'blur(20px)',
             background: 'linear-gradient(135deg, rgba(9,9,11,0.98) 0%, rgba(12,10,16,0.98) 100%)',
-            boxShadow: '0 0 0 1px rgba(139,92,246,0.06), 0 32px 64px -12px rgba(0,0,0,0.8), 0 0 60px -20px rgba(139,92,246,0.08)'
+            backdropFilter: 'blur(20px)',
+            border: '1px solid rgba(139,92,246,0.15)',
+            boxShadow: '0 0 0 1px rgba(139,92,246,0.08), 0 32px 64px -12px rgba(0,0,0,0.8), 0 0 60px -20px rgba(139,92,246,0.15)'
           }}
         >
+          {/* Top glow line */}
+          <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent 0%, rgba(139,92,246,0.4) 50%, transparent 100%)' }} />
+
           {/* Header */}
           <div className="flex items-center gap-3 px-5 py-4 border-b border-zinc-800/60">
-            <div className="w-7 h-7 rounded-lg bg-violet-600/15 border border-violet-500/20 flex items-center justify-center flex-shrink-0">
-              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" className="text-violet-400">
+            <div className="relative w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(109,40,217,0.15)', border: '1px solid rgba(139,92,246,0.25)' }}>
+              {/* Breathing glow */}
+              <div className="absolute inset-0 rounded-lg animate-pulse" style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 70%)', animationDuration: '2s' }} />
+              <svg width="13" height="13" fill="none" viewBox="0 0 24 24" className="text-violet-400 relative z-10">
                 <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" fill="currentColor"/>
               </svg>
+              {/* Active dot in header icon */}
+              <div className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full" style={{ background: 'radial-gradient(circle at 35% 35%, #a78bfa, #6d28d9)', boxShadow: '0 0 4px rgba(139,92,246,0.7)' }} />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-white tracking-tight">Keeper AI</p>
-              <p className="text-xs text-zinc-600 mt-px">
-                {dataLoaded ? (contexts.length + ' contextos') : 'Iniciando...'}
-              </p>
+              <div className="flex items-center gap-1.5 mt-px">
+                <div className="w-1.5 h-1.5 rounded-full bg-violet-400" style={{ boxShadow: '0 0 4px rgba(139,92,246,0.8)' }} />
+                <p className="text-xs text-zinc-600">
+                  {dataLoaded ? (contexts.length + ' contextos cargados') : 'Iniciando...'}
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-1.5">
               <kbd className="hidden sm:flex items-center gap-1 px-1.5 py-0.5 text-[10px] text-zinc-600 bg-zinc-900 border border-zinc-800 rounded-md font-mono">Esc</kbd>
@@ -163,16 +200,16 @@ export default function KeeperBot({ userId, plan }: KeeperBotProps) {
             {messages.length === 0 && !dataLoaded && (
               <div className="flex items-center gap-2 py-6 justify-center">
                 <div className="flex gap-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-violet-500/60 animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <div className="w-1.5 h-1.5 rounded-full bg-violet-500/60 animate-bounce" style={{ animationDelay: '120ms' }} />
-                  <div className="w-1.5 h-1.5 rounded-full bg-violet-500/60 animate-bounce" style={{ animationDelay: '240ms' }} />
+                  <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: 'rgba(139,92,246,0.6)', animationDelay: '0ms' }} />
+                  <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: 'rgba(139,92,246,0.6)', animationDelay: '120ms' }} />
+                  <div className="w-1.5 h-1.5 rounded-full animate-bounce" style={{ background: 'rgba(139,92,246,0.6)', animationDelay: '240ms' }} />
                 </div>
               </div>
             )}
             {messages.map((m, i) => (
               <div key={i} className={m.role === 'user' ? 'flex justify-end' : 'flex justify-start items-start gap-2.5'}>
                 {m.role === 'assistant' && (
-                  <div className="w-5 h-5 rounded-md bg-violet-600/20 border border-violet-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <div className="relative w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: 'rgba(109,40,217,0.15)', border: '1px solid rgba(139,92,246,0.2)' }}>
                     <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" className="text-violet-400">
                       <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
                     </svg>
@@ -181,17 +218,23 @@ export default function KeeperBot({ userId, plan }: KeeperBotProps) {
                 <div className={
                   'max-w-[82%] text-sm leading-relaxed ' +
                   (m.role === 'user'
-                    ? 'bg-violet-600/15 border border-violet-500/20 text-zinc-200 px-3.5 py-2.5 rounded-2xl rounded-tr-md'
+                    ? 'text-zinc-200 px-3.5 py-2.5 rounded-2xl rounded-tr-md'
                     : 'text-zinc-300 py-0.5')
-                }>
+                }
+                  style={m.role === 'user' ? {
+                    background: 'rgba(109,40,217,0.15)',
+                    border: '1px solid rgba(139,92,246,0.2)'
+                  } : {}}
+                >
                   {m.content}
                 </div>
               </div>
             ))}
             {loading && (
               <div className="flex items-start gap-2.5">
-                <div className="w-5 h-5 rounded-md bg-violet-600/20 border border-violet-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" className="text-violet-400">
+                <div className="relative w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: 'rgba(109,40,217,0.15)', border: '1px solid rgba(139,92,246,0.2)' }}>
+                  <div className="absolute inset-0 rounded-md animate-pulse" style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 70%)', animationDuration: '1s' }} />
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" className="text-violet-400 relative z-10">
                     <path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
                   </svg>
                 </div>
@@ -205,10 +248,10 @@ export default function KeeperBot({ userId, plan }: KeeperBotProps) {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Suggestions — only on fresh chat */}
+          {/* Suggestions */}
           {messages.length <= 1 && !loading && (
             <div className="px-4 pb-3 flex flex-wrap gap-1.5">
-              {suggestions.map(s => (
+              {['¿Qué contextos tengo?', 'Crea uno para marketing', '¿Cómo funciona Keeper?'].map(s => (
                 <button
                   key={s}
                   onClick={() => { setInput(s); if (inputRef.current) inputRef.current.focus() }}
@@ -222,7 +265,10 @@ export default function KeeperBot({ userId, plan }: KeeperBotProps) {
 
           {/* Input */}
           <div className="px-4 pb-4">
-            <div className="flex items-center gap-2 bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 rounded-xl px-3.5 py-2.5 focus-within:border-violet-500/40 focus-within:bg-zinc-900 transition-all duration-200">
+            <div className="flex items-center gap-2 rounded-xl px-3.5 py-2.5 transition-all duration-200"
+              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
+              onFocus={() => {}}
+            >
               <input
                 ref={inputRef}
                 type="text"
@@ -236,7 +282,8 @@ export default function KeeperBot({ userId, plan }: KeeperBotProps) {
               <button
                 onClick={send}
                 disabled={!input.trim() || loading}
-                className="w-7 h-7 rounded-lg flex items-center justify-center bg-violet-600 hover:bg-violet-500 disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-150 flex-shrink-0"
+                className="w-7 h-7 rounded-lg flex items-center justify-center disabled:opacity-20 disabled:cursor-not-allowed transition-all duration-150 flex-shrink-0"
+                style={{ background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', boxShadow: input.trim() ? '0 0 10px rgba(109,40,217,0.4)' : 'none' }}
               >
                 <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" className="text-white">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
