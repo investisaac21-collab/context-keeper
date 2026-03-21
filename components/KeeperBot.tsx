@@ -97,7 +97,7 @@ export default function KeeperBot({ userId, plan }: KeeperBotProps) {
       const data = await res.json()
       const reply = data.reply || data.error || 'Sin respuesta'
       setMessages(prev => [...prev, { role: 'assistant', content: reply }])
-    } catch {
+    } catch (_e) {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Error de conexi\u00f3n. Intenta de nuevo.' }])
     }
     setLoading(false)
