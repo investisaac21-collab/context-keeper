@@ -71,7 +71,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         showToast('Contexto actualizado')
       } else {
         if (!isPro && projects.length >= FREE_LIMIT) {
-          showToast('L\u00edmite del plan Free alcanzado. Actualiza a Pro.', 'error')
+          showToast('Límite del plan Free alcanzado. Actualiza a Pro.', 'error')
           setLoading(false)
           return
         }
@@ -94,7 +94,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('\u00bfEliminar este contexto?')) return
+    if (!confirm('¿Eliminar este contexto?')) return
     const { error } = await supabase.from('projects').delete().eq('id', id)
     if (error) { showToast('Error al eliminar', 'error'); return }
     setProjects(prev => prev.filter(p => p.id !== id))
@@ -103,7 +103,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
 
   async function handleDuplicate(project: Project) {
     if (!isPro && projects.length >= FREE_LIMIT) {
-      showToast('L\u00edmite del plan Free alcanzado', 'error'); return
+      showToast('Límite del plan Free alcanzado', 'error'); return
     }
     const { data: created, error } = await supabase
       .from('projects')
@@ -196,7 +196,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             <button
               onClick={() => setShowOnboarding(!showOnboarding)}
               className="p-2 text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-lg transition-all"
-              title="Gu\u00eda de inicio"
+              title="Guía de inicio"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </button>
@@ -234,7 +234,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             { label: 'Contextos', value: projects.length, icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
             { label: 'Variables', value: variables.length, icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' },
             { label: 'Plan', value: planLabel, icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z' },
-            { label: 'Categor\u00edas', value: Math.max(0, categories.length - 1), icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
+            { label: 'Categorías', value: Math.max(0, categories.length - 1), icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
           ].map(stat => (
             <div key={stat.label} className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-1">
@@ -264,7 +264,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         {tab === 'templates' ? (
           /* Templates Grid */
           <div>
-            <p className="text-zinc-500 text-sm mb-4">Elige una plantilla para empezar r\u00e1pido</p>
+            <p className="text-zinc-500 text-sm mb-4">Elige una plantilla para empezar rápido</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {TEMPLATES.map((tpl, i) => (
                 <button
@@ -272,7 +272,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
                   onClick={() => { setTemplateData(tpl); setEditingProject(null); setShowModal(true); setTab('contexts') }}
                   className="text-left p-5 bg-zinc-900 border border-zinc-800 hover:border-violet-600 rounded-xl transition-all group"
                 >
-                  <div className="text-2xl mb-3">{tpl.emoji || '\u25c6'}</div>
+                  <div className="text-2xl mb-3">{tpl.emoji || '◆'}</div>
                   <h3 className="font-semibold text-white text-sm mb-1 group-hover:text-violet-300 transition-colors">{tpl.name}</h3>
                   <p className="text-zinc-500 text-xs">{tpl.tag || 'Plantilla'}</p>
                 </button>
@@ -301,7 +301,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
                 onChange={e => setCategory(e.target.value)}
                 className="px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 transition-colors"
               >
-                <option value="all">Todas las categor\u00edas</option>
+                <option value="all">Todas las categorías</option>
                 {categories.filter(c => c !== 'all').map(c => (
                   <option key={c} value={c}>{c}</option>
                 ))}
@@ -329,7 +329,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
                 <div>
-                  <p className="text-violet-200 text-sm font-medium">L\u00edmite del plan Free alcanzado</p>
+                  <p className="text-violet-200 text-sm font-medium">Límite del plan Free alcanzado</p>
                   <p className="text-violet-400 text-xs mt-0.5">Tienes {projects.length} contextos. Actualiza a Pro para crear ilimitados.</p>
                 </div>
               </div>
@@ -351,7 +351,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
                   </>
                 ) : (
                   <>
-                    <p className="text-zinc-400 font-medium mb-1">A\u00fan no tienes contextos</p>
+                    <p className="text-zinc-400 font-medium mb-1">Aún no tienes contextos</p>
                     <p className="text-zinc-600 text-sm mb-4">Crea tu primer contexto o usa una plantilla</p>
                     <div className="flex gap-3">
                       <button
@@ -393,8 +393,8 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           <div className="mt-12 pt-8 border-t border-zinc-800">
             <div className="max-w-lg">
               <p className="text-zinc-500 text-xs font-mono uppercase tracking-wider mb-2">Plan Free</p>
-              <h3 className="text-white font-semibold mb-1">\u00bfTienes un c\u00f3digo de acceso?</h3>
-              <p className="text-zinc-500 text-sm mb-4">Intr\u00f3ducelo para activar Pro al instante, sin tarjeta.</p>
+              <h3 className="text-white font-semibold mb-1">¿Tienes un código de acceso?</h3>
+              <p className="text-zinc-500 text-sm mb-4">Intróducelo para activar Pro al instante, sin tarjeta.</p>
               <PromoInput onSuccess={(newPlan) => { window.location.reload() }} />
             </div>
           </div>
@@ -443,11 +443,11 @@ function PromoInput({ onSuccess }: { onSuccess?: (plan: string) => void }) {
         }, 1500)
       } else {
         setStatus('error')
-        setMsg(data.error || 'C\u00f3digo no v\u00e1lido')
+        setMsg(data.error || 'Código no válido')
       }
     } catch {
       setStatus('error')
-      setMsg('Error de conexi\u00f3n')
+      setMsg('Error de conexión')
     }
   }
 
