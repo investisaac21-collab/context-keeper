@@ -197,7 +197,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
       {/* HEADER */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Mis Proyectos</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Mis Contextos</h1>
           <div className="flex items-center gap-2 mt-1.5">
             <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
               plan === 'team' ? 'bg-purple-100 text-purple-700'
@@ -207,7 +207,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
               Plan {planLabel}
             </span>
             <span className="text-xs text-gray-400">
-              {isPro ? 'Proyectos ilimitados' : `${projects.length} de ${FREE_LIMIT} proyectos usados`}
+              {isPro ? 'Proyectos ilimitados' : `${projects.length} de ${FREE_LIMIT} contextos usados`}
             </span>
           </div>
         </div>
@@ -231,7 +231,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
                 : 'bg-violet-600 text-white hover:bg-violet-700'
             }`}
           >
-            + Nuevo proyecto
+            + Nuevo contexto
           </button>
         </div>
       </div>
@@ -342,7 +342,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         <div className="flex flex-col sm:flex-row gap-2">
           <input
             type="text"
-            placeholder="Buscar proyectos..."
+            placeholder="Buscar contextos..."
             value={search}
             onChange={e => setSearch(e.target.value)}
             className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
