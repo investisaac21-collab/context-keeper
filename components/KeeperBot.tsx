@@ -1,7 +1,7 @@
 'use client'
 // Keeper Bot v1.0 - Fase 2
 import { useState, useEffect, useRef } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -14,7 +14,7 @@ interface KeeperBotProps {
 }
 
 export default function KeeperBot({ userId, plan }: KeeperBotProps) {
-  const supabase = createClientComponentClient()
+  const supabase = createClient()
   const [open, setOpen] = useState(false)
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
