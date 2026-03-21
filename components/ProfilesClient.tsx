@@ -41,6 +41,10 @@ function getColor(name: string): string {
 export default function ProfilesClient({ userId, userEmail, plan, initialProfiles }: Props) {
   const supabase = createClientComponentClient()
   const isPro = plan === 'pro' || plan === 'team'
+  const [aiDesc, setAiDesc] = useState('')
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiError, setAiError] = useState('')
+  const [showAIPanel, setShowAIPanel] = useState(false)
 
   const [profiles, setProfiles] = useState<KeeperProfile[]>(initialProfiles)
   const [tableError, setTableError] = useState(false)
@@ -79,7 +83,39 @@ export default function ProfilesClient({ userId, userEmail, plan, initialProfile
     setShowModal(true)
   }
 
-  const handleSave = async () => {
+  const handleGenerateProfile = async () => {
+    if (!aiDesc.trim()) return
+    setAiLoading(true)
+    setAiError('')
+    try {
+      const res = await fetch('/api/generate-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: aiDesc })
+      })
+      const data = await res.json()
+      if (data.profile) {
+        const p = data.profile
+        setForm(f => ({
+          ...f,
+          name: p.name || f.name,
+          role: p.role || f.role,
+          tone: p.tone || f.tone,
+          rules: p.rules || f.rules,
+          extra: p.extra || f.extra,
+        }))
+        setShowAIPanel(false)
+        setAiDesc('')
+      } else {
+        setAiError(data.error || 'Error generando perfil')
+      }
+    } catch {
+      setAiError('Error de conexión')
+    }
+    setAiLoading(false)
+  }
+
+    const handleSave = async () => {
     if (!form.name.trim()) return
     setSaving(true)
     const rules = form.rules.split('\n').map((r: string) => r.trim()).filter(Boolean)
@@ -346,13 +382,65 @@ export default function ProfilesClient({ userId, userEmail, plan, initialProfile
                 <h2 className="font-bold text-white">{editingProfile ? 'Editar perfil' : 'Nuevo Keeper Profile'}</h2>
                 <p className="text-xs text-zinc-500 mt-0.5">Define la identidad de tu IA</p>
               </div>
-              <button onClick={() => setShowModal(false)} className="w-8 h-8 rounded-lg hover:bg-zinc-800 flex items-center justify-center transition-colors text-zinc-400">
-                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => { setShowAIPanel(!showAIPanel); setAiError('') }}
+                  className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-violet-600/20 hover:bg-violet-600/30 text-violet-300 border border-violet-600/30 transition-colors"
+                >
+                  <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Generar con IA
+                </button>
+                <button onClick={() => { setShowModal(false); setShowAIPanel(false) }} className="w-8 h-8 rounded-lg hover:bg-zinc-800 flex items-center justify-center transition-colors text-zinc-400">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
             </div>
             <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+              {/* AI Generation Panel */}
+              {showAIPanel && (
+                <div className="bg-violet-950/30 border border-violet-700/40 rounded-xl p-4 space-y-3">
+                  <p className="text-xs font-semibold text-violet-300">Describe el tipo de perfil que quieres crear</p>
+                  <textarea
+                    className="w-full bg-zinc-900 border border-zinc-700 focus:border-violet-500 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-500 focus:outline-none resize-none transition-colors"
+                    placeholder="ej: Analista financiero senior especializado en startups, con tono formal pero accesible"
+                    rows={3}
+                    value={aiDesc}
+                    onChange={e => setAiDesc(e.target.value)}
+                  />
+                  {aiError && <p className="text-red-400 text-xs">{aiError}</p>}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleGenerateProfile}
+                      disabled={aiLoading || !aiDesc.trim()}
+                      className="flex-1 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-xs font-semibold py-2 rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                    >
+                      {aiLoading ? (
+                        <>
+                          <span className="w-3 h-3 rounded-full border-2 border-white/30 border-t-white animate-spin inline-block" />
+                          Generando...
+                        </>
+                      ) : (
+                        <>
+                          <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                          </svg>
+                          Generar perfil
+                        </>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => { setShowAIPanel(false); setAiDesc(''); setAiError('') }}
+                      className="px-3 py-2 text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-700 rounded-lg transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              )}
               <div>
                 <label className="block text-xs font-semibold text-zinc-300 mb-1.5">Nombre del perfil *</label>
                 <input
