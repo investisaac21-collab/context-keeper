@@ -94,7 +94,7 @@ export default function UserVariablesPanel({ variables: propVars, initialVariabl
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              AÃ±adir
+              Añadir
             </button>
           </div>
 
@@ -114,7 +114,7 @@ export default function UserVariablesPanel({ variables: propVars, initialVariabl
                     {v.default_value || <span className="text-gray-400 italic">Sin valor por defecto</span>}
                   </span>
                   {justAdded === v.id && (
-                    <span className="text-xs text-green-600 font-medium shrink-0">&#10003; AÃ±adida</span>
+                    <span className="text-xs text-green-600 font-medium shrink-0">&#10003; Añadida</span>
                   )}
                   <button onClick={() => handleDelete(v.id)} className="p-1 text-gray-400 hover:text-red-500 rounded shrink-0">
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -127,7 +127,7 @@ export default function UserVariablesPanel({ variables: propVars, initialVariabl
           ) : (
             <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-5 text-center">
               <div className="text-2xl mb-2">&#128204;</div>
-              <p className="text-sm font-medium text-gray-700 mb-1">AÃºn no tienes variables guardadas</p>
+              <p className="text-sm font-medium text-gray-700 mb-1">Aún no tienes variables guardadas</p>
               <p className="text-xs text-gray-400 mb-3">
                 Las variables te permiten reutilizar valores entre proyectos sin escribirlos cada vez.
               </p>
