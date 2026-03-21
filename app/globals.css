@@ -231,3 +231,96 @@ html {
 .card-enter {
   animation: card-in 0.5s ease forwards;
 }
+
+
+/* ===== KEEPER ATMOSPHERIC V2 ===== */
+
+/* Matte deep violet palette */
+:root {
+  --k-violet: rgba(109, 40, 217, 1);
+  --k-violet-glow: rgba(109, 40, 217, 0.25);
+  --k-violet-soft: rgba(139, 92, 246, 0.15);
+  --k-surface: rgba(255, 255, 255, 0.03);
+  --k-border: rgba(255, 255, 255, 0.07);
+  --k-bg: #080808;
+}
+
+/* Atmospheric orb glow */
+@keyframes orb-float {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-8px) scale(1.02); }
+}
+
+.orb-float {
+  animation: orb-float 6s ease-in-out infinite;
+}
+
+/* Vibrant matte button glow pulse */
+@keyframes btn-glow {
+  0%, 100% { box-shadow: 0 4px 20px rgba(109,40,217,0.25), inset 0 1px 0 rgba(255,255,255,0.1); }
+  50% { box-shadow: 0 4px 35px rgba(109,40,217,0.45), inset 0 1px 0 rgba(255,255,255,0.15); }
+}
+
+.btn-glow-pulse {
+  animation: btn-glow 3s ease-in-out infinite;
+}
+
+/* Subtle surface shimmer */
+@keyframes surface-shimmer {
+  0% { opacity: 0; background-position: -200% 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; background-position: 200% 0; }
+}
+
+/* Matte glass panel */
+.keeper-glass {
+  background: rgba(12, 10, 20, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(109, 40, 217, 0.15);
+  box-shadow: 0 0 40px rgba(109,40,217,0.08), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+/* Keeper upgrade banner pulse */
+@keyframes upgrade-ping {
+  0% { box-shadow: 0 0 0 0 rgba(109,40,217,0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(109,40,217,0); }
+  100% { box-shadow: 0 0 0 0 rgba(109,40,217,0); }
+}
+
+.upgrade-pulse {
+  animation: upgrade-ping 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Ambient light sweep */
+@keyframes ambient-sweep {
+  0% { transform: translateX(-100%) rotate(-15deg); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 0.5; }
+  100% { transform: translateX(300%) rotate(-15deg); opacity: 0; }
+}
+
+/* Keeper nav glow line */
+@keyframes nav-line-glow {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.6; }
+}
+
+.nav-top-glow {
+  animation: nav-line-glow 4s ease-in-out infinite;
+}
+
+/* Text gradient shimmer */
+@keyframes text-shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.gradient-text-animated {
+  background: linear-gradient(135deg, #c4b5fd, #a78bfa, #7c3aed, #c4b5fd);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: text-shimmer 6s ease infinite;
+}
