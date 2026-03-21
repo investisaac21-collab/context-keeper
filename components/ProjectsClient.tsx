@@ -101,7 +101,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         .single()
       if (created) {
         setProjects(prev => [created, ...prev])
-        showToast('Â¡Proyecto creado!')
+        showToast('ÃÂ¡Proyecto creado!')
       }
     }
     setLoading(false)
@@ -111,7 +111,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Â¿Seguro que quieres eliminar este proyecto? Esta acciÃ³n no se puede deshacer.')) return
+    if (!confirm('ÃÂ¿Seguro que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) return
     const { error } = await supabase.from('projects').delete().eq('id', id)
     if (!error) {
       setProjects(prev => prev.filter(p => p.id !== id))
@@ -121,7 +121,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
 
   async function handleDuplicate(project: Project) {
     if (isFreeLimitReached) {
-      showToast('LÃ­mite del plan Free alcanzado. Actualiza a Pro.', 'error')
+      showToast('Límite del plan Free alcanzado. Actualiza a Pro.', 'error')
       return
     }
     const { data: created } = await supabase
@@ -177,13 +177,13 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
     { icon: '&#128218;', label: 'Historial de versiones' },
     { icon: '&#127760;', label: 'Variables globales' },
     { icon: '&#128203;', label: 'Duplicado avanzado' },
-    { icon: '&#128228;', label: 'ExportaciÃ³n avanzada' },
+    { icon: '&#128228;', label: 'Exportación avanzada' },
   ]
 
   const showOnboarding = onboardingVisible && projects.length === 0
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5 space-y-4">
 
       {/* TOAST GLOBAL */}
       {toast && (
@@ -201,7 +201,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           <div className="flex items-center gap-2 mt-1.5">
             <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
               plan === 'team' ? 'bg-purple-100 text-purple-700'
-              : plan === 'pro' ? 'bg-indigo-100 text-indigo-700'
+              : plan === 'pro' ? 'bg-violet-100 text-violet-700'
               : 'bg-gray-100 text-gray-500'
             }`}>
               Plan {planLabel}
@@ -228,7 +228,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             className={`text-sm px-4 py-1.5 rounded-lg font-medium transition ${
               isFreeLimitReached
                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                : 'bg-violet-600 text-white hover:bg-violet-700'
             }`}
           >
             + Nuevo proyecto
@@ -236,29 +236,29 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       </div>
 
-      {/* BANNER LÃMITE ALCANZADO */}
+      {/* BANNER LÃÂMITE ALCANZADO */}
       {isFreeLimitReached && (
-        <div className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 p-5 text-white shadow-md">
+        <div className="rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 p-5 text-white shadow-md">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <p className="font-bold text-base">Has alcanzado el lÃ­mite del plan Free</p>
-              <p className="text-sm text-indigo-100 mt-1">
+              <p className="font-bold text-base">Has alcanzado el límite del plan Free</p>
+              <p className="text-sm text-violet-100 mt-1">
                 Actualiza a Pro para desbloquear proyectos ilimitados, historial de versiones y variables globales
               </p>
             </div>
             <a
               href="/pricing"
-              className="shrink-0 bg-white text-indigo-700 font-semibold text-sm px-5 py-2 rounded-lg hover:bg-indigo-50 transition whitespace-nowrap shadow-sm"
+              className="shrink-0 bg-white text-violet-700 font-semibold text-sm px-5 py-2 rounded-lg hover:bg-violet-50 transition whitespace-nowrap shadow-sm"
             >
               Hazte Pro &#8212; 9 &#8364;/mes
             </a>
           </div>
           <div className="mt-4">
-            <div className="h-1.5 bg-indigo-400/40 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-violet-400/40 rounded-full overflow-hidden">
               <div className="h-full bg-white rounded-full w-full" />
             </div>
-            <span className="text-xs text-indigo-200 mt-1.5 block">
-              {projects.length}/{FREE_LIMIT} proyectos &#8212; lÃ­mite alcanzado
+            <span className="text-xs text-violet-200 mt-1.5 block">
+              {projects.length}/{FREE_LIMIT} proyectos &#8212; límite alcanzado
             </span>
           </div>
         </div>
@@ -270,11 +270,11 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           <span className="text-xs text-gray-500 shrink-0">{projects.length} de {FREE_LIMIT} proyectos</span>
           <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="h-full bg-indigo-500 rounded-full transition-all"
+              className="h-full bg-violet-500 rounded-full transition-all"
               style={{ width: progressPercent + '%' }}
             />
           </div>
-          <a href="/pricing" className="text-xs text-indigo-600 hover:text-indigo-700 font-medium shrink-0">Ver planes</a>
+          <a href="/pricing" className="text-xs text-violet-600 hover:text-violet-700 font-medium shrink-0">Ver planes</a>
         </div>
       )}
       
@@ -297,17 +297,17 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
       {/* EMPTY STATE MEJORADO */}
       {projects.length === 0 && !showOnboarding && (
         <div className="rounded-2xl border-2 border-dashed border-gray-200 bg-white p-12 text-center">
-          <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-violet-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl">&#128196;</span>
           </div>
           <h3 className="text-lg font-bold text-gray-900 mb-2">Crea tu primer prompt</h3>
           <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
-            Organiza tus mejores prompts de IA, aÃ±ade variables dinÃ¡micas y cÃ³pialos con un click cuando los necesites.
+            Organiza tus mejores prompts de IA, añade variables dinámicas y cópialos con un click cuando los necesites.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={() => setShowModal(true)}
-              className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-medium text-sm hover:bg-indigo-700 transition"
+              className="bg-violet-600 text-white px-6 py-2.5 rounded-xl font-medium text-sm hover:bg-violet-700 transition"
             >
               + Crear mi primer proyecto
             </button>
@@ -332,12 +332,12 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
           </svg>
           <span>Historial de versiones &middot; Variables globales &middot; Refinamiento IA &middot; Exportaci&oacute;n</span>
-          <a href="/pricing" className="ml-auto shrink-0 text-indigo-600 hover:text-indigo-700 font-semibold whitespace-nowrap">Hazte Pro &mdash; 9 &euro;/mes &rarr;</a>
+          <a href="/pricing" className="ml-auto shrink-0 text-violet-600 hover:text-violet-700 font-semibold whitespace-nowrap">Hazte Pro &mdash; 9 &euro;/mes &rarr;</a>
         </div>
       )}
       
 
-      {/* BÃSQL Y FILTROS */}
+      {/* BÃÂSQL Y FILTROS */}
       {projects.length > 0 && (
         <div className="flex flex-col sm:flex-row gap-2">
           <input
@@ -345,14 +345,14 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             placeholder="Buscar proyectos..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
           />
           <select
             value={filterTag}
             onChange={e => setFilterTag(e.target.value)}
-            className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
           >
-            <option value="">Todas las categorÃ­as</option>
+            <option value="">Todas las categorías</option>
             {allTags.map(tag => <option key={tag} value={tag}>{tag}</option>)}
           </select>
         </div>
@@ -371,7 +371,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
               onHistory={() => setHistoryProject(project)}
               onDuplicate={() => handleDuplicate(project)}
               plan={plan}
-              onCopy={() => { setHasCopied(true); showToast('Â¡Prompt copiado!') }}
+              onCopy={() => { setHasCopied(true); showToast('ÃÂ¡Prompt copiado!') }}
               onPreview={() => setHasPreview(true)}
             />
           ))}
@@ -381,7 +381,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           <p className="text-sm">No se encontraron proyectos con ese filtro.</p>
           <button
             onClick={() => { setSearch(''); setFilterTag('') }}
-            className="text-xs text-indigo-600 hover:underline mt-2"
+            className="text-xs text-violet-600 hover:underline mt-2"
           >
             Limpiar filtros
           </button>
