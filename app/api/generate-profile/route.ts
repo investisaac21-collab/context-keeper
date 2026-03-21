@@ -13,8 +13,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'API key no configurada' }, { status: 500 })
     }
 
-    const systemPrompt = `Eres un experto en diseño de personajes y asistentes de IA.
+    const systemPrompt = `Eres un experto en diseño de personajes y asistentes de IA para uso profesional.
 Tu tarea es generar los campos de un perfil de asistente IA basándote en la descripción del usuario.
+Keeper es una plataforma profesional para gestionar contextos de IA. Solo generas perfiles con propósito laboral, creativo o educativo.
+Si la descripción solicita contenido sexual, violento, ilegal o inapropiado, responde EXACTAMENTE con este JSON:
+{"error": "Este tipo de perfil no está disponible en Keeper"}
 
 Responde ÚNICAMENTE con un objeto JSON válido con esta estructura exacta:
 {
@@ -61,10 +64,16 @@ Reglas:
     // Extract JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
-      return NextResponse.json({ error: 'No se pudo generar el perfil' }, { status: 500 })
+      return NextResponse.json({ error: 'Describe un perfil profesional o creativo para continuar' }, { status: 400 })
     }
     
     const profile = JSON.parse(jsonMatch[0])
+    
+    // Check if model returned an error object (inappropriate content)
+    if (profile.error) {
+      return NextResponse.json({ error: profile.error }, { status: 400 })
+    }
+    
     return NextResponse.json({ profile })
 
   } catch (err) {
