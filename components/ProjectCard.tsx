@@ -13,7 +13,7 @@ interface ProjectCardProps {
 
 const TAG_STYLES: Record<string, string> = {
   Desarrollo: 'bg-violet-50 text-violet-700 border border-violet-200',
-  DiseÃ±o: 'bg-purple-50 text-purple-700 border border-purple-200',
+  DiseÃÂ±o: 'bg-purple-50 text-purple-700 border border-purple-200',
   Marketing: 'bg-amber-50 text-amber-700 border border-amber-200',
   Negocios: 'bg-orange-50 text-orange-700 border border-orange-200',
   Educacion: 'bg-teal-50 text-teal-700 border border-teal-200',
@@ -108,7 +108,7 @@ export default function ProjectCard({ project, variables = [], onEdit, onDelete,
       {/* Excerpt */}
       <div className="px-4 pb-3 flex-1">
         <p className="text-sm text-gray-500 leading-relaxed line-clamp-2 font-normal">
-          {excerpt}{(project.context || '').length > 110 ? 'âÃÂÃÂ¦' : ''}
+          {excerpt}{(project.context || '').length > 110 ? 'Ã¢ÃÂÃÂÃÂÃÂ¦' : ''}
         </p>
       </div>
 
