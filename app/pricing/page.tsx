@@ -8,12 +8,12 @@ const PLANS = [
   {
     name: 'Free',
     price: 0,
-    desc: 'Empieza a guardar contexto',
+    desc: 'Empieza a guardar tu memoria operativa',
     color: 'border-gray-200',
     badge: null,
     features: [
-      'Hasta 3 proyectos',
-      'Variables dinámicas',
+      'Hasta 3 contextos',
+      'Variables de contexto dinámicas',
       'Importar / exportar JSON',
       'Plantillas predefinidas',
     ],
@@ -24,18 +24,18 @@ const PLANS = [
   {
     name: 'Pro',
     price: 9,
-    desc: 'Tu memoria completa, sin límites',
+    desc: 'Memoria completa, sin límites',
     color: 'border-violet-500',
     badge: 'MÁS POPULAR',
     features: [
       'Todo lo del plan Free',
-      'Proyectos ilimitados',
+      'Contextos ilimitados',
       'Historial de versiones y rollback',
-      'Variables globales guardadas',
+      'Tokens de memoria globales',
       'Soporte prioritario',
-      'Acceso anticipado a nuevas funciones',
+      'Acceso anticipado a Keeper Lab',
     ],
-    cta: 'Hazte Pro',
+    cta: 'Hazte Pro — 9 €/mes',
     ctaHref: null,
     highlight: true,
     priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO,
@@ -49,7 +49,7 @@ const PLANS = [
     features: [
       'Todo lo del plan Pro',
       'Hasta 5 miembros',
-      'Prompts compartidos entre miembros',
+      'Contextos compartidos entre miembros',
       'Panel de administrador',
       'Facturación centralizada',
       'Permisos por rol (admin, editor, viewer)',
@@ -62,13 +62,13 @@ const PLANS = [
 ]
 
 const FAQ = [
-  { q: '¿Qué incluye el plan Free?', a: 'El plan Free incluye hasta 3 proyectos, variables dinámicas, plantillas predefinidas e importación/exportación JSON. Sin tarjeta de crédito.' },
+  { q: '¿Qué incluye el plan Free?', a: 'El plan Free incluye hasta 3 contextos, variables dinámicas, plantillas predefinidas e importación/exportación JSON. Sin tarjeta de crédito.' },
   { q: '¿Qué funciones exactas se desbloquean con Pro?', a: 'Con Pro desbloqueas proyectos ilimitados, historial de versiones con rollback, variables globales guardadas, soporte prioritario y acceso anticipado a nuevas funciones.' },
   { q: '¿Cuál es la diferencia entre Pro y Team?', a: 'Team incluye todo lo de Pro más colaboración para hasta 5 miembros, prompts compartidos, panel de administrador, facturación centralizada y permisos por rol (admin, editor, viewer).' },
   { q: '¿Team incluye permisos por rol?', a: 'Sí. Con el plan Team puedes asignar roles a cada miembro: admin (control total), editor (puede crear y editar) y viewer (solo lectura).' },
-  { q: '¿Qué pasa con mis proyectos si cancelo?', a: 'Tus proyectos siempre son tuyos. Si cancelas Pro o Team, volverás al plan Free y conservarás hasta 3 proyectos. El resto quedará archivado y podrás recuperarlo si vuelves a suscribirte.' },
+  { q: '¿Qué pasa con mis proyectos si cancelo?', a: 'Tus proyectos siempre son tuyos. Si cancelas Pro o Team, volverás al plan Free y conservarás hasta 3 contextos. El resto quedará archivado y podrás recuperarlo si vuelves a suscribirte.' },
   { q: '¿Puedo cambiar de plan en cualquier momento?', a: 'Sí, puedes subir o bajar de plan cuando quieras desde tu página de cuenta. Los cambios se aplican de forma inmediata.' },
-  { q: '¿Qué pasa si llego al límite gratuito?', a: 'Si llegas al límite de 3 proyectos en el plan Free, no podrás crear nuevos proyectos hasta que actualices al plan Pro o elimines alguno existente.' },
+  { q: '¿Qué pasa si llego al límite gratuito?', a: 'Si llegas al límite de 3 contextos en el plan Free, no podrás crear nuevos proyectos hasta que actualices al plan Pro o elimines alguno existente.' },
   { q: '¿Habrá plan anual con descuento?', a: 'Estamos preparando un plan anual con descuento. Próximamente podrás pagar por año y ahorrar hasta un 20%. Si quieres ser notificado, escríbenos.' },
 ]
 
@@ -239,7 +239,7 @@ export default function PricingPage() {
                   ['Variables globales', '&#10007;', '&#10003;', '&#10003;'],
                   ['Soporte prioritario', '&#10007;', '&#10003;', '&#10003;'],
                   ['Miembros del equipo', '&#10007;', '&#10007;', 'Hasta 5'],
-                  ['Prompts compartidos', '&#10007;', '&#10007;', '&#10003;'],
+                  ['Contextos compartidos', '&#10007;', '&#10007;', '&#10003;'],
                   ['Panel de administrador', '&#10007;', '&#10007;', '&#10003;'],
                   ['Permisos por rol', '&#10007;', '&#10007;', '&#10003;'],
                   ['Facturación centralizada', '&#10007;', '&#10007;', '&#10003;'],
@@ -278,6 +278,46 @@ export default function PricingPage() {
             ))}
           </div>
         </div>
+
+      {/* KEEPER LAB + PROFILES — próximamente */}
+      <div className="max-w-4xl mx-auto px-4 pb-20">
+        <div className="rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-50 to-purple-50 overflow-hidden">
+          <div className="p-8 md:p-10">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center">
+                <svg width="20" height="20" fill="none" stroke="white" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </div>
+              <div>
+                <span className="text-xs font-bold text-violet-600 uppercase tracking-wider">Próximamente en Pro y Team</span>
+                <h3 className="text-xl font-bold text-gray-900">Keeper Lab + Keeper Profiles</h3>
+              </div>
+            </div>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-xl p-6 border border-violet-100">
+                <div className="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center mb-3">
+                  <svg width="16" height="16" fill="none" stroke="#7c3aed" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                  </svg>
+                </div>
+                <h4 className="font-bold text-gray-900 mb-2">Keeper Lab</h4>
+                <p className="text-sm text-gray-600">Refinamiento profundo de contexto con IA. Analiza, mejora y optimiza tu memoria operativa antes de usarla con cualquier IA.</p>
+              </div>
+              <div className="bg-white rounded-xl p-6 border border-violet-100">
+                <div className="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center mb-3">
+                  <svg width="16" height="16" fill="none" stroke="#7c3aed" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <h4 className="font-bold text-gray-900 mb-2">Keeper Profiles</h4>
+                <p className="text-sm text-gray-600">Perfiles de IA reutilizables con personalidad, tono, reglas y comportamiento configurables. Una identidad persistente para cada flujo de trabajo.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       </main>
     </div>
   )
