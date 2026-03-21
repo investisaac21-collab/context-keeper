@@ -83,7 +83,7 @@ export default function LoginPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
             </svg>
           </div>
-          <span className="font-bold text-white text-lg tracking-tight">Context Keeper</span>
+          <span className="font-bold text-white text-lg tracking-tight">Keeper</span>
         </div>
 
         {/* Central content */}
@@ -133,7 +133,7 @@ export default function LoginPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
             </svg>
           </div>
-          <span className="font-bold text-white">Context Keeper</span>
+          <span className="font-bold text-white">Keeper</span>
         </div>
 
         {magicSent ? (
@@ -192,7 +192,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl bg-white/[0.05] border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-violet-500/50 focus:bg-white/[0.08] transition-all"
-                  placeholder="â¢â¢â¢â¢â¢â¢â¢â¢"
+                  placeholder=""
                   required
                   minLength={6}
                 />
@@ -259,7 +259,7 @@ export default function LoginPage() {
             </button>
 
             <p className="text-center text-white/20 text-xs mt-6">
-              Free para siempre. Pro desde 9 â¬/mes.{' '}
+              Free para siempre. Pro desde 9 €/mes.{' '}
               <Link href="/pricing" className="text-violet-400/70 hover:text-violet-400 transition-colors">Ver planes</Link>
             </p>
           </div>
