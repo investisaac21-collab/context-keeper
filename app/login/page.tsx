@@ -30,7 +30,7 @@ export default function LoginPage() {
         setMagicSent(true)
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Error de autenticaciÃ³n')
+      setError(err instanceof Error ? err.message : 'Error de autenticación')
     } finally {
       setLoading(false)
     }
@@ -105,12 +105,12 @@ export default function LoginPage() {
             <span className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">no empiece de cero.</span>
           </h1>
           <p className="text-white/40 text-lg leading-relaxed max-w-sm">
-            Guarda personalidad, instrucciones, variables y contexto. RecupÃ©ralos en segundos.
+            Guarda personalidad, instrucciones, variables y contexto. Recupéralos en segundos.
           </p>
 
           {/* Feature pills */}
           <div className="flex flex-wrap gap-2 mt-8">
-            {['Memoria persistente', 'Variables dinÃ¡micas', 'Historial de versiones', 'GeneraciÃ³n con IA'].map((f, i) => (
+            {['Memoria persistente', 'Variables dinámicas', 'Historial de versiones', 'Generación con IA'].map((f, i) => (
               <span key={i} className="px-3 py-1.5 rounded-full text-xs font-medium border border-white/10 text-white/40 bg-white/[0.03]">
                 {f}
               </span>
@@ -144,9 +144,9 @@ export default function LoginPage() {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-white mb-3">Revisa tu email</h2>
-            <p className="text-white/40 mb-6">Te hemos enviado un enlace de acceso a <span className="text-white/70">{email}</span>. Ãsalo para entrar directamente.</p>
+            <p className="text-white/40 mb-6">Te hemos enviado un enlace de acceso a <span className="text-white/70">{email}</span>. Úsalo para entrar directamente.</p>
             <button onClick={() => setMagicSent(false)} className="text-sm text-violet-400 hover:text-violet-300 transition-colors">
-              Volver al inicio de sesiÃ³n
+              Volver al inicio de sesión
             </button>
           </div>
         ) : (
@@ -156,7 +156,7 @@ export default function LoginPage() {
                 {mode === 'login' ? 'Accede a tu memoria' : 'Empieza gratis'}
               </h2>
               <p className="text-white/40 text-sm">
-                {mode === 'login' ? 'Tus contextos te esperan.' : 'Sin tarjeta de crÃ©dito. Cancela cuando quieras.'}
+                {mode === 'login' ? 'Tus contextos te esperan.' : 'Sin tarjeta de crédito. Cancela cuando quieras.'}
               </p>
             </div>
 
@@ -168,7 +168,7 @@ export default function LoginPage() {
                   onClick={() => { setMode(m); setError('') }}
                   className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${mode === m ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white/70'}`}
                 >
-                  {m === 'login' ? 'Iniciar sesiÃ³n' : 'Registrarme'}
+                  {m === 'login' ? 'Iniciar sesión' : 'Registrarme'}
                 </button>
               ))}
             </div>
@@ -186,7 +186,7 @@ export default function LoginPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-white/50 mb-1.5">ContraseÃ±a</label>
+                <label className="block text-xs font-medium text-white/50 mb-1.5">Contraseña</label>
                 <input
                   type="password"
                   value={password}
