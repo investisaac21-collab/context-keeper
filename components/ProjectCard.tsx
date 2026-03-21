@@ -54,7 +54,7 @@ export default function ProjectCard({ project, variables = [], onEdit, onDelete,
     window.open('https://chatgpt.com/?q=' + encodeURIComponent(text), '_blank');
   };
 
-  const excerpt = (project.context || '').replace(/{{[^}]+}}/g, '\u2022').slice(0, 110);
+  const excerpt = (project.context || '').replace(/{{[^}]+}}/g, '...').slice(0, 110);
 
   return (
     <div className="bg-white rounded-xl border border-gray-100 bg-white shadow-sm hover:shadow-md hover:border-violet-200 transition-all duration-200 flex flex-col">
