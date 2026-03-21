@@ -209,7 +209,7 @@ export default function HistoryModal({ project, onClose, plan = 'free', onRestor
         ) : versions.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
             <span className="text-3xl mb-3">&#128196;</span>
-            <p className="text-sm text-gray-500">Aún no hay versiones guardadas para este proyecto.</p>
+            <p className="text-sm text-gray-500">Aún no hay versiones guardadas para este contexto.</p>
             <p className="text-xs text-gray-400 mt-1">Las versiones se guardan automáticamente al editar.</p>
           </div>
         ) : selectedVersion && showDiff ? (
