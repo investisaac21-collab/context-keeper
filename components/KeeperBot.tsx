@@ -51,8 +51,8 @@ export default function KeeperBot({ userId, plan }: KeeperBotProps) {
           setProfiles(profList)
           setDataLoaded(true)
           const n = ctxList.length
-          let msg = 'Hola. Soy tu asistente de Keeper. \u00bfQu\u00e9 necesitas?'
-          if (n > 0) { msg = '\u00bfEn qu\u00e9 te ayudo? Tienes ' + n + ' contexto' + (n !== 1 ? 's' : '') + ' listos.' }
+          let msg = 'Hola. Soy tu asistente de Keeper. ¿Qué necesitas?'
+          if (n > 0) { msg = '¿En qué te ayudo? Tienes ' + n + ' contexto' + (n !== 1 ? 's' : '') + ' listos.' }
           setMessages([{ role: 'assistant', content: msg }])
         })
       ).catch(() => { setDataLoaded(true) })
@@ -74,12 +74,12 @@ export default function KeeperBot({ userId, plan }: KeeperBotProps) {
       const d = await r.json()
       setMessages(prev => [...prev, { role: 'assistant', content: d.reply || d.error || 'Sin respuesta' }])
     } catch (err) {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Error de conexi\u00f3n.' }])
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Error de conexión.' }])
     }
     setLoading(false)
   }
 
-  const suggestions = ['\u00bfQu\u00e9 contextos tengo?', 'Crea uno para marketing', '\u00bfC\u00f3mo funciona Keeper?']
+  const suggestions = ['¿Qué contextos tengo?', 'Crea uno para marketing', '¿Cómo funciona Keeper?']
 
   return (
     <>
@@ -116,7 +116,7 @@ export default function KeeperBot({ userId, plan }: KeeperBotProps) {
         {!open && (
           <span className="absolute right-14 top-1/2 -translate-y-1/2 whitespace-nowrap text-xs text-zinc-500 bg-zinc-900 border border-zinc-800 px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none translate-x-1 group-hover:translate-x-0">
             Keeper AI
-            <span className="ml-2 text-zinc-600">\u2318K</span>
+            <span className="ml-2 text-zinc-600">⌘K</span>
           </span>
         )}
       </button>
