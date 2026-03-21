@@ -101,7 +101,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         .single()
       if (created) {
         setProjects(prev => [created, ...prev])
-        showToast('¡Contexto creado!')
+        showToast('Â¡Contexto creado!')
       }
     }
     setLoading(false)
@@ -111,7 +111,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('¿Seguro que quieres eliminar este contexto? Esta acción no se puede deshacer.')) return
+    if (!confirm('Â¿Seguro que quieres eliminar este contexto? Esta acciÃ³n no se puede deshacer.')) return
     const { error } = await supabase.from('projects').delete().eq('id', id)
     if (!error) {
       setProjects(prev => prev.filter(p => p.id !== id))
@@ -121,7 +121,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
 
   async function handleDuplicate(project: Project) {
     if (isFreeLimitReached) {
-      showToast('Límite del plan Free alcanzado. Actualiza a Pro.', 'error')
+      showToast('LÃ­mite del plan Free alcanzado. Actualiza a Pro.', 'error')
       return
     }
     const { data: created } = await supabase
@@ -177,7 +177,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
     { icon: '&#128218;', label: 'Historial de versiones' },
     { icon: '&#127760;', label: 'Variables globales' },
     { icon: '&#128203;', label: 'Duplicado avanzado' },
-    { icon: '&#128228;', label: 'Exportación avanzada' },
+    { icon: '&#128228;', label: 'ExportaciÃ³n avanzada' },
   ]
 
   const showOnboarding = onboardingVisible && projects.length === 0
@@ -236,14 +236,14 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         </div>
       </div>
 
-      {/* BANNER LÍMITE ALCANZADO */}
+      {/* BANNER LÃMITE ALCANZADO */}
       {isFreeLimitReached && (
         <div className="rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 p-5 text-white shadow-md">
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <p className="font-bold text-base">Has alcanzado el límite del plan Free</p>
+              <p className="font-bold text-base">Has alcanzado el lÃ­mite del plan Free</p>
               <p className="text-sm text-violet-100 mt-1">
-                Desbloquea memoria completa — contextos ilimitados, historial de versiones, generación con IA y más
+                Desbloquea memoria completa â contextos ilimitados, historial de versiones, generaciÃ³n con IA y mÃ¡s
               </p>
             </div>
             <a
@@ -258,7 +258,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
               <div className="h-full bg-white rounded-full w-full" />
             </div>
             <span className="text-xs text-violet-200 mt-1.5 block">
-              {projects.length}/{FREE_LIMIT} contextos — límite alcanzado
+              {projects.length}/{FREE_LIMIT} contextos â lÃ­mite alcanzado
             </span>
           </div>
         </div>
@@ -294,22 +294,37 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         />
       )}
 
-      {/* EMPTY STATE MEJORADO */}
+      {/* EMPTY STATE — MEMORIA OPERATIVA */}
       {projects.length === 0 && !showOnboarding && (
-        <div className="rounded-2xl border-2 border-dashed border-gray-200 bg-white p-12 text-center">
-          <div className="w-16 h-16 bg-violet-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">&#128196;</span>
+        <div className="rounded-2xl border-2 border-dashed border-violet-200 bg-gradient-to-b from-violet-50/60 to-white p-14 text-center">
+          {/* Keeper Core mini */}
+          <div className="relative w-20 h-20 mx-auto mb-6">
+            <div className="absolute inset-0 rounded-full border border-violet-200/60 animate-ping opacity-20" />
+            <div className="absolute inset-2 rounded-full border border-violet-300/40" />
+            <div className="w-full h-full rounded-full bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center shadow-lg shadow-violet-500/30">
+              <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.347.347a3.75 3.75 0 00-1.097 2.651V19.5a.75.75 0 01-.75.75h-3a.75.75 0 01-.75-.75v-.904a3.75 3.75 0 00-1.097-2.651l-.347-.347z" />
+              </svg>
+            </div>
           </div>
-          <h3 className="text-lg font-bold text-gray-900 mb-2">Crea tu primer prompt</h3>
-          <p className="text-sm text-gray-500 mb-6 max-w-sm mx-auto">
-            Organiza tus mejores prompts de IA, añade variables dinámicas y cópialos con un click cuando los necesites.
+
+          <h3 className="text-xl font-bold text-gray-900 mb-2">Tu IA no recuerda nada.</h3>
+          <p className="text-base font-semibold text-violet-600 mb-3">Context Keeper sí.</p>
+          <p className="text-sm text-gray-500 mb-8 max-w-sm mx-auto leading-relaxed">
+            Crea tu primer contexto. Define la personalidad, el tono y las instrucciones de tu IA una sola vez.
+            <br />
+            <span className="text-gray-400">No vuelvas a empezar de cero.</span>
           </p>
+
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
               onClick={() => setShowModal(true)}
-              className="bg-violet-600 text-white px-6 py-2.5 rounded-xl font-medium text-sm hover:bg-violet-700 transition"
+              className="bg-violet-600 text-white px-7 py-3 rounded-xl font-semibold text-sm hover:bg-violet-700 transition shadow-md shadow-violet-500/20 flex items-center gap-2 justify-center"
             >
-              + Crear mi primer proyecto
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Crear mi primer contexto
             </button>
             <button
               onClick={() => {
@@ -317,11 +332,18 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
                 setTemplateData(tmpl)
                 setShowModal(true)
               }}
-              className="border border-gray-200 text-gray-600 px-6 py-2.5 rounded-xl font-medium text-sm hover:bg-gray-50 transition"
+              className="border border-violet-200 text-violet-600 bg-white px-7 py-3 rounded-xl font-medium text-sm hover:bg-violet-50 transition flex items-center gap-2 justify-center"
             >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h10" />
+              </svg>
               Usar una plantilla
             </button>
           </div>
+
+          <p className="mt-6 text-xs text-gray-400">
+            &#9889; Usa las plantillas para empezar en 30 segundos
+          </p>
         </div>
       )}
 
@@ -337,7 +359,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
       )}
       
 
-      {/* BÚSQL Y FILTROS */}
+      {/* BÃSQL Y FILTROS */}
       {projects.length > 0 && (
         <div className="flex flex-col sm:flex-row gap-2">
           <input
@@ -352,7 +374,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             onChange={e => setFilterTag(e.target.value)}
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
           >
-            <option value="">Todas las categorías</option>
+            <option value="">Todas las categorÃ­as</option>
             {allTags.map(tag => <option key={tag} value={tag}>{tag}</option>)}
           </select>
         </div>
@@ -371,7 +393,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
               onHistory={() => setHistoryProject(project)}
               onDuplicate={() => handleDuplicate(project)}
               plan={plan}
-              onCopy={() => { setHasCopied(true); showToast('¡Prompt copiado!') }}
+              onCopy={() => { setHasCopied(true); showToast('Â¡Prompt copiado!') }}
               onPreview={() => setHasPreview(true)}
             />
           ))}
