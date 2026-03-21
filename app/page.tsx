@@ -30,7 +30,7 @@ export default function Home() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
             </svg>
           </div>
-          <span className="font-bold text-base tracking-tight text-white">Context Keeper</span>
+          <span className="font-bold text-base tracking-tight text-white">Keeper</span>
         </div>
         <div className="hidden md:flex items-center gap-8">
           <Link href="/pricing" className="text-sm text-white/50 hover:text-white transition-colors">Precios</Link>
@@ -83,7 +83,7 @@ export default function Home() {
           <br />
           <span className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">nada.</span>
           <br />
-          Context Keeper sí.
+          Keeper sí.
         </h1>
 
         <p className="relative text-lg sm:text-xl text-white/50 max-w-2xl mb-10 leading-relaxed animate-fade-up delay-300">
@@ -141,7 +141,7 @@ export default function Home() {
             La memoria operativa<br />que tu IA no tiene.
           </h2>
           <p className="text-white/40 text-center max-w-xl mx-auto mb-16 text-lg">
-            Context Keeper guarda lo que hace que tu IA responda bien — y te lo devuelve cuando lo necesitas.
+            Keeper guarda lo que hace que tu IA responda bien — y te lo devuelve cuando lo necesitas.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -192,7 +192,7 @@ export default function Home() {
             Cada tipo de trabajo,<br />su propia memoria.
           </h2>
           <p className="text-white/40 text-center max-w-xl mx-auto mb-16 text-lg">
-            Context Keeper no es solo para prompts sueltos. Es para cualquiera que use IA de forma seria y continua.
+            Keeper no es solo para prompts sueltos. Es para cualquiera que use IA de forma seria y continua.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -355,7 +355,7 @@ export default function Home() {
             <span className="text-white/40">No solo contexto. Identidad.</span>
           </h2>
           <p className="text-white/40 text-center max-w-2xl mx-auto mb-16 text-lg">
-            La siguiente capa de Context Keeper. Guarda no solo qué decirle a tu IA, sino quién quieres que sea — su tono, sus reglas, su estilo, su comportamiento. Reutilizable. Consistente. Tuyo.
+            La siguiente capa de Keeper. Guarda no solo qué decirle a tu IA, sino quién quieres que sea — su tono, sus reglas, su estilo, su comportamiento. Reutilizable. Consistente. Tuyo.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
@@ -527,9 +527,9 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
               </svg>
             </div>
-            <span className="font-semibold text-sm text-white/60">Context Keeper</span>
+            <span className="font-semibold text-sm text-white/60">Keeper</span>
           </div>
-          <p className="text-white/20 text-xs">La memoria operativa de tu IA. © 2025 Context Keeper.</p>
+          <p className="text-white/20 text-xs">La memoria operativa de tu IA. © 2025 Keeper.</p>
           <div className="flex items-center gap-6">
             <Link href="/pricing" className="text-white/30 hover:text-white/60 text-xs transition-colors">Precios</Link>
             <Link href="/login" className="text-white/30 hover:text-white/60 text-xs transition-colors">Acceder</Link>
