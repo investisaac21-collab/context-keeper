@@ -120,7 +120,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
   }
 
   async function handleDelete() {
-    if (!confirm('¿Seguro que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) return
+    if (!confirm('Â¿Seguro que quieres eliminar este proyecto? Esta acciÃ³n no se puede deshacer.')) return
     await supabase.from('projects').delete().eq('id', project.id)
     router.push('/dashboard')
   }
@@ -128,7 +128,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
   function handleCopy() {
     navigator.clipboard.writeText(previewText)
     setCopied(true)
-    showToast('¡Prompt copiado al portapapeles!')
+    showToast('Â¡Prompt copiado al portapapeles!')
     setTimeout(() => setCopied(false), 2000)
   }
 
@@ -178,7 +178,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
       setRefinedPreview('')
       setChatMessages([])
       setShowChat(false)
-      showToast('¡Prompt actualizado con el refinamiento de IA!')
+      showToast('Â¡Prompt actualizado con el refinamiento de IA!')
     }
     setLoading(false)
   }
@@ -188,7 +188,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
     writing: 'bg-green-100 text-green-800',
     analysis: 'bg-purple-100 text-purple-800',
     marketing: 'bg-yellow-100 text-yellow-800',
-    IA: 'bg-indigo-100 text-indigo-800',
+    IA: 'bg-violet-100 text-indigo-800',
     Desarrollo: 'bg-blue-100 text-blue-800',
     Marketing: 'bg-yellow-100 text-yellow-800',
     Negocios: 'bg-orange-100 text-orange-800',
@@ -219,7 +219,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
       <div className="max-w-3xl mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-400 mb-6">
-          <a href="/dashboard" className="hover:text-indigo-600 transition">Mis Proyectos</a>
+          <a href="/dashboard" className="hover:text-violet-600 transition">Mis Proyectos</a>
           <span>/</span>
           <span className="text-gray-700 font-medium">{project.name}</span>
         </div>
@@ -237,7 +237,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
                 )}
                 <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
                   plan === 'team' ? 'bg-purple-100 text-purple-700' :
-                  plan === 'pro' ? 'bg-indigo-100 text-indigo-700' :
+                  plan === 'pro' ? 'bg-violet-100 text-violet-700' :
                   'bg-gray-100 text-gray-500'
                 }`}>
                   Plan {planLabel}
@@ -245,7 +245,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
               </div>
               {project.updated_at && (
                 <p className="text-xs text-gray-400">
-                  Última edición:{' '}
+                  Ãltima ediciÃ³n:{' '}
                   {new Date(project.updated_at).toLocaleDateString('es-ES', {
                     day: '2-digit', month: '2-digit', year: 'numeric',
                     hour: '2-digit', minute: '2-digit',
@@ -292,7 +292,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
         {detectedVars.length === 0 && project.context && (
           <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-4 mb-4 text-center">
             <p className="text-sm text-gray-400 italic">
-              Sin variables dinámicas. Añade <code className="font-mono bg-gray-100 px-1 rounded text-xs">{'{{'+'nombre'+'}}'}</code> al contexto para personalizar el prompt.
+              Sin variables dinÃ¡micas. AÃ±ade <code className="font-mono bg-gray-100 px-1 rounded text-xs">{'{{'+'nombre'+'}}'}</code> al contexto para personalizar el prompt.
             </p>
           </div>
         )}
@@ -313,7 +313,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
                     value={varValues[v] || ''}
                     onChange={e => setVarValues(prev => ({ ...prev, [v]: e.target.value }))}
                     placeholder={'Valor para ' + v}
-                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400"
                   />
                 </div>
               ))}
@@ -321,7 +321,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
             {missingVars.length > 0 && (
               <p className="text-xs text-amber-600 mt-3 flex items-center gap-1">
                 &#9888; {missingVars.length} variable{missingVars.length !== 1 ? 's' : ''} sin rellenar.
-                El prompt se copiará con los marcadores sin sustituir.
+                El prompt se copiarÃ¡ con los marcadores sin sustituir.
               </p>
             )}
           </div>
@@ -347,7 +347,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
               <button
                 onClick={handleCopy}
                 className={`text-sm px-4 py-1.5 rounded-lg font-medium transition ${
-                  copied ? 'bg-green-100 text-green-700' : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                  copied ? 'bg-green-100 text-green-700' : 'bg-violet-600 text-white hover:bg-violet-700'
                 }`}
               >
                 {copied ? '&#10003; Copiado' : 'Copiar'}
@@ -356,7 +356,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
           </div>
           <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm text-gray-700 whitespace-pre-wrap font-mono leading-relaxed max-h-96 overflow-y-auto">
             {previewText || (
-              <span className="text-gray-400 italic">Este proyecto no tiene contenido aún.</span>
+              <span className="text-gray-400 italic">Este proyecto no tiene contenido aÃºn.</span>
             )}
           </div>
         </div>
@@ -371,7 +371,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
           >
             <div className="flex items-center gap-3">
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                isPro ? 'bg-gradient-to-br from-indigo-500 to-purple-600' : 'bg-gray-100'
+                isPro ? 'bg-gradient-to-br from-violet-500 to-purple-600' : 'bg-gray-100'
               }`}>
                 <span className="text-sm">&#129302;</span>
               </div>
@@ -381,7 +381,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
                   {!isPro && <span className="ml-2 text-gray-300">&#128274;</span>}
                 </p>
                 <p className={`text-xs ${isPro ? 'text-gray-500' : 'text-gray-300'}`}>
-                  {isPro ? 'Dile a la IA cómo mejorar este prompt' : 'Disponible en plan Pro'}
+                  {isPro ? 'Dile a la IA cÃ³mo mejorar este prompt' : 'Disponible en plan Pro'}
                 </p>
               </div>
             </div>
@@ -392,7 +392,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
               <a
                 href="/pricing"
                 onClick={e => e.stopPropagation()}
-                className="text-xs bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-3 py-1.5 rounded-lg font-medium hover:opacity-90 transition"
+                className="text-xs bg-gradient-to-r from-violet-600 to-purple-600 text-white px-3 py-1.5 rounded-lg font-medium hover:opacity-90 transition"
               >
                 Hazte Pro
               </a>
@@ -405,19 +405,19 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
               <div className="max-h-80 overflow-y-auto p-4 flex flex-col gap-3 bg-gray-50/50">
                 {chatMessages.length === 0 && (
                   <div className="text-center py-6">
-                    <p className="text-sm text-gray-400 mb-3">Dile a la IA cómo quieres mejorar el prompt</p>
+                    <p className="text-sm text-gray-400 mb-3">Dile a la IA cÃ³mo quieres mejorar el prompt</p>
                     <div className="flex flex-wrap gap-2 justify-center">
                       {[
-                        'Házlo más formal',
-                        'Házlo más corto',
-                        'Añade más detalle',
+                        'HÃ¡zlo mÃ¡s formal',
+                        'HÃ¡zlo mÃ¡s corto',
+                        'AÃ±ade mÃ¡s detalle',
                         'Cambia el tono a amigable',
-                        'Añade instrucciones de formato',
+                        'AÃ±ade instrucciones de formato',
                       ].map(s => (
                         <button
                           key={s}
                           onClick={() => setChatInput(s)}
-                          className="text-xs bg-white border border-gray-200 rounded-full px-3 py-1 text-gray-600 hover:border-indigo-300 hover:text-indigo-600 transition"
+                          className="text-xs bg-white border border-gray-200 rounded-full px-3 py-1 text-gray-600 hover:border-indigo-300 hover:text-violet-600 transition"
                         >
                           {s}
                         </button>
@@ -429,12 +429,12 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
                   <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${
                       msg.role === 'user'
-                        ? 'bg-indigo-600 text-white rounded-br-sm'
+                        ? 'bg-violet-600 text-white rounded-br-sm'
                         : 'bg-white border border-gray-200 text-gray-800 rounded-bl-sm shadow-sm'
                     }`}>
                       {msg.role === 'assistant' ? (
                         <div>
-                          <p className="text-xs text-indigo-500 font-medium mb-1.5">Prompt refinado:</p>
+                          <p className="text-xs text-violet-500 font-medium mb-1.5">Prompt refinado:</p>
                           <p className="whitespace-pre-wrap font-mono text-xs leading-relaxed">{msg.content}</p>
                         </div>
                       ) : (
@@ -463,14 +463,14 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
               {/* Input del chat */}
               <div className="p-4 border-t border-gray-100 bg-white">
                 {refinedPreview && (
-                  <div className="mb-3 p-3 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-between gap-3">
-                    <p className="text-xs text-indigo-700 font-medium">
+                  <div className="mb-3 p-3 bg-violet-50 border border-violet-200 rounded-xl flex items-center justify-between gap-3">
+                    <p className="text-xs text-violet-700 font-medium">
                       &#10003; Tienes un prompt refinado listo para guardar
                     </p>
                     <button
                       onClick={handleApplyRefined}
                       disabled={loading}
-                      className="shrink-0 text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition font-medium"
+                      className="shrink-0 text-xs bg-violet-600 text-white px-3 py-1.5 rounded-lg hover:bg-violet-700 transition font-medium"
                     >
                       {loading ? 'Guardando...' : 'Aplicar y guardar'}
                     </button>
@@ -482,14 +482,14 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
                     value={chatInput}
                     onChange={e => setChatInput(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleChatSend()}
-                    placeholder="Ej: Házlo más formal, añade contexto sobre..."
+                    placeholder="Ej: HÃ¡zlo mÃ¡s formal, aÃ±ade contexto sobre..."
                     disabled={chatLoading}
-                    className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 disabled:opacity-50"
+                    className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 disabled:opacity-50"
                   />
                   <button
                     onClick={handleChatSend}
                     disabled={chatLoading || !chatInput.trim()}
-                    className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2.5 rounded-xl font-medium text-sm hover:opacity-90 transition disabled:opacity-40"
+                    className="bg-gradient-to-r from-violet-600 to-purple-600 text-white px-4 py-2.5 rounded-xl font-medium text-sm hover:opacity-90 transition disabled:opacity-40"
                   >
                     &#10148;
                   </button>
