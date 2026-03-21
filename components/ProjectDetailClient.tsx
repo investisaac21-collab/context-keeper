@@ -120,7 +120,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
   }
 
   async function handleDelete() {
-    if (!confirm('\u00bfSeguro que quieres eliminar este proyecto? Esta acci\u00f3n no se puede deshacer.')) return
+    if (!confirm('¿Seguro que quieres eliminar este proyecto? Esta acción no se puede deshacer.')) return
     await supabase.from('projects').delete().eq('id', project.id)
     router.push('/dashboard')
   }
@@ -128,7 +128,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
   function handleCopy() {
     navigator.clipboard.writeText(previewText)
     setCopied(true)
-    showToast('\u00a1Prompt copiado al portapapeles!')
+    showToast('¡Prompt copiado al portapapeles!')
     setTimeout(() => setCopied(false), 2000)
   }
 
@@ -178,7 +178,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
       setRefinedPreview('')
       setChatMessages([])
       setShowChat(false)
-      showToast('\u00a1Prompt actualizado con el refinamiento de IA!')
+      showToast('¡Prompt actualizado con el refinamiento de IA!')
     }
     setLoading(false)
   }
@@ -245,7 +245,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
               </div>
               {project.updated_at && (
                 <p className="text-xs text-gray-400">
-                  \u00daltima edici\u00f3n:{' '}
+                  Última edición:{' '}
                   {new Date(project.updated_at).toLocaleDateString('es-ES', {
                     day: '2-digit', month: '2-digit', year: 'numeric',
                     hour: '2-digit', minute: '2-digit',
@@ -292,7 +292,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
         {detectedVars.length === 0 && project.context && (
           <div className="bg-white rounded-2xl border border-dashed border-gray-200 p-4 mb-4 text-center">
             <p className="text-sm text-gray-400 italic">
-              Sin variables din\u00e1micas. A\u00f1ade <code className="font-mono bg-gray-100 px-1 rounded text-xs">{'{{'+'nombre'+'}}'}</code> al contexto para personalizar el prompt.
+              Sin variables dinámicas. Añade <code className="font-mono bg-gray-100 px-1 rounded text-xs">{'{{'+'nombre'+'}}'}</code> al contexto para personalizar el prompt.
             </p>
           </div>
         )}
@@ -321,7 +321,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
             {missingVars.length > 0 && (
               <p className="text-xs text-amber-600 mt-3 flex items-center gap-1">
                 &#9888; {missingVars.length} variable{missingVars.length !== 1 ? 's' : ''} sin rellenar.
-                El prompt se copiar\u00e1 con los marcadores sin sustituir.
+                El prompt se copiará con los marcadores sin sustituir.
               </p>
             )}
           </div>
@@ -356,7 +356,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
           </div>
           <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm text-gray-700 whitespace-pre-wrap font-mono leading-relaxed max-h-96 overflow-y-auto">
             {previewText || (
-              <span className="text-gray-400 italic">Este proyecto no tiene contenido a\u00fan.</span>
+              <span className="text-gray-400 italic">Este proyecto no tiene contenido aún.</span>
             )}
           </div>
         </div>
@@ -381,7 +381,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
                   {!isPro && <span className="ml-2 text-gray-300">&#128274;</span>}
                 </p>
                 <p className={`text-xs ${isPro ? 'text-gray-500' : 'text-gray-300'}`}>
-                  {isPro ? 'Dile a la IA c\u00f3mo mejorar este prompt' : 'Disponible en plan Pro'}
+                  {isPro ? 'Dile a la IA cómo mejorar este prompt' : 'Disponible en plan Pro'}
                 </p>
               </div>
             </div>
@@ -405,14 +405,14 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
               <div className="max-h-80 overflow-y-auto p-4 flex flex-col gap-3 bg-gray-50/50">
                 {chatMessages.length === 0 && (
                   <div className="text-center py-6">
-                    <p className="text-sm text-gray-400 mb-3">Dile a la IA c\u00f3mo quieres mejorar el prompt</p>
+                    <p className="text-sm text-gray-400 mb-3">Dile a la IA cómo quieres mejorar el prompt</p>
                     <div className="flex flex-wrap gap-2 justify-center">
                       {[
-                        'H\u00e1zlo m\u00e1s formal',
-                        'H\u00e1zlo m\u00e1s corto',
-                        'A\u00f1ade m\u00e1s detalle',
+                        'Házlo más formal',
+                        'Házlo más corto',
+                        'Añade más detalle',
                         'Cambia el tono a amigable',
-                        'A\u00f1ade instrucciones de formato',
+                        'Añade instrucciones de formato',
                       ].map(s => (
                         <button
                           key={s}
@@ -482,7 +482,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
                     value={chatInput}
                     onChange={e => setChatInput(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleChatSend()}
-                    placeholder="Ej: H\u00e1zlo m\u00e1s formal, a\u00f1ade contexto sobre..."
+                    placeholder="Ej: Házlo más formal, añade contexto sobre..."
                     disabled={chatLoading}
                     className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 disabled:opacity-50"
                   />
@@ -509,7 +509,7 @@ export default function ProjectDetailClient({ project: initialProject, plan, use
           onRestored={(updated) => {
             setProject(updated)
             setShowHistory(false)
-            showToast('\u00a1Versi\u00f3n restaurada correctamente!')
+            showToast('¡Versión restaurada correctamente!')
           }}
         />
       )}
