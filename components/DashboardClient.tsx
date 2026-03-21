@@ -123,6 +123,33 @@ export default function DashboardClient({ projects, stats, plan, userName }: Das
           </Link>
         </div>
 
+        {/* Upgrade banner for Free users */}
+        {!isPro && (
+          <div className="mb-8 bg-gradient-to-r from-violet-900/40 to-violet-800/20 border border-violet-700/50 rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-violet-600/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-violet-300">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-white">Est&#225;s en el plan Free</p>
+                <p className="text-xs text-zinc-400 mt-0.5">Tienes 3 contextos m&#225;ximos y sin IA. Pro desbloquea todo por <span className="text-violet-300 font-semibold">9 &#8364;/mes</span>.</p>
+                <div className="flex flex-wrap gap-3 mt-2">
+                  {['Contextos ilimitados', 'Generar con IA', 'Historial de versiones', 'Keeper Lab'].map(f => (
+                    <span key={f} className="text-xs text-violet-300 flex items-center gap-1">
+                      <svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                      {f}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <a href="/pricing" className="flex-shrink-0 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors whitespace-nowrap">
+              Hazte Pro
+            </a>
+          </div>
+        )}
         {/* Contextos recientes */}
         <div>
           <div className="flex items-center justify-between mb-4">
