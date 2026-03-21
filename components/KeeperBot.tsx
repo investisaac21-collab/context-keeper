@@ -1,4 +1,5 @@
 'use client'
+// Keeper Bot v1.0 - Fase 2
 import { useState, useEffect, useRef } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
