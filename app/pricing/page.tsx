@@ -13,7 +13,7 @@ const PLANS = [
     badge: null,
     features: [
       'Hasta 3 proyectos',
-      'Variables dinámicas',
+      'Variables din\u00e1micas',
       'Importar / exportar JSON',
       'Plantillas predefinidas',
     ],
@@ -26,7 +26,7 @@ const PLANS = [
     price: 9,
     desc: 'Para profesionales que usan IA a diario',
     color: 'border-violet-500',
-    badge: 'MÁS POPULAR',
+    badge: 'M\u00c1S POPULAR',
     features: [
       'Todo lo del plan Free',
       'Proyectos ilimitados',
@@ -51,7 +51,7 @@ const PLANS = [
       'Hasta 5 miembros',
       'Prompts compartidos entre miembros',
       'Panel de administrador',
-      'Facturación centralizada',
+      'Facturaci\u00f3n centralizada',
       'Permisos por rol (admin, editor, viewer)',
     ],
     cta: 'Empezar con Team',
@@ -62,14 +62,14 @@ const PLANS = [
 ]
 
 const FAQ = [
-  { q: 'ÃÂ¿Qué incluye el plan Free?', a: 'El plan Free incluye hasta 3 proyectos, variables dinámicas, plantillas predefinidas e importación/exportación JSON. Sin tarjeta de crédito.' },
-  { q: 'ÃÂ¿Qué funciones exactas se desbloquean con Pro?', a: 'Con Pro desbloqueas proyectos ilimitados, historial de versiones con rollback, variables globales guardadas, soporte prioritario y acceso anticipado a nuevas funciones.' },
-  { q: 'ÃÂ¿Cuál es la diferencia entre Pro y Team?', a: 'Team incluye todo lo de Pro más colaboración para hasta 5 miembros, prompts compartidos, panel de administrador, facturación centralizada y permisos por rol (admin, editor, viewer).' },
-  { q: 'ÃÂ¿Team incluye permisos por rol?', a: 'Sí. Con el plan Team puedes asignar roles a cada miembro: admin (control total), editor (puede crear y editar) y viewer (solo lectura).' },
-  { q: 'ÃÂ¿Qué pasa con mis proyectos si cancelo?', a: 'Tus proyectos siempre son tuyos. Si cancelas Pro o Team, volverás al plan Free y conservarás hasta 3 proyectos. El resto quedará archivado y podrás recuperarlo si vuelves a suscribirte.' },
-  { q: 'ÃÂ¿Puedo cambiar de plan en cualquier momento?', a: 'Sí, puedes subir o bajar de plan cuando quieras desde tu página de cuenta. Los cambios se aplican de forma inmediata.' },
-  { q: 'ÃÂ¿Qué pasa si llego al límite gratuito?', a: 'Si llegas al límite de 3 proyectos en el plan Free, no podrás crear nuevos proyectos hasta que actualices al plan Pro o elimines alguno existente.' },
-  { q: 'ÃÂ¿Habrá plan anual con descuento?', a: 'Estamos preparando un plan anual con descuento. Próximamente podrás pagar por año y ahorrar hasta un 20%. Si quieres ser notificado, escríbenos.' },
+  { q: '\u00c3\u0082\u00c2\u00bfQu\u00e9 incluye el plan Free?', a: 'El plan Free incluye hasta 3 proyectos, variables din\u00e1micas, plantillas predefinidas e importaci\u00f3n/exportaci\u00f3n JSON. Sin tarjeta de cr\u00e9dito.' },
+  { q: '\u00c3\u0082\u00c2\u00bfQu\u00e9 funciones exactas se desbloquean con Pro?', a: 'Con Pro desbloqueas proyectos ilimitados, historial de versiones con rollback, variables globales guardadas, soporte prioritario y acceso anticipado a nuevas funciones.' },
+  { q: '\u00c3\u0082\u00c2\u00bfCu\u00e1l es la diferencia entre Pro y Team?', a: 'Team incluye todo lo de Pro m\u00e1s colaboraci\u00f3n para hasta 5 miembros, prompts compartidos, panel de administrador, facturaci\u00f3n centralizada y permisos por rol (admin, editor, viewer).' },
+  { q: '\u00c3\u0082\u00c2\u00bfTeam incluye permisos por rol?', a: 'S\u00ed. Con el plan Team puedes asignar roles a cada miembro: admin (control total), editor (puede crear y editar) y viewer (solo lectura).' },
+  { q: '\u00c3\u0082\u00c2\u00bfQu\u00e9 pasa con mis proyectos si cancelo?', a: 'Tus proyectos siempre son tuyos. Si cancelas Pro o Team, volver\u00e1s al plan Free y conservar\u00e1s hasta 3 proyectos. El resto quedar\u00e1 archivado y podr\u00e1s recuperarlo si vuelves a suscribirte.' },
+  { q: '\u00c3\u0082\u00c2\u00bfPuedo cambiar de plan en cualquier momento?', a: 'S\u00ed, puedes subir o bajar de plan cuando quieras desde tu p\u00e1gina de cuenta. Los cambios se aplican de forma inmediata.' },
+  { q: '\u00c3\u0082\u00c2\u00bfQu\u00e9 pasa si llego al l\u00edmite gratuito?', a: 'Si llegas al l\u00edmite de 3 proyectos en el plan Free, no podr\u00e1s crear nuevos proyectos hasta que actualices al plan Pro o elimines alguno existente.' },
+  { q: '\u00c3\u0082\u00c2\u00bfHabr\u00e1 plan anual con descuento?', a: 'Estamos preparando un plan anual con descuento. Pr\u00f3ximamente podr\u00e1s pagar por a\u00f1o y ahorrar hasta un 20%. Si quieres ser notificado, escr\u00edbenos.' },
 ]
 
 export default function PricingPage() {
@@ -106,9 +106,9 @@ export default function PricingPage() {
       })
       const data = await res.json()
       if (data.url) window.location.href = data.url
-      else alert('Error al iniciar el pago. Inténtalo de nuevo.')
+      else alert('Error al iniciar el pago. Int\u00e9ntalo de nuevo.')
     } catch {
-      alert('Error de conexión. Inténtalo de nuevo.')
+      alert('Error de conexi\u00f3n. Int\u00e9ntalo de nuevo.')
     } finally {
       setLoading(null)
     }
@@ -126,7 +126,7 @@ export default function PricingPage() {
       <main className="max-w-5xl mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-3">Planes y precios</h1>
-          <p className="text-gray-500 text-lg">Empieza gratis. Sin tarjeta de crédito. Cancela cuando quieras.</p>
+          <p className="text-gray-500 text-lg">Empieza gratis. Sin tarjeta de cr\u00e9dito. Cancela cuando quieras.</p>
           <div className="inline-flex items-center gap-3 mt-6 bg-white border border-gray-200 rounded-full px-2 py-1.5 shadow-sm">
             <button
               onClick={() => setBilling('monthly')}
@@ -144,7 +144,7 @@ export default function PricingPage() {
           </div>
           {billing === 'yearly' && (
             <p className="text-xs text-green-600 mt-2 font-medium">
-              Próximamente disponible &#8212; apúntate para ser el primero en saberlo
+              Pr\u00f3ximamente disponible &#8212; ap\u00fantate para ser el primero en saberlo
             </p>
           )}
         </div>
@@ -184,7 +184,7 @@ export default function PricingPage() {
                   </div>
                   {billing === 'yearly' && plan.price > 0 && (
                     <p className="text-xs text-green-600 font-medium mt-1">
-                      Ahorras {Math.round(plan.price * 0.2 * 12)} &#8364;/año
+                      Ahorras {Math.round(plan.price * 0.2 * 12)} &#8364;/a\u00f1o
                     </p>
                   )}
                 </div>
@@ -223,7 +223,7 @@ export default function PricingPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-gray-100">
-                  <th className="text-left py-3 text-gray-500 font-medium w-1/2">Función</th>
+                  <th className="text-left py-3 text-gray-500 font-medium w-1/2">Funci\u00f3n</th>
                   <th className="text-center py-3 text-gray-700 font-semibold">Free</th>
                   <th className="text-center py-3 text-violet-600 font-semibold">Pro</th>
                   <th className="text-center py-3 text-purple-600 font-semibold">Team</th>
@@ -232,7 +232,7 @@ export default function PricingPage() {
               <tbody className="divide-y divide-gray-50">
                 {[
                   ['Proyectos', '3', 'Ilimitados', 'Ilimitados'],
-                  ['Variables dinámicas', '&#10003;', '&#10003;', '&#10003;'],
+                  ['Variables din\u00e1micas', '&#10003;', '&#10003;', '&#10003;'],
                   ['Plantillas predefinidas', '&#10003;', '&#10003;', '&#10003;'],
                   ['Importar / exportar JSON', '&#10003;', '&#10003;', '&#10003;'],
                   ['Historial de versiones', '&#10007;', '&#10003;', '&#10003;'],
@@ -242,7 +242,7 @@ export default function PricingPage() {
                   ['Prompts compartidos', '&#10007;', '&#10007;', '&#10003;'],
                   ['Panel de administrador', '&#10007;', '&#10007;', '&#10003;'],
                   ['Permisos por rol', '&#10007;', '&#10007;', '&#10003;'],
-                  ['Facturación centralizada', '&#10007;', '&#10007;', '&#10003;'],
+                  ['Facturaci\u00f3n centralizada', '&#10007;', '&#10007;', '&#10003;'],
                 ].map(([feature, free, pro, team]) => (
                   <tr key={feature}>
                     <td className="py-3 text-gray-700">{feature}</td>
