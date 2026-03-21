@@ -40,7 +40,7 @@ export default async function AccountPage() {
   const planLabels: Record<string, string> = { free: 'Free', pro: 'Pro', team: 'Team' }
   const planColors: Record<string, string> = {
     free: 'bg-gray-100 text-gray-700',
-    pro: 'bg-indigo-100 text-indigo-700',
+    pro: 'bg-indigo-100 text-violet-700',
     team: 'bg-purple-100 text-purple-700',
   }
   const FREE_LIMIT = 3
@@ -56,7 +56,7 @@ export default async function AccountPage() {
         <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-4 shadow-sm">
           <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Perfil</h2>
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg shrink-0">
+            <div className="w-12 h-12 bg-violet-600 rounded-full flex items-center justify-center text-white font-bold text-lg shrink-0">
               {user.email?.[0]?.toUpperCase()}
             </div>
             <div>
@@ -85,7 +85,7 @@ export default async function AccountPage() {
                 <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all ${
-                      projectCount >= FREE_LIMIT ? 'bg-red-500' : 'bg-indigo-500'
+                      projectCount >= FREE_LIMIT ? 'bg-red-500' : 'bg-violet-500'
                     }`}
                     style={{ width: Math.min((projectCount / FREE_LIMIT) * 100, 100) + '%' }}
                   />
@@ -99,9 +99,9 @@ export default async function AccountPage() {
           </div>
         </div>
 
-        {/* SUSCRIPCIÓN */}
+        {/* SUSCRIPCIÃN */}
         <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-4 shadow-sm">
-          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">Suscripción</h2>
+          <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">SuscripciÃ³n</h2>
           <div className="flex items-start justify-between gap-4 mb-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
@@ -120,33 +120,33 @@ export default async function AccountPage() {
                 )}
               </div>
               {periodEnd && (
-                <p className="text-sm text-gray-500 mt-1">Próxima renovación: {periodEnd}</p>
+                <p className="text-sm text-gray-500 mt-1">PrÃ³xima renovaciÃ³n: {periodEnd}</p>
               )}
               {plan === 'free' && (
-                <p className="text-sm text-gray-400 mt-1">Sin suscripción activa</p>
+                <p className="text-sm text-gray-400 mt-1">Sin suscripciÃ³n activa</p>
               )}
             </div>
           </div>
 
           {plan === 'free' ? (
-            <div className="rounded-xl bg-indigo-50 border border-indigo-100 p-4 flex items-start justify-between gap-4">
+            <div className="rounded-xl bg-violet-50 border border-violet-100 p-4 flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm font-semibold text-indigo-900">Desbloquea todo con Pro</p>
-                <p className="text-xs text-indigo-600 mt-0.5">
+                <p className="text-xs text-violet-600 mt-0.5">
                   Proyectos ilimitados, historial de versiones y variables globales por solo 9 &#8364;/mes
                 </p>
               </div>
               <Link
                 href="/pricing"
-                className="shrink-0 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
+                className="shrink-0 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
               >
                 Ver planes
               </Link>
             </div>
           ) : (
             <p className="text-sm text-gray-400">
-              Para cancelar o gestionar tu suscripción, escríbenos a{' '}
-              <a href="mailto:hola@contextkeeper.app" className="text-indigo-600 hover:underline">
+              Para cancelar o gestionar tu suscripciÃ³n, escrÃ­benos a{' '}
+              <a href="mailto:hola@contextkeeper.app" className="text-violet-600 hover:underline">
                 hola@contextkeeper.app
               </a>
             </p>
@@ -155,7 +155,7 @@ export default async function AccountPage() {
 
         {/* VOLVER */}
         <div className="text-center">
-          <Link href="/dashboard" className="text-sm text-indigo-600 hover:underline">
+          <Link href="/dashboard" className="text-sm text-violet-600 hover:underline">
             &#8592; Volver al dashboard
           </Link>
         </div>
