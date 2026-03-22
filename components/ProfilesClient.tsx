@@ -401,15 +401,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
               {labResult&&(<div className="space-y-5">
                   <div style={{textAlign:'center',padding:'20px 0 12px'}}>
                     <div style={{position:'relative',display:'inline-block',marginBottom:16}}>
-                      <svg width="100" height="100" style={{transform:'rotate(-90deg)'}}>
-                        <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(59,130,246,0.1)" strokeWidth="8"/>
-                        <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(59,130,246,0.8)" strokeWidth="8"
-                          strokeDasharray={2*3.14159*42}
-                          strokeDashoffset={2*3.14159*42*(1-(Number(labResult.score)||0)/10)}
-                          strokeLinecap="round"
-                          style={{transition:'stroke-dashoffset 1s ease'}}
-                        />
-                      </svg>
+                      <div style={{fontSize:52,fontWeight:900,color:'rgba(147,197,253,0.9)',lineHeight:1,marginBottom:4}}>{String(labResult.score||0)}<span style={{fontSize:16,opacity:0.4,marginLeft:4}}>/ 10</span></div>
                       <div style={{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',textAlign:'center'}}>
                         <div style={{fontSize:28,fontWeight:900,color:'rgba(147,197,253,0.95)',lineHeight:1}}>{String(labResult.score||0)}</div>
                         <div style={{fontSize:9,color:'rgba(147,197,253,0.5)',letterSpacing:'0.1em',marginTop:2}}>/ 10</div>
@@ -418,7 +410,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                     <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginBottom:12}}>
                       {[{k:'clarity',label:'Claridad',color:'rgba(96,165,250,0.9)'},{k:'consistency',label:'Consistencia',color:'rgba(167,139,250,0.9)'},{k:'completeness',label:'Completitud',color:'rgba(52,211,153,0.9)'},{k:'effectiveness',label:'Efectividad',color:'rgba(251,191,36,0.9)'}].map(({k,label,color})=>(
                         <div key={k} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:8,padding:'8px 4px',textAlign:'center'}}>
-                          <div style={{fontSize:18,fontWeight:800,color,lineHeight:1.1}}>{String((labResult as Record<string,unknown>)[k]||0)}</div>
+                          <div style={{fontSize:18,fontWeight:800,color,lineHeight:1.1}}>{Number((labResult as Record<string,string|number>)[k]||0)}</div>
                           <div style={{fontSize:8,color:'rgba(255,255,255,0.35)',letterSpacing:'0.06em',marginTop:3}}>{label.toUpperCase()}</div>
                         </div>
                       ))}
@@ -523,7 +515,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                         {forgeResult.consistency_score!=null&&(
                           <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,marginTop:4}}>
                             <div style={{height:4,flex:1,maxWidth:120,background:'rgba(255,255,255,0.06)',borderRadius:2}}>
-                              <div style={{height:'100%',borderRadius:2,background:'rgba(251,191,36,0.7)',width:String(Number(forgeResult.consistency_score)*10)+'%',transition:'width 1s ease'}}/>
+                              <div style={{height:'100%',borderRadius:2,background:'rgba(251,191,36,0.7)',width:String(Math.min(100,Number(forgeResult.consistency_score||0)*10))+'%',transition:'width 1s ease'}}/>
                             </div>
                             <span style={{fontSize:12,color:'rgba(253,230,138,0.7)',fontWeight:700}}>{String(forgeResult.consistency_score)}/10</span>
                           </div>
