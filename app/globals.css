@@ -113,12 +113,12 @@ html {
 }
 
 /* =============================
-   SCROLL ANIMATIONS â fade-up
+   SCROLL ANIMATIONS ?????? fade-up
    ============================= */
 .fade-section {
   opacity: 0;
-  transform: translateY(32px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+  transform: translateY(16px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 .fade-section.in-view {
@@ -130,7 +130,7 @@ html {
 .fade-section:nth-child(3) { transition-delay: 0.1s; }
 .fade-section:nth-child(4) { transition-delay: 0.15s; }
 
-/* ââ Keeper Premium Animations ââ */
+/* ???????????? Keeper Premium Animations ???????????? */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -325,7 +325,7 @@ html {
   animation: text-shimmer 6s ease infinite;
 }
 
-/* ===== KEEPER FASE 1 — Premium Visual System ===== */
+/* ===== KEEPER FASE 1 ??? Premium Visual System ===== */
 
 /* Bar fill animation for Lab scores */
 @keyframes bar-fill {
