@@ -2,14 +2,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
+
 export async function POST(req: NextRequest) {
   try {
     const supabase = createRouteHandlerClient({ cookies })
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
 
-    const groqKey = process.env.GROQ_API_KEY
-    if (!groqKey) return NextResponse.json({ error: 'GROQ no configurado' }, { status: 500 })
+    const apiKey = process.env.GEMINI_API_KEY
+    if (!apiKey) return NextResponse.json({ error: 'Gemini no configurado' }, { status: 500 })
 
     const { message, history = [], contexts = [], profiles = [] } = await req.json()
     if (!message) return NextResponse.json({ error: 'Mensaje requerido' }, { status: 400 })
@@ -17,9 +19,9 @@ export async function POST(req: NextRequest) {
     // Build context summary for the bot
     const ctxSummary = contexts.length > 0
       ? 'Contextos guardados del usuario:\n' + contexts.map((c: any) =>
-          `- "${c.name}" [${c.tag || c.category || 'sin categoría'}]: ${(c.context || '').substring(0, 200)}`
+          `- "${c.name}" [${c.tag || c.category || 'sin categoria'}]: ${(c.context || '').substring(0, 200)}`
         ).join('\n')
-      : 'El usuario no tiene contextos guardados aún.'
+      : 'El usuario no tiene contextos guardados aun.'
 
     const profileSummary = profiles.length > 0
       ? '\n\nPerfiles Keeper del usuario:\n' + profiles.map((p: any) =>
@@ -33,42 +35,42 @@ Keeper es una herramienta para guardar contextos, instrucciones y perfiles de IA
 
 Tus capacidades:
 - Conoces todos los contextos y perfiles guardados del usuario
-- Puedes sugerir qué contexto usar para cada tarea
+- Puedes sugerir que contexto usar para cada tarea
 - Puedes explicar, mejorar o crear nuevos contextos
 - Ayudas a organizar y aprovechar mejor la memoria del usuario
-- Respondes siempre en español, de forma directa y útil
-- Eres conciso: máximo 3-4 frases por respuesta salvo que el usuario pida más detalle
+- Respondes siempre en espanol, de forma directa y util
+- Eres conciso: maximo 3-4 frases por respuesta salvo que el usuario pida mas detalle
 
 Datos actuales del usuario:
 ${ctxSummary}${profileSummary}
 
-Cuando el usuario pregunte por un contexto específico, cítalo por nombre.
+Cuando el usuario pregunte por un contexto especifico, citalo por nombre.
 Si no tiene contextos relevantes, sugiere que cree uno.`
 
-    const messages = [
-      { role: 'system', content: systemPrompt },
-      ...history.map((m: any) => ({ role: m.role, content: m.content })),
-      { role: 'user', content: message }
-    ]
+    // Build Gemini multi-turn contents
+    const contents: any[] = []
+    for (const m of history) {
+      contents.push({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }]
+      })
+    }
+    contents.push({ role: 'user', parts: [{ text: message }] })
 
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
       method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + groqKey,
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages,
-        max_tokens: 600,
-        temperature: 0.7,
-      }),
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents,
+        generationConfig: { temperature: 0.7, maxOutputTokens: 800 }
+      })
     })
 
     const data = await res.json()
-    if (!res.ok) return NextResponse.json({ error: data.error?.message || 'Error GROQ' }, { status: 500 })
+    if (!res.ok) return NextResponse.json({ error: data.error?.message || 'Error Gemini' }, { status: 500 })
 
-    const reply = data.choices?.[0]?.message?.content || 'Sin respuesta'
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sin respuesta'
     return NextResponse.json({ reply })
 
   } catch (err) {
