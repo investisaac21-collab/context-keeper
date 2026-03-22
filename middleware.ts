@@ -10,13 +10,18 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // Protect dashboard routes
-  if (!session && req.nextUrl.pathname.startsWith('/dashboard')) {
+  const { pathname } = req.nextUrl
+
+  // Protect app routes (require login)
+  const protectedPrefixes = ['/dashboard', '/profiles', '/lab', '/forge', '/account', '/contexts']
+  const isProtected = protectedPrefixes.some(p => pathname.startsWith(p))
+
+  if (!session && isProtected) {
     return NextResponse.redirect(new URL('/login', req.url))
   }
 
-  // Redirect logged-in users away from login
-  if (session && (req.nextUrl.pathname === '/login' || req.nextUrl.pathname === '/')) {
+  // Redirect logged-in users away from login/landing
+  if (session && (pathname === '/login' || pathname === '/')) {
     return NextResponse.redirect(new URL('/dashboard', req.url))
   }
 
@@ -24,5 +29,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/login', '/dashboard/:path*'],
+  matcher: ['/', '/login', '/dashboard/:path*', '/profiles/:path*', '/lab/:path*', '/forge/:path*', '/account/:path*', '/contexts/:path*'],
 }
