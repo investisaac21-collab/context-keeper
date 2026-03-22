@@ -246,7 +246,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
     if(!forgeProfile)return;setForgeLoading(true);setForgeError('');setForgeResult(null);setForgeLoadMsg(0)
     forgeTimerRef.current=setInterval(()=>setForgeLoadMsg(p=>(p+1)%4),1800)
     const scenarioToUse=forgeMode==='scenario'?(forgeCustomScenario.trim()||forgeScenario):''
-    try{const res=await fetch('/api/forge-simulate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profile:forgeProfile,mode:forgeMode,scenario:scenarioToUse})});const data=await res.json();if(data.result){setForgeResult(data.result);supabase.from('forge_results').insert({profile_id:forgeProfile?.id,mode:forgeMode,result:data.result,scenario:forgeScenario}).then(()=>{}).catch(()=>{})}else setForgeError(data.error||'Error en simulacion')}catch(_e){setForgeError('Error de conexion')}
+    try{const res=await fetch('/api/forge-simulate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profileId:forgeProfile?.id,mode:forgeMode,scenario:scenarioToUse})});const data=await res.json();if(data.result){setForgeResult(data.result);supabase.from('forge_results').insert({profile_id:forgeProfile?.id,mode:forgeMode,result:data.result,scenario:forgeScenario}).then(()=>{}).catch(()=>{})}else setForgeError(data.error||'Error en simulacion')}catch(_e){setForgeError('Error de conexion')}
     if(forgeTimerRef.current)clearInterval(forgeTimerRef.current)
     setForgeLoading(false)
   }
@@ -480,14 +480,14 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                       <p className="text-xs font-semibold text-zinc-400">Escenario a simular</p>
                       <div className="space-y-1.5">
                         {(SCENARIOS_BY_TYPE[forgeProfile.profile_type||'custom']||SCENARIOS_BY_TYPE.custom).map((s:string,i:number)=>(
-                          <button key={i} onClick={()=>{setForgeScenario(s);setForgeCustomScenario('')}} style={{background:forgeScenario===s&&!forgeCustomScenario?'rgba(245,158,11,0.1)':'rgba(39,39,42,0.4)',border:forgeScenario===s&&!forgeCustomScenario?'1px solid rgba(245,158,11,0.3)':'1px solid rgba(63,63,70,0.4)',width:'100%',textAlign:'left'}} className="px-3 py-2.5 rounded-xl text-xs transition-all">
+                          <button key={i} onClick={()=>{setForgeScenario(s);setForgeCustomScenario('');setForgeError('')}} style={{background:forgeScenario===s&&!forgeCustomScenario?'rgba(245,158,11,0.1)':'rgba(39,39,42,0.4)',border:forgeScenario===s&&!forgeCustomScenario?'1px solid rgba(245,158,11,0.3)':'1px solid rgba(63,63,70,0.4)',width:'100%',textAlign:'left'}} className="px-3 py-2.5 rounded-xl text-xs transition-all">
                             <span className={forgeScenario===s&&!forgeCustomScenario?'text-amber-300':'text-zinc-400'}>{s}</span>
                           </button>
                         ))}
                       </div>
                       <div>
                         <p className="text-xs text-zinc-600 mb-1.5">O escribe tu propio escenario:</p>
-                        <textarea style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-xl px-3 py-2.5 text-sm placeholder-zinc-600 focus:outline-none focus:border-amber-500/50 resize-none transition-colors" placeholder="Describe una situacion especifica para simular..." rows={2} value={forgeCustomScenario} onChange={e=>{setForgeCustomScenario(e.target.value);if(e.target.value)setForgeScenario('')}}/>
+                        <textarea style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-xl px-3 py-2.5 text-sm placeholder-zinc-600 focus:outline-none focus:border-amber-500/50 resize-none transition-colors" placeholder="Describe una situacion especifica para simular..." rows={2} value={forgeCustomScenario} onChange={e=>{setForgeCustomScenario(e.target.value);setForgeError('');if(e.target.value)setForgeScenario('')}}/>
                       </div>
                     </div>
                   )}
