@@ -86,8 +86,7 @@ Realiza una prueba libre de interaccion con este perfil. Responde SOLO con JSON 
       })
     })
     const data = await res.json()
-    console.log('FORGE_GEMINI_DATA:', JSON.stringify(data).slice(0, 500))
-    // Gemini 2.5 flash may have thinking parts - find text part
+// Gemini 2.5 flash may have thinking parts - find text part
     const parts = data.candidates?.[0]?.content?.parts || []
     raw = parts.find((p: any) => p.text && p.text.trim())?.text || ''
   } catch (_e) {
@@ -96,14 +95,24 @@ Realiza una prueba libre de interaccion con este perfil. Responde SOLO con JSON 
 
   if (!raw) return NextResponse.json({ error: 'No se pudo simular' }, { status: 500 })
 
-  const sanitized = sanitizeJson(raw)
-  if (!sanitized) return NextResponse.json({ error: 'No se pudo simular' }, { status: 500 })
-
   let parsed: Record<string, unknown>
+  // Try direct parse first (Gemini response may already be valid JSON)
   try {
-    parsed = JSON.parse(sanitized)
-  } catch (_e) {
-    return NextResponse.json({ error: 'No se pudo simular' }, { status: 500 })
+    // Strip markdown fences if present
+    const stripped = raw.replace(/```(?:json)?\s*/gi, '').replace(/```\s*/g, '').trim()
+    const jsonStart = stripped.indexOf('{')
+    const jsonEnd = stripped.lastIndexOf('}')
+    const jsonStr = jsonStart !== -1 && jsonEnd !== -1 ? stripped.slice(jsonStart, jsonEnd + 1) : stripped
+    parsed = JSON.parse(jsonStr)
+  } catch (_e1) {
+    // Fallback: use sanitizeJson
+    const sanitized = sanitizeJson(raw)
+    if (!sanitized) return NextResponse.json({ error: 'No se pudo simular' }, { status: 500 })
+    try {
+      parsed = JSON.parse(sanitized)
+    } catch (_e2) {
+      return NextResponse.json({ error: 'No se pudo simular' }, { status: 500 })
+    }
   }
 
   return NextResponse.json({ result: parsed })
