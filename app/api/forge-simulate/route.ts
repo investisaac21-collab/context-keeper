@@ -86,7 +86,10 @@ Realiza una prueba libre de interaccion con este perfil. Responde SOLO con JSON 
       })
     })
     const data = await res.json()
-    raw = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+    console.log('FORGE_GEMINI_DATA:', JSON.stringify(data).slice(0, 500))
+    // Gemini 2.5 flash may have thinking parts - find text part
+    const parts = data.candidates?.[0]?.content?.parts || []
+    raw = parts.find((p: any) => p.text && p.text.trim())?.text || ''
   } catch (_e) {
     return NextResponse.json({ error: 'Error de conexion con Gemini' }, { status: 500 })
   }
