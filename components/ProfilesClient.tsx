@@ -246,7 +246,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
     if(!forgeProfile)return;setForgeLoading(true);setForgeError('');setForgeResult(null);setForgeLoadMsg(0)
     forgeTimerRef.current=setInterval(()=>setForgeLoadMsg(p=>(p+1)%4),1800)
     const scenarioToUse=forgeMode==='scenario'?(forgeCustomScenario.trim()||forgeScenario):''
-    try{const res=await fetch('/api/forge-simulate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profile:forgeProfile,mode:forgeMode,scenario:scenarioToUse})});const data=await res.json();if(data.result)setForgeResult(data.result);else setForgeError(data.error||'Error en simulacion')}catch(_e){setForgeError('Error de conexion')}
+    try{const res=await fetch('/api/forge-simulate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profile:forgeProfile,mode:forgeMode,scenario:scenarioToUse})});const data=await res.json();if(data.result)setForgeResult(data.result);supabase.from('forge_results').insert({profile_id:forgeProfile?.id,mode:forgeMode,result:data.result,scenario:forgeScenario}).then(()=>{}).catch(()=>{});else setForgeError(data.error||'Error en simulacion')}catch(_e){setForgeError('Error de conexion')}
     if(forgeTimerRef.current)clearInterval(forgeTimerRef.current)
     setForgeLoading(false)
   }
@@ -398,13 +398,50 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
               {!labResult&&!labLoading&&!labError&&<div className="text-center py-6"><p className="text-zinc-400 text-sm mb-2 leading-relaxed">Analisis en 4 dimensiones:</p><div className="flex justify-center gap-4 mb-6">{[['Claridad','text-blue-400'],['Consistencia','text-violet-400'],['Completitud','text-emerald-400'],['Efectividad','text-amber-400']].map(([label,color])=><div key={label} className="text-center"><div style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.5)'}} className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1"><span className={"text-sm font-black "+color}>?</span></div><span className="text-xs text-zinc-600">{label}</span></div>)}</div><button onClick={handleRunLab} style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 4px 20px rgba(139,92,246,0.25)'}} className="flex items-center gap-2 text-white text-sm font-semibold px-6 py-3 rounded-xl hover:opacity-90 transition-opacity mx-auto"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Analizar perfil</button></div>}
               {labLoading&&<div className="flex flex-col items-center py-8 gap-4"><div className="relative w-12 h-12"><div style={{border:'2px solid rgba(59,130,246,0.15)',borderTop:'2px solid #3b82f6'}} className="absolute inset-0 rounded-full animate-spin"/><div style={{border:'2px solid rgba(139,92,246,0.1)',borderBottom:'2px solid #7c3aed',animationDuration:'1.4s'}} className="absolute inset-1.5 rounded-full animate-spin"/></div><div className="text-center space-y-1"><p className="text-blue-400 text-sm font-medium" style={{transition:'opacity 0.4s'}}>{labMsgs[labLoadMsg]}</p><p className="text-zinc-700 text-xs">Keeper Lab · Analisis profundo</p></div></div>}
               {labError&&<div style={{background:'rgba(239,68,68,0.07)',border:'1px solid rgba(239,68,68,0.2)'}} className="p-4 rounded-xl"><p className="text-red-400 text-sm">{labError}</p><button onClick={handleRunLab} className="mt-3 text-xs text-violet-400 hover:text-violet-300">Reintentar</button></div>}
-              {labResult&&(<div className="space-y-4">
-                <div style={{background:'rgba(139,92,246,0.08)',border:'1px solid rgba(139,92,246,0.2)'}} className="p-4 rounded-xl"><div className="flex items-center gap-4 mb-4"><div style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 0 20px rgba(139,92,246,0.3)',minWidth:'56px'}} className="w-14 h-14 rounded-2xl flex items-center justify-center"><span className="text-2xl font-black text-white">{labResult.score}</span></div><div><p className="text-violet-300 font-bold text-sm">Score global</p><p className="text-zinc-500 text-xs mt-0.5 leading-relaxed">{labResult.tip}</p></div></div>
-                  <div className="grid grid-cols-4 gap-2">{[{k:'clarity',label:'Claridad',color:'#60a5fa'},{k:'consistency',label:'Consistencia',color:'#a78bfa'},{k:'completeness',label:'Completitud',color:'#34d399'},{k:'effectiveness',label:'Efectividad',color:'#fbbf24'}].map(d=>{const val=labResult[d.k as keyof typeof labResult] as number||0;return(<div key={d.k} style={{background:'rgba(0,0,0,0.3)',border:'1px solid rgba(63,63,70,0.4)'}} className="p-2.5 rounded-xl text-center"><div className="text-lg font-black mb-0.5" style={{color:d.color,transition:'opacity 0.5s ease',opacity:labAnimated?1:0}}>{val}</div><div className="text-xs text-zinc-600 leading-tight">{d.label}</div><div style={{background:'rgba(63,63,70,0.4)',borderRadius:'999px',height:'3px',marginTop:'6px'}}><div style={{background:d.color,width:labAnimated?(val*10)+'%':'0%',height:'3px',borderRadius:'999px',transition:'width 0.9s cubic-bezier(0.34,1.56,0.64,1)'}}/></div></div>)})}</div>
-                </div>
-                <div className="grid grid-cols-2 gap-3"><div style={{background:'rgba(16,185,129,0.05)',border:'1px solid rgba(16,185,129,0.15)'}} className="p-3 rounded-xl"><p className="text-emerald-400 text-xs font-bold mb-2">Fortalezas</p><ul className="space-y-1.5">{(labResult.strengths||[]).map((s:string,i:number)=><li key={i} className="text-zinc-300 text-xs flex gap-1.5"><span className="text-emerald-500 flex-shrink-0">+</span>{s}</li>)}</ul></div><div style={{background:'rgba(245,158,11,0.05)',border:'1px solid rgba(245,158,11,0.15)'}} className="p-3 rounded-xl"><p className="text-amber-400 text-xs font-bold mb-2">Mejoras</p><ul className="space-y-1.5">{(labResult.improvements||[]).map((s:string,i:number)=><li key={i} className="text-zinc-300 text-xs flex gap-1.5"><span className="text-amber-500 flex-shrink-0">&#8593;</span>{s}</li>)}</ul></div></div>
-                {labResult.optimized&&<div style={{background:'rgba(9,9,11,0.8)',border:'1px solid rgba(63,63,70,0.5)'}} className="p-4 rounded-xl"><div className="flex items-center justify-between mb-2"><p className="text-zinc-300 text-xs font-bold">Version optimizada</p><button onClick={()=>{doCopy(labResult.optimized);showToast('Copiada')}} className="text-xs text-violet-400 hover:text-violet-300 transition-colors flex items-center gap-1"><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>Copiar</button></div><p className="text-zinc-400 text-xs leading-relaxed whitespace-pre-wrap">{labResult.optimized}</p></div>}
-                <button onClick={handleRunLab} className="w-full text-xs text-zinc-700 hover:text-zinc-400 transition-colors py-1">Analizar de nuevo</button>
+              {labResult&&(<div className="space-y-5">
+                  <div style={{textAlign:'center',padding:'20px 0 12px'}}>
+                    <div style={{position:'relative',display:'inline-block',marginBottom:16}}>
+                      <svg width="100" height="100" style={{transform:'rotate(-90deg)'}}>
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(59,130,246,0.1)" strokeWidth="8"/>
+                        <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(59,130,246,0.8)" strokeWidth="8"
+                          strokeDasharray={String(2*3.14159*42)}
+                          strokeDashoffset={String(2*3.14159*42*(1-(Number(labResult.score)||0)/10))}
+                          strokeLinecap="round"
+                          style={{transition:'stroke-dashoffset 1s ease'}}
+                        />
+                      </svg>
+                      <div style={{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',textAlign:'center'}}>
+                        <div style={{fontSize:28,fontWeight:900,color:'rgba(147,197,253,0.95)',lineHeight:1}}>{labResult.score}</div>
+                        <div style={{fontSize:9,color:'rgba(147,197,253,0.5)',letterSpacing:'0.1em',marginTop:2}}>/ 10</div>
+                      </div>
+                    </div>
+                    <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginBottom:12}}>
+                      {[{k:'clarity',label:'Claridad',color:'rgba(96,165,250,0.9)'},{k:'consistency',label:'Consistencia',color:'rgba(167,139,250,0.9)'},{k:'completeness',label:'Completitud',color:'rgba(52,211,153,0.9)'},{k:'effectiveness',label:'Efectividad',color:'rgba(251,191,36,0.9)'}].map(({k,label,color})=>(
+                        <div key={k} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.06)',borderRadius:8,padding:'8px 4px',textAlign:'center'}}>
+                          <div style={{fontSize:18,fontWeight:800,color,lineHeight:1.1}}>{String(labResult[k as keyof typeof labResult]||0)}</div>
+                          <div style={{fontSize:8,color:'rgba(255,255,255,0.35)',letterSpacing:'0.06em',marginTop:3}}>{label.toUpperCase()}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {labResult.tip&&<div style={{background:'rgba(59,130,246,0.08)',border:'1px solid rgba(59,130,246,0.15)',borderRadius:10,padding:'10px 14px'}}>
+                    <p style={{fontSize:11,color:'rgba(147,197,253,0.8)',margin:0,lineHeight:1.5}}>&#9670; {String(labResult.tip)}</p>
+                  </div>}
+                  {(labResult.improvements as string[]||[]).length>0&&<div>
+                    <p style={{fontSize:10,color:'rgba(255,255,255,0.3)',letterSpacing:'0.08em',marginBottom:6}}>MEJORAS</p>
+                    <div style={{display:'flex',flexDirection:'column',gap:4}}>
+                      {(labResult.improvements as string[]).slice(0,3).map((imp,i)=>(
+                        <div key={i} style={{background:'rgba(239,68,68,0.06)',border:'1px solid rgba(239,68,68,0.12)',borderRadius:6,padding:'6px 10px'}}>
+                          <p style={{fontSize:11,color:'rgba(252,165,165,0.8)',margin:0}}>{imp}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>}
+                  {labResult.optimized&&<div style={{background:'rgba(16,185,129,0.06)',border:'1px solid rgba(16,185,129,0.15)',borderRadius:10,padding:'10px 14px'}}>
+                    <p style={{fontSize:10,color:'rgba(52,211,153,0.5)',letterSpacing:'0.08em',marginBottom:4}}>VERSION OPTIMIZADA</p>
+                    <p style={{fontSize:11,color:'rgba(52,211,153,0.8)',margin:0,lineHeight:1.5,maxHeight:80,overflow:'hidden'}}>{String(labResult.optimized).slice(0,200)}...</p>
+                  </div>}
+                  <button onClick={handleRunLab} className="w-full text-xs text-zinc-700 hover:text-zinc-500 transition py-1">Repetir analisis</button>
               </div>)}
             </div>
           </div>
@@ -464,41 +501,110 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
               {forgeResult&&!forgeLoading&&(
                 <div className="space-y-4">
                   {forgeMode==='scenario'&&(
-                    <div className="space-y-3">
-                      {forgeResult.verdict&&(<div style={{background:(forgeResult.verdict as string)==='SOLIDO'?'rgba(16,185,129,0.08)':(forgeResult.verdict as string)==='INCONSISTENTE'?'rgba(239,68,68,0.08)':'rgba(245,158,11,0.08)',border:(forgeResult.verdict as string)==='SOLIDO'?'1px solid rgba(16,185,129,0.2)':(forgeResult.verdict as string)==='INCONSISTENTE'?'1px solid rgba(239,68,68,0.2)':'1px solid rgba(245,158,11,0.2)'}} className="flex items-center gap-3 p-3 rounded-xl">
-                        <div style={{width:'8px',height:'8px',borderRadius:'50%',background:(forgeResult.verdict as string)==='SOLIDO'?'#34d399':(forgeResult.verdict as string)==='INCONSISTENTE'?'#f87171':'#fbbf24',flexShrink:0}}/>
-                        <div>
-                          <span className={"text-xs font-black "+(forgeResult.verdict==='SOLIDO'?'text-emerald-400':forgeResult.verdict==='INCONSISTENTE'?'text-red-400':'text-amber-400')}>{forgeResult.verdict as string}</span>
-                          <span className="text-zinc-500 text-xs ml-2">Score: {forgeResult.consistency_score as number}/10</span>
+                    <div>
+                      <div style={{textAlign:'center',padding:'24px 0 16px'}}>
+                        <div style={{
+                          display:'inline-block',
+                          padding:'10px 28px',
+                          borderRadius:12,
+                          marginBottom:12,
+                          background:forgeResult.verdict==='SOLIDO'?'rgba(34,197,94,0.1)':forgeResult.verdict==='ACEPTABLE'?'rgba(251,191,36,0.08)':'rgba(239,68,68,0.08)',
+                          border:forgeResult.verdict==='SOLIDO'?'1px solid rgba(34,197,94,0.3)':forgeResult.verdict==='ACEPTABLE'?'1px solid rgba(251,191,36,0.25)':'1px solid rgba(239,68,68,0.25)'
+                        }}>
+                          <div style={{
+                            fontSize:32,
+                            fontWeight:900,
+                            letterSpacing:'0.06em',
+                            color:forgeResult.verdict==='SOLIDO'?'rgba(134,239,172,0.95)':forgeResult.verdict==='ACEPTABLE'?'rgba(253,230,138,0.95)':'rgba(252,165,165,0.95)',
+                            lineHeight:1
+                          }}>{String(forgeResult.verdict||'—')}</div>
+                          <div style={{fontSize:9,letterSpacing:'0.12em',opacity:0.5,marginTop:4,color:'white'}}>VEREDICTO FORGE</div>
                         </div>
-                      </div>)}
-                      {forgeResult.simulated_response&&<div style={{background:'rgba(24,24,27,0.8)',border:'1px solid rgba(63,63,70,0.5)'}} className="p-4 rounded-xl"><p className="text-zinc-500 text-xs font-semibold mb-2">Respuesta simulada del perfil</p><p className="text-zinc-200 text-sm leading-relaxed">{forgeResult.simulated_response as string}</p></div>}
-                      {(forgeResult.strengths_shown as string[]||[]).length>0&&<div style={{background:'rgba(16,185,129,0.05)',border:'1px solid rgba(16,185,129,0.15)'}} className="p-3 rounded-xl"><p className="text-emerald-400 text-xs font-bold mb-2">Fortalezas demostradas</p><ul className="space-y-1">{(forgeResult.strengths_shown as string[]).map((s:string,i:number)=><li key={i} className="text-zinc-300 text-xs flex gap-1.5"><span className="text-emerald-500">+</span>{s}</li>)}</ul></div>}
-                      {(forgeResult.detected_issues as string[]||[]).length>0&&<div style={{background:'rgba(239,68,68,0.05)',border:'1px solid rgba(239,68,68,0.15)'}} className="p-3 rounded-xl"><p className="text-red-400 text-xs font-bold mb-2">Problemas detectados</p><ul className="space-y-1">{(forgeResult.detected_issues as string[]).map((s:string,i:number)=><li key={i} className="text-zinc-300 text-xs flex gap-1.5"><span className="text-red-500">!</span>{s}</li>)}</ul></div>}
-                      {forgeResult.recommendation&&<div style={{background:'rgba(139,92,246,0.06)',border:'1px solid rgba(139,92,246,0.2)'}} className="p-3 rounded-xl"><p className="text-violet-400 text-xs font-bold mb-1">Recomendacion</p><p className="text-zinc-300 text-xs leading-relaxed">{forgeResult.recommendation as string}</p></div>}
+                        {forgeResult.consistency_score!==undefined&&(
+                          <div style={{display:'flex',alignItems:'center',justifyContent:'center',gap:8,marginTop:4}}>
+                            <div style={{height:4,flex:1,maxWidth:120,background:'rgba(255,255,255,0.06)',borderRadius:2}}>
+                              <div style={{height:'100%',borderRadius:2,background:'rgba(251,191,36,0.7)',width:String(Number(forgeResult.consistency_score)*10)+'%',transition:'width 1s ease'}}/>
+                            </div>
+                            <span style={{fontSize:12,color:'rgba(253,230,138,0.7)',fontWeight:700}}>{String(forgeResult.consistency_score)}/10</span>
+                          </div>
+                        )}
+                      </div>
+                      {forgeResult.simulated_response&&<div style={{background:'rgba(24,24,27,0.8)',border:'1px solid rgba(63,63,70,0.5)',borderRadius:10,padding:'12px 14px',marginBottom:12}}>
+                        <p style={{fontSize:10,color:'rgba(255,255,255,0.3)',letterSpacing:'0.08em',marginBottom:6}}>RESPUESTA SIMULADA</p>
+                        <p style={{fontSize:12,color:'rgba(255,255,255,0.75)',margin:0,lineHeight:1.6}}>{String(forgeResult.simulated_response)}</p>
+                      </div>}
+                      {(forgeResult.strengths_shown as string[]||[]).length>0&&<div style={{marginBottom:8}}>
+                        <p style={{fontSize:10,color:'rgba(52,211,153,0.5)',letterSpacing:'0.08em',marginBottom:4}}>FORTALEZAS</p>
+                        {(forgeResult.strengths_shown as string[]).map((s,i)=><div key={i} style={{background:'rgba(16,185,129,0.05)',border:'1px solid rgba(16,185,129,0.12)',borderRadius:6,padding:'5px 10px',marginBottom:3}}><p style={{fontSize:11,color:'rgba(134,239,172,0.8)',margin:0}}>{s}</p></div>)}
+                      </div>}
+                      {(forgeResult.detected_issues as string[]||[]).length>0&&<div style={{marginBottom:8}}>
+                        <p style={{fontSize:10,color:'rgba(239,68,68,0.5)',letterSpacing:'0.08em',marginBottom:4}}>PROBLEMAS DETECTADOS</p>
+                        {(forgeResult.detected_issues as string[]).map((s,i)=><div key={i} style={{background:'rgba(239,68,68,0.05)',border:'1px solid rgba(239,68,68,0.12)',borderRadius:6,padding:'5px 10px',marginBottom:3}}><p style={{fontSize:11,color:'rgba(252,165,165,0.8)',margin:0}}>{s}</p></div>)}
+                      </div>}
+                      {forgeResult.recommendation&&<div style={{background:'rgba(139,92,246,0.07)',border:'1px solid rgba(139,92,246,0.18)',borderRadius:10,padding:'10px 14px'}}>
+                        <p style={{fontSize:10,color:'rgba(167,139,250,0.6)',letterSpacing:'0.08em',marginBottom:4}}>RECOMENDACION</p>
+                        <p style={{fontSize:12,color:'rgba(167,139,250,0.85)',margin:0,lineHeight:1.5}}>{String(forgeResult.recommendation)}</p>
+                      </div>}
                     </div>
                   )}
                   {forgeMode==='stress'&&(
-                    <div className="space-y-3">
-                      {forgeResult.overall_verdict&&<div style={{background:'rgba(239,68,68,0.07)',border:'1px solid rgba(239,68,68,0.2)'}} className="flex items-center gap-3 p-3 rounded-xl"><span className="text-red-400 text-xs font-black">{forgeResult.overall_verdict as string}</span><span className="text-zinc-500 text-xs">Consistencia: {forgeResult.consistency_score as number}/10</span></div>}
-                      {(forgeResult.stress_questions as string[]||[]).length>0&&<div style={{background:'rgba(24,24,27,0.8)',border:'1px solid rgba(63,63,70,0.5)'}} className="p-4 rounded-xl"><p className="text-zinc-400 text-xs font-bold mb-3">Preguntas de estres generadas</p><ul className="space-y-2">{(forgeResult.stress_questions as string[]).map((q:string,i:number)=><li key={i} style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.4)'}} className="p-2.5 rounded-lg text-xs text-zinc-300 flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">{i+1}.</span>{q}</li>)}</ul></div>}
-                      {(forgeResult.critical_gaps as string[]||[]).length>0&&<div style={{background:'rgba(239,68,68,0.05)',border:'1px solid rgba(239,68,68,0.15)'}} className="p-3 rounded-xl"><p className="text-red-400 text-xs font-bold mb-2">Gaps criticos</p><ul className="space-y-1">{(forgeResult.critical_gaps as string[]).map((g:string,i:number)=><li key={i} className="text-zinc-300 text-xs flex gap-1.5"><span className="text-red-500">!</span>{g}</li>)}</ul></div>}
-                      {(forgeResult.hardening_suggestions as string[]||[]).length>0&&<div style={{background:'rgba(139,92,246,0.05)',border:'1px solid rgba(139,92,246,0.15)'}} className="p-3 rounded-xl"><p className="text-violet-400 text-xs font-bold mb-2">Como reforzar el perfil</p><ul className="space-y-1">{(forgeResult.hardening_suggestions as string[]).map((s:string,i:number)=><li key={i} className="text-zinc-300 text-xs flex gap-1.5"><span className="text-violet-400">+</span>{s}</li>)}</ul></div>}
+                    <div>
+                      <div style={{textAlign:'center',padding:'20px 0 16px'}}>
+                        <div style={{
+                          display:'inline-block',
+                          padding:'10px 28px',
+                          borderRadius:12,
+                          marginBottom:12,
+                          background:forgeResult.overall_verdict==='ROBUSTO'?'rgba(34,197,94,0.1)':forgeResult.overall_verdict==='FRAGIL'?'rgba(239,68,68,0.08)':'rgba(251,191,36,0.08)',
+                          border:forgeResult.overall_verdict==='ROBUSTO'?'1px solid rgba(34,197,94,0.3)':forgeResult.overall_verdict==='FRAGIL'?'1px solid rgba(239,68,68,0.25)':'1px solid rgba(251,191,36,0.25)'
+                        }}>
+                          <div style={{fontSize:28,fontWeight:900,letterSpacing:'0.06em',color:forgeResult.overall_verdict==='ROBUSTO'?'rgba(134,239,172,0.95)':forgeResult.overall_verdict==='FRAGIL'?'rgba(252,165,165,0.95)':'rgba(253,230,138,0.95)',lineHeight:1}}>{String(forgeResult.overall_verdict||'—')}</div>
+                          <div style={{fontSize:9,letterSpacing:'0.12em',opacity:0.5,marginTop:4,color:'white'}}>ESTRÉS FORGE</div>
+                        </div>
+                      </div>
+                      {(forgeResult.stress_questions as string[]||[]).length>0&&<div style={{marginBottom:10}}>
+                        <p style={{fontSize:10,color:'rgba(251,191,36,0.5)',letterSpacing:'0.08em',marginBottom:6}}>PREGUNTAS DE ESTRÉS</p>
+                        {(forgeResult.stress_questions as string[]).map((q,i)=><div key={i} style={{borderLeft:'2px solid rgba(251,191,36,0.3)',paddingLeft:10,marginBottom:6}}><p style={{fontSize:11,color:'rgba(253,230,138,0.75)',margin:0}}>{q}</p></div>)}
+                      </div>}
+                      {(forgeResult.critical_gaps as string[]||[]).length>0&&<div style={{marginBottom:8}}>
+                        <p style={{fontSize:10,color:'rgba(239,68,68,0.5)',letterSpacing:'0.08em',marginBottom:4}}>GAPS CRITICOS</p>
+                        {(forgeResult.critical_gaps as string[]).map((g,i)=><div key={i} style={{background:'rgba(239,68,68,0.05)',border:'1px solid rgba(239,68,68,0.12)',borderRadius:6,padding:'5px 10px',marginBottom:3}}><p style={{fontSize:11,color:'rgba(252,165,165,0.8)',margin:0}}>{g}</p></div>)}
+                      </div>}
+                      {(forgeResult.hardening_suggestions as string[]||[]).length>0&&<div>
+                        <p style={{fontSize:10,color:'rgba(52,211,153,0.5)',letterSpacing:'0.08em',marginBottom:4}}>MEJORAS</p>
+                        {(forgeResult.hardening_suggestions as string[]).map((s,i)=><div key={i} style={{background:'rgba(16,185,129,0.05)',border:'1px solid rgba(16,185,129,0.12)',borderRadius:6,padding:'5px 10px',marginBottom:3}}><p style={{fontSize:11,color:'rgba(134,239,172,0.8)',margin:0}}>{s}</p></div>)}
+                      </div>}
                     </div>
                   )}
-                  {forgeMode==='free'&&forgeResult.test_interaction&&(
-                    <div className="space-y-3">
-                      {forgeResult.quick_verdict&&<div style={{background:forgeResult.quick_verdict==='COHERENTE'?'rgba(16,185,129,0.08)':'rgba(245,158,11,0.08)',border:forgeResult.quick_verdict==='COHERENTE'?'1px solid rgba(16,185,129,0.2)':'1px solid rgba(245,158,11,0.2)'}} className="p-3 rounded-xl"><span className={"text-xs font-black "+(forgeResult.quick_verdict==='COHERENTE'?'text-emerald-400':'text-amber-400')}>{forgeResult.quick_verdict as string}</span></div>}
-                      <div style={{background:'rgba(24,24,27,0.8)',border:'1px solid rgba(63,63,70,0.5)'}} className="p-4 rounded-xl space-y-3">
-                        <div><p className="text-zinc-600 text-xs mb-1">Pregunta de prueba</p><p className="text-zinc-200 text-sm">{(forgeResult.test_interaction as Record<string,string>).question}</p></div>
-                        <div style={{borderTop:'1px solid rgba(63,63,70,0.4)'}} className="pt-3"><p className="text-zinc-600 text-xs mb-1">Respuesta esperada segun la identidad</p><p className="text-zinc-300 text-sm leading-relaxed">{(forgeResult.test_interaction as Record<string,string>).expected_response}</p></div>
+                  {forgeMode==='free'&&(
+                    <div>
+                      <div style={{textAlign:'center',padding:'20px 0 16px'}}>
+                        <div style={{
+                          display:'inline-block',
+                          padding:'10px 28px',
+                          borderRadius:12,
+                          marginBottom:12,
+                          background:forgeResult.quick_verdict==='COHERENTE'?'rgba(34,197,94,0.1)':'rgba(239,68,68,0.08)',
+                          border:forgeResult.quick_verdict==='COHERENTE'?'1px solid rgba(34,197,94,0.3)':'1px solid rgba(239,68,68,0.25)'
+                        }}>
+                          <div style={{fontSize:26,fontWeight:900,letterSpacing:'0.06em',color:forgeResult.quick_verdict==='COHERENTE'?'rgba(134,239,172,0.95)':'rgba(252,165,165,0.95)',lineHeight:1}}>{String(forgeResult.quick_verdict||'—')}</div>
+                          <div style={{fontSize:9,letterSpacing:'0.12em',opacity:0.5,marginTop:4,color:'white'}}>VERIFICACION LIBRE</div>
+                        </div>
                       </div>
-                      {forgeResult.notes&&<div style={{background:'rgba(139,92,246,0.06)',border:'1px solid rgba(139,92,246,0.2)'}} className="p-3 rounded-xl"><p className="text-violet-400 text-xs leading-relaxed">{forgeResult.notes as string}</p></div>}
+                      {(forgeResult.test_interaction as Record<string,string>)?.question&&<div style={{background:'rgba(24,24,27,0.8)',border:'1px solid rgba(63,63,70,0.5)',borderRadius:10,padding:'12px 14px',marginBottom:10}}>
+                        <p style={{fontSize:10,color:'rgba(255,255,255,0.3)',letterSpacing:'0.08em',marginBottom:6}}>PREGUNTA DE PRUEBA</p>
+                        <p style={{fontSize:12,color:'rgba(255,255,255,0.75)',margin:0,marginBottom:8}}>{String((forgeResult.test_interaction as Record<string,string>).question)}</p>
+                        <div style={{borderTop:'1px solid rgba(63,63,70,0.4)',paddingTop:8}}>
+                          <p style={{fontSize:10,color:'rgba(255,255,255,0.3)',letterSpacing:'0.08em',marginBottom:4}}>RESPUESTA ESPERADA</p>
+                          <p style={{fontSize:11,color:'rgba(167,139,250,0.8)',margin:0}}>{String((forgeResult.test_interaction as Record<string,string>).expected_response)}</p>
+                        </div>
+                      </div>}
+                      {forgeResult.notes&&<p style={{fontSize:11,color:'rgba(255,255,255,0.5)',margin:0,lineHeight:1.5,fontStyle:'italic'}}>"{String(forgeResult.notes)}"</p>}
                     </div>
                   )}
                   <div className="flex gap-2 pt-2">
-                    <button onClick={()=>{setForgeResult(null);setForgeError('')}} style={{border:'1px solid rgba(63,63,70,0.6)'}} className="flex-1 text-zinc-400 text-xs py-2 rounded-xl hover:bg-zinc-800 hover:text-white transition-colors">Nueva simulacion</button>
-                    <button onClick={()=>openEdit(forgeProfile)} style={{border:'1px solid rgba(139,92,246,0.3)'}} className="flex-1 text-violet-400 text-xs py-2 rounded-xl hover:bg-violet-900/20 transition-colors">Editar perfil</button>
+                    <button onClick={()=>setForgeResult(null)} style={{flex:1,background:'transparent',border:'1px solid rgba(63,63,70,0.5)',color:'rgba(255,255,255,0.4)',padding:'7px 0',borderRadius:8,fontSize:11,cursor:'pointer'}}>Nueva simulacion</button>
+                    <button onClick={()=>openEdit(forgeProfile)} style={{flex:1,background:'transparent',border:'1px solid rgba(139,92,246,0.3)',color:'rgba(167,139,250,0.7)',padding:'7px 0',borderRadius:8,fontSize:11,cursor:'pointer'}}>Editar perfil</button>
                   </div>
                 </div>
               )}
@@ -553,7 +659,18 @@ function KeeperSandbox({profile,onClose}:{profile:KeeperProfile;onClose:()=>void
   const [mode,setMode]=useState<'chat'|'test'>('chat')
   const [testQ,setTestQ]=useState('')
   const sp=[profile.name&&'Nombre: '+profile.name,profile.role&&'Rol: '+profile.role,profile.tone&&'Tono: '+profile.tone,profile.goals&&'Objetivo: '+profile.goals,(profile.rules?.length)&&'Reglas: '+profile.rules.join(' | '),profile.limits&&'Limites: '+profile.limits,profile.base_memory&&'Memoria de fondo: '+profile.base_memory,profile.response_patterns&&'Patrones: '+profile.response_patterns,profile.relationships&&'Relaciones: '+profile.relationships,profile.extra&&'Contexto: '+profile.extra].filter(Boolean).join('\n')
-  const send=async(msg?:string)=>{
+
+  // Persist conversation to localStorage by profile id
+  useEffect(()=>{
+    const key='ck_sandbox_'+profile.id
+    const saved=localStorage.getItem(key)
+    if(saved){try{const parsed=JSON.parse(saved);if(Array.isArray(parsed)&&parsed.length>1)setMessages(parsed)}catch(_e){}}
+  },[profile.id])
+  useEffect(()=>{
+    const key='ck_sandbox_'+profile.id
+    localStorage.setItem(key,JSON.stringify(messages))
+  },[messages,profile.id])
+    const send=async(msg?:string)=>{
     const userMsg=(msg||input).trim();if(!userMsg||loading)return;setInput('');setMessages(prev=>[...prev,{role:'user',content:userMsg}]);setLoading(true)
     try{const res=await fetch('/api/chat-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:userMsg,systemPrompt:sp,history:messages.slice(-8)})});const data=await res.json();setMessages(prev=>[...prev,{role:'assistant',content:data.reply||data.error||'Error'}])}catch(_e){setMessages(prev=>[...prev,{role:'assistant',content:'Error de conexion'}])}
     setLoading(false)
