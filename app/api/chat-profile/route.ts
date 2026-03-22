@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+
 export async function POST(req: NextRequest) {
   try {
     const supabase = createRouteHandlerClient({ cookies })
@@ -11,40 +13,34 @@ export async function POST(req: NextRequest) {
     const { message, systemPrompt, history = [] } = await req.json()
     if (!message) return NextResponse.json({ error: 'Mensaje requerido' }, { status: 400 })
 
-    const groqKey = process.env.GROQ_API_KEY
-    if (!groqKey) return NextResponse.json({ error: 'GROQ no configurado' }, { status: 500 })
+    const apiKey = process.env.GEMINI_API_KEY
+    if (!apiKey) return NextResponse.json({ error: 'GEMINI_API_KEY no configurada' }, { status: 500 })
 
-    const messages = [
-      { role: 'system', content: systemPrompt || 'Eres un asistente de IA. Responde siempre en el idioma del usuario.' },
-      ...history.map((m: { role: string; content: string }) => ({ role: m.role, content: m.content })),
-      { role: 'user', content: message }
-    ]
+    // Build contents array for Gemini multi-turn format
+    const contents: { role: string; parts: { text: string }[] }[] = []
 
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + groqKey,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        messages,
-        max_tokens: 800,
-        temperature: 0.7,
-      }),
-    })
-
-    const data = await res.json()
-
-    if (!res.ok) {
-      return NextResponse.json({ error: data.error?.message || 'Error de GROQ' }, { status: 500 })
+    // Add history
+    for (const m of history as { role: string; content: string }[]) {
+      contents.push({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] })
     }
+    // Add current message
+    contents.push({ role: 'user', parts: [{ text: message }] })
 
-    const reply = data.choices?.[0]?.message?.content || 'Sin respuesta'
+    const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt || 'Eres un asistente de IA. Responde siempre en el idioma del usuario.' }] },
+        contents,
+        generationConfig: { temperature: 0.7, maxOutputTokens: 800 }
+      })
+    })
+    const data = await res.json()
+    if (!res.ok) return NextResponse.json({ error: data.error?.message || 'Error Gemini' }, { status: 500 })
+
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sin respuesta'
     return NextResponse.json({ reply })
-
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Error desconocido'
-    return NextResponse.json({ error: message }, { status: 500 })
+    return NextResponse.json({ error: err instanceof Error ? err.message : 'Error desconocido' }, { status: 500 })
   }
 }
