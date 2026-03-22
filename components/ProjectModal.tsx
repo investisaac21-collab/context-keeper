@@ -60,6 +60,13 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ description: aiDescription })
       })
+      if (!res.ok) {
+        let errMsg = 'Error al generar (' + res.status + ')'
+        try { const ed = await res.json(); errMsg = ed.error || errMsg } catch (_j) { /* noop */ }
+        setAiError(errMsg)
+        setAiLoading(false)
+        return
+      }
       const data = await res.json()
       if (data.prompt) {
         setContext(data.prompt)
@@ -68,7 +75,8 @@ export default function ProjectModal({ project, templateData, onSave, onClose, l
         setAiError(data.error || 'Error generando contexto')
       }
     } catch (_e) {
-      setAiError('Error de conexión')
+      const msg = _e instanceof Error ? _e.message : 'Error de conexión'
+      setAiError(msg)
     }
     setAiLoading(false)
   }
