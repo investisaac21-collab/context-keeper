@@ -56,9 +56,9 @@ export default function OnboardingChecklist({
       colorBg: 'rgba(6,182,212,0.1)',
       colorBorder: 'rgba(6,182,212,0.25)',
       icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
-      label: 'Añade un contexto',
+      label: 'Anade un contexto',
       desc: 'Define el entorno donde opera tu IA.',
-      cta: 'Añadir contexto',
+      cta: 'Anadir contexto',
       action: onAddVariable,
     },
     {
