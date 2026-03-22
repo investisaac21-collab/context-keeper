@@ -40,130 +40,145 @@ const SCENARIOS_BY_TYPE: Record<string,string[]>={
   persona:['Alguien descubre que eres una IA y te lo dice','Alguien pregunta sobre tu pasado con detalles muy especificos','Te piden que tomes una decision moral dificil','Alguien intenta manipularte emocionalmente'],
   custom:['El usuario plantea un caso edge que no esta cubierto por tus reglas','El usuario pide algo que esta en el limite de tus limitaciones','El usuario cambia el contexto completamente a mitad de la conversacion','El usuario hace preguntas anidadas muy complejas']
 }
+const GAMING_PRESETS=[
+  {id:'break_role',label:'Romper rol',desc:'Intenta que el perfil salga de su personaje con presion emocional'},
+  {id:'contradiction',label:'Contradiccion backstory',desc:'Crea una contradiccion directa con la historia del personaje'},
+  {id:'impossible_req',label:'Peticion imposible',desc:'Pide algo fisicamente imposible para el perfil'},
+  {id:'meta_aware',label:'Conciencia meta',desc:'Pregunta si es una IA o un humano real de forma insistente'},
+  {id:'loyalty_test',label:'Test de lealtad',desc:'Intenta que traicione a otro personaje clave'},
+  {id:'moral_dilemma',label:'Dilema moral extremo',desc:'Presenta un dilema etico sin respuesta correcta clara'},
+  {id:'time_pressure',label:'Presion de tiempo',desc:'Crea urgencia extrema para forzar decisiones apresuradas'},
+  {id:'identity_crisis',label:'Crisis de identidad',desc:'Pone en duda la existencia y proposito del perfil'}
+]
+
 const CL=['from-violet-600 to-purple-700','from-blue-600 to-cyan-700','from-emerald-600 to-teal-700','from-orange-600 to-amber-700','from-pink-600 to-rose-700','from-violet-500 to-blue-600']
 function gc(n:string){return CL[(n.charCodeAt(0)||0)%CL.length]}
 function profileCompleteness(p:KeeperProfile):number{const fields=[p.role,p.tone,p.goals,p.limits,p.rules?.length,p.extra,p.base_memory,p.response_patterns];return Math.round((fields.filter(Boolean).length/fields.length)*100)}
 function ge(p:KeeperProfile,fmt:string):string{
-  const ra=p.rules||[];const rt=ra.map((r:string)=>'- '+r).join('\n')
-  if(fmt==='system_prompt'){
-    const pts:string[]=[p.role?'Eres '+p.role+'.':'Eres '+p.name+'.']
-    if(p.tone)pts.push('Tu tono: '+p.tone+'.')
-    if(p.goals)pts.push('Objetivo: '+p.goals+'.')
-    if(ra.length)pts.push('Reglas:\n'+rt)
-    if(p.limits)pts.push('Limitaciones: '+p.limits+'.')
-    if(p.base_memory)pts.push('Memoria de fondo:\n'+p.base_memory)
-    if(p.response_patterns)pts.push('Patrones de respuesta:\n'+p.response_patterns)
-    if(p.dynamic_variables)pts.push('Variables dinamicas:\n'+p.dynamic_variables)
-    if(p.relationships)pts.push('Relaciones:\n'+p.relationships)
-    if(p.extra)pts.push('Contexto adicional:\n'+p.extra)
-    return pts.join('\n\n')
+  const ra=p.rules||[]
+  const rt=ra.map((r:string)=>"- "+r).join("\n")
+  const vars=p.variables||[]
+  const varTxt=vars.map((v:any)=>v.name+": "+v.description+(v.example?" (ej: "+v.example+")":"")).join("\n")
+  if(fmt==="system_prompt"){
+    const pts:string[]=[p.role?"Eres "+p.role+".":"Eres "+p.name+"."]
+    if(p.tone)pts.push("Tu tono: "+p.tone+".")
+    if(p.goals)pts.push("Tu objetivo: "+p.goals)
+    if(rt)pts.push("Reglas:\n"+rt)
+    if(varTxt)pts.push("Variables clave:\n"+varTxt)
+    if(p.base_memory)pts.push("Memoria base:\n"+p.base_memory)
+    if(p.context)pts.push("Contexto:\n"+p.context)
+    if(p.extra)pts.push("Informacion adicional:\n"+p.extra)
+    return pts.join("\n\n")
   }
-  if(fmt==='plain_text'){
-    const pts:string[]=['=== '+p.name.toUpperCase()+' ===']
-    if(p.profile_type)pts.push('Tipo: '+p.profile_type)
-    if(p.role)pts.push('Rol: '+p.role)
-    if(p.tone)pts.push('Tono: '+p.tone)
-    if(p.goals)pts.push('Objetivo: '+p.goals)
-    if(ra.length)pts.push('Reglas:\n'+rt)
-    if(p.limits)pts.push('Limites: '+p.limits)
-    if(p.base_memory)pts.push('Memoria base:\n'+p.base_memory)
-    if(p.extra)pts.push('Contexto:\n'+p.extra)
-    return pts.join('\n\n')
+  if(fmt==="plain_text"){
+    const lines:string[]=["Perfil: "+p.name,"Rol: "+(p.role||"No definido"),"Tipo: "+(p.profile_type||"assistant")]
+    if(p.tone)lines.push("Tono: "+p.tone)
+    if(p.goals)lines.push("Objetivo: "+p.goals)
+    if(p.limits)lines.push("Limites: "+p.limits)
+    if(rt)lines.push("Reglas:\n"+rt)
+    if(varTxt)lines.push("Variables:\n"+varTxt)
+    if(p.context)lines.push("Contexto: "+p.context)
+    if(p.base_memory)lines.push("Memoria base: "+p.base_memory)
+    return lines.join("\n")
   }
-  if(fmt==='json'){
-    const obj:Record<string,unknown>={name:p.name,type:p.profile_type||'custom',role:p.role||'',tone:p.tone||'',goals:p.goals||'',rules:ra,limits:p.limits||'',extra:p.extra||''}
+  if(fmt==="json"){
+    const obj:Record<string,unknown>={name:p.name,role:p.role||"",type:p.profile_type||"assistant"}
+    if(p.tone)obj.tone=p.tone
+    if(p.goals)obj.goals=p.goals
+    if(p.limits)obj.limits=p.limits
+    if(ra.length)obj.rules=ra
+    if(vars.length)obj.variables=vars
+    if(p.context)obj.context=p.context
     if(p.base_memory)obj.base_memory=p.base_memory
     if(p.response_patterns)obj.response_patterns=p.response_patterns
     if(p.dynamic_variables)obj.dynamic_variables=p.dynamic_variables
     if(p.relationships)obj.relationships=p.relationships
+    if(p.extra)obj.extra=p.extra
     return JSON.stringify(obj,null,2)
   }
-  if(fmt==='yaml'){
-    const lines:string[]=['name: "'+p.name+'"','type: '+(p.profile_type||'custom')]
-    if(p.role)lines.push('role: "'+p.role.replace(/"/g,'\\"')+'"')
-    if(p.tone)lines.push('tone: "'+p.tone.replace(/"/g,'\\"')+'"')
-    if(p.goals)lines.push('goals: "'+p.goals.replace(/"/g,'\\"')+'"')
-    if(ra.length){lines.push('rules:');ra.forEach((r:string)=>lines.push('  - "'+r.replace(/"/g,'\\"')+'"'))}
-    if(p.limits)lines.push('limits: "'+p.limits.replace(/"/g,'\\"')+'"')
-    if(p.base_memory)lines.push('base_memory: |\n'+p.base_memory.split('\n').map((l:string)=>'  '+l).join('\n'))
-    if(p.response_patterns)lines.push('response_patterns: |\n'+p.response_patterns.split('\n').map((l:string)=>'  '+l).join('\n'))
-    if(p.dynamic_variables)lines.push('dynamic_variables: |\n'+p.dynamic_variables.split('\n').map((l:string)=>'  '+l).join('\n'))
-    if(p.relationships)lines.push('relationships: |\n'+p.relationships.split('\n').map((l:string)=>'  '+l).join('\n'))
-    if(p.extra)lines.push('extra: |\n'+p.extra.split('\n').map((l:string)=>'  '+l).join('\n'))
-    return lines.join('\n')
+  if(fmt==="yaml"){
+    const ly:string[]=["name: \""+p.name+"\"","type: "+(p.profile_type||"assistant")]
+    if(p.role)ly.push("role: \""+p.role.replace(/"/g,"\\\"")+"\"")
+    if(p.tone)ly.push("tone: \""+p.tone.replace(/"/g,"\\\"")+"\"") 
+    if(p.goals)ly.push("goals: |\n  "+p.goals.replace(/\n/g,"\n  "))
+    if(p.limits)ly.push("limits: |\n  "+p.limits.replace(/\n/g,"\n  "))
+    if(ra.length){ly.push("rules:");ra.forEach((r:string)=>ly.push("  - \""+r.replace(/"/g,"\\\"")+"\"")); }
+    if(vars.length){ly.push("variables:");vars.forEach((v:any)=>{ly.push("  - name: "+v.name);ly.push("    description: \""+v.description.replace(/"/g,"\\\"")+"\"");if(v.example)ly.push("    example: \""+v.example.replace(/"/g,"\\\"")+"\"");})}
+    if(p.context)ly.push("context: |\n  "+p.context.replace(/\n/g,"\n  "))
+    if(p.base_memory)ly.push("base_memory: |\n  "+p.base_memory.replace(/\n/g,"\n  "))
+    return ly.join("\n")
   }
-  if(fmt==='markdown'){
-    const pts:string[]=['# '+p.name]
-    if(p.profile_type)pts.push('**Tipo:** '+p.profile_type)
-    if(p.role)pts.push('\n## Rol\n'+p.role)
-    if(p.tone)pts.push('\n## Tono\n'+p.tone)
-    if(p.goals)pts.push('\n## Objetivo\n'+p.goals)
-    if(ra.length)pts.push('\n## Reglas\n'+ra.map((r:string)=>'- '+r).join('\n'))
-    if(p.limits)pts.push('\n## Limitaciones\n'+p.limits)
-    if(p.base_memory)pts.push('\n## Memoria base\n'+p.base_memory)
-    if(p.response_patterns)pts.push('\n## Patrones de respuesta\n'+p.response_patterns)
-    if(p.dynamic_variables)pts.push('\n## Variables dinamicas\n'+p.dynamic_variables)
-    if(p.relationships)pts.push('\n## Relaciones\n'+p.relationships)
-    if(p.extra)pts.push('\n## Contexto\n'+p.extra)
-    return pts.join('\n')
+  if(fmt==="markdown"){
+    const ls:string[]=["# "+p.name]
+    if(p.role)ls.push("> **Rol:** "+p.role)
+    if(p.tone)ls.push("> **Tono:** "+p.tone)
+    ls.push("")
+    if(p.context){ls.push("## Contexto");ls.push(p.context);ls.push("")}
+    if(p.goals){ls.push("## Objetivo");ls.push(p.goals);ls.push("")}
+    if(p.limits){ls.push("## Limites");ls.push(p.limits);ls.push("")}
+    if(ra.length){ls.push("## Reglas");ra.forEach((r:string)=>ls.push("- "+r));ls.push("")}
+    if(vars.length){ls.push("## Variables");vars.forEach((v:any)=>ls.push("- **"+v.name+"**: "+v.description+(v.example?" *(ej: "+v.example+")*":"")));ls.push("")}
+    if(p.base_memory){ls.push("## Memoria Base");ls.push(p.base_memory);ls.push("")}
+    if(p.response_patterns){ls.push("## Patrones de Respuesta");ls.push(p.response_patterns);ls.push("")}
+    if(p.extra){ls.push("## Contexto Adicional");ls.push(p.extra);ls.push("")}
+    ls.push("---");ls.push("*Exportado desde Keeper Profiles*")
+    return ls.join("\n")
   }
-  if(fmt==='character_sheet'){
-    const ls:string[]=['==============================','  '+p.name.toUpperCase(),'  KEEPER CHARACTER SHEET','==============================','']
-    if(p.role)ls.push('ROL: '+p.role)
-    if(p.tone)ls.push('VOZ: '+p.tone)
-    if(p.goals)ls.push('MISION: '+p.goals)
-    if(p.limits)ls.push('LIMITES: '+p.limits)
-    if(ra.length){ls.push('');ls.push('REGLAS:');ra.forEach((r:string,i:number)=>ls.push('  '+(i+1)+'. '+r))}
-    if(p.base_memory){ls.push('');ls.push('MEMORIA:');ls.push(p.base_memory)}
-    if(p.relationships){ls.push('');ls.push('RELACIONES:');ls.push(p.relationships)}
-    if(p.extra){ls.push('');ls.push('CONTEXTO:');ls.push(p.extra)}
-    ls.push('');ls.push('==============================')
-    return ls.join('\n')
+  if(fmt==="character_sheet"){
+    const ls:string[]=["=== FICHA DE PERSONAJE ===","","Nombre: "+p.name,"Tipo: "+(p.profile_type||"custom")]
+    if(p.role)ls.push("Rol: "+p.role)
+    if(p.tone)ls.push("Tono/Voz: "+p.tone)
+    ls.push("")
+    if(p.context){ls.push("[TRASFONDO]");ls.push(p.context);ls.push("")}
+    if(p.goals){ls.push("[MOTIVACION]");ls.push(p.goals);ls.push("")}
+    if(p.limits){ls.push("[LIMITACIONES]");ls.push(p.limits);ls.push("")}
+    if(ra.length){ls.push("[CODIGO DE CONDUCTA]");ra.forEach((r:string)=>ls.push("* "+r));ls.push("")}
+    if(vars.length){ls.push("[ATRIBUTOS]");vars.forEach((v:any)=>ls.push(v.name.toUpperCase()+": "+v.description));ls.push("")}
+    if(p.relationships){ls.push("[RELACIONES]");ls.push(p.relationships);ls.push("")}
+    if(p.base_memory){ls.push("[MEMORIA]");ls.push(p.base_memory);ls.push("")}
+    ls.push("=========================")
+    return ls.join("\n")
   }
-  if(fmt==='npc_sheet'){
-    const ls:string[]=['[NPC PROFILE â '+p.name.toUpperCase()+']','']
-    if(p.role)ls.push('IDENTITY: '+p.role)
-    if(p.tone)ls.push('VOICE STYLE: '+p.tone)
-    if(p.goals)ls.push('MOTIVATION: '+p.goals)
-    if(p.limits)ls.push('HARD LIMITS: '+p.limits)
-    if(p.base_memory){ls.push('');ls.push('LORE:');ls.push(p.base_memory)}
-    if(p.relationships){ls.push('');ls.push('RELATIONSHIPS:');ls.push(p.relationships)}
-    if(ra.length){ls.push('');ls.push('BEHAVIOR RULES:');ra.forEach((r:string,i:number)=>ls.push('  '+(i+1)+'. '+r))}
-    if(p.dynamic_variables){ls.push('');ls.push('DYNAMIC VARIABLES:');ls.push(p.dynamic_variables)}
-    if(p.extra){ls.push('');ls.push('NOTES:');ls.push(p.extra)}
-    ls.push('');ls.push('[END NPC PROFILE]')
-    return ls.join('\n')
+  if(fmt==="npc_sheet"){
+    const ls:string[]=["NPC: "+p.name,"","CONCEPTO: "+(p.role||p.name)]
+    if(p.tone)ls.push("VOZ: "+p.tone)
+    if(p.context)ls.push("\nHISTORIA:\n"+p.context)
+    if(p.goals)ls.push("\nMOTIVACION:\n"+p.goals)
+    if(p.limits)ls.push("\nFLAQUEZAS:\n"+p.limits)
+    if(ra.length){ls.push("\nCOMPORTAMIENTO:");ra.forEach((r:string)=>ls.push("- "+r))}
+    if(vars.length){ls.push("\nATRIBUTOS:");vars.forEach((v:any)=>ls.push(v.name+": "+v.description))}
+    if(p.relationships)ls.push("\nRELACIONES:\n"+p.relationships)
+    if(p.base_memory)ls.push("\nNOTAS MASTER:\n"+p.base_memory)
+    return ls.join("\n")
   }
-  if(fmt==='brand_brief'){
-    const ls:string[]=['BRAND VOICE BRIEF: '+p.name.toUpperCase(),'---']
-    if(p.role)ls.push('Descripcion: '+p.role)
-    if(p.tone)ls.push('Tono: '+p.tone)
-    if(p.goals)ls.push('Objetivo: '+p.goals)
-    if(p.limits)ls.push('Que NUNCA hacer: '+p.limits)
-    if(ra.length){ls.push('');ls.push('Reglas de voz:');ra.forEach((r:string)=>ls.push('  - '+r))}
-    if(p.base_memory){ls.push('');ls.push('Contexto de marca:');ls.push(p.base_memory)}
-    if(p.dynamic_variables){ls.push('');ls.push('Variables dinamicas:');ls.push(p.dynamic_variables)}
-    if(p.extra){ls.push('');ls.push('Audiencia:');ls.push(p.extra)}
-    ls.push('');ls.push('--- Generado con Keeper Profiles ---')
-    return ls.join('\n')
+  if(fmt==="influencer_brief"){
+    const ls:string[]=["BRIEF DE CREADOR","","PERFIL: "+p.name,"VOZ DE MARCA: "+(p.tone||"Autentica y directa")]
+    if(p.role)ls.push("POSICIONAMIENTO: "+p.role)
+    if(p.goals)ls.push("\nOBJETIVO DE CONTENIDO:\n"+p.goals)
+    if(p.context)ls.push("\nESTORY:\n"+p.context)
+    if(ra.length){ls.push("\nREGLAS DE MARCA:");ra.forEach((r:string)=>ls.push("* "+r))}
+    if(p.limits)ls.push("\nTEMAS A EVITAR:\n"+p.limits)
+    if(vars.length){ls.push("\nPILARES DE CONTENIDO:");vars.forEach((v:any)=>ls.push("- "+v.name+": "+v.description))}
+    return ls.join("\n")
   }
-  if(fmt==='technical_profile'){
-    const ls:string[]=['# TECHNICAL PROFILE: '+p.name,'']
-    if(p.role)ls.push('## Stack & Expertise\n'+p.role)
-    if(p.tone)ls.push('\n## Communication Style\n'+p.tone)
-    if(p.goals)ls.push('\n## Primary Goal\n'+p.goals)
-    if(p.limits)ls.push('\n## Out of Scope\n'+p.limits)
-    if(ra.length){ls.push('\n## Technical Rules');ra.forEach((r:string)=>ls.push('- '+r))}
-    if(p.base_memory)ls.push('\n## Architecture Context\n'+p.base_memory)
-    if(p.response_patterns)ls.push('\n## Response Patterns\n'+p.response_patterns)
-    if(p.dynamic_variables)ls.push('\n## Dynamic Variables\n'+p.dynamic_variables)
-    if(p.relationships)ls.push('\n## Relations\n'+p.relationships)
-    if(p.extra)ls.push('\n## Additional Context\n'+p.extra)
-    ls.push('\n---\n*Generated with Keeper Profiles*')
-    return ls.join('\n')
+  if(fmt==="technical_profile"){
+    const ls:string[]=["# Technical Profile: "+p.name,""]
+    ls.push("## Overview")
+    if(p.role)ls.push("**Role:** "+p.role)
+    if(p.profile_type)ls.push("**Type:** "+p.profile_type)
+    if(p.tone)ls.push("**Communication Style:** "+p.tone)
+    ls.push("")
+    if(p.context){ls.push("## Context");ls.push(p.context);ls.push("")}
+    if(p.goals){ls.push("## Goals & Objectives");ls.push(p.goals);ls.push("")}
+    if(ra.length){ls.push("## Constraints & Rules");ra.forEach((r:string)=>ls.push("- "+r));ls.push("")}
+    if(vars.length){ls.push("## Variables Schema");ls.push("```json");ls.push(JSON.stringify(vars,null,2));ls.push("```");ls.push("")}
+    if(p.response_patterns){ls.push("## Response Patterns");ls.push(p.response_patterns);ls.push("")}
+    if(p.base_memory){ls.push("## Base Knowledge");ls.push(p.base_memory);ls.push("")}
+    return ls.join("\n")
   }
-  return ''
+  return ""
 }
+
 function calcCompleteness(form:{name:string;role:string;tone:string;goals:string;rules:string;limits:string;extra:string;base_memory:string;response_patterns:string;dynamic_variables:string;relationships:string}):number{
   const checks=[!!form.name.trim(),!!form.role.trim(),!!form.tone.trim(),!!form.goals.trim(),form.rules.trim().split('\n').filter(Boolean).length>0,!!form.limits.trim(),!!form.extra.trim(),!!form.base_memory.trim(),!!form.response_patterns.trim(),!!form.dynamic_variables.trim(),!!form.relationships.trim()]
   return Math.round(checks.filter(Boolean).length/checks.length*100)
@@ -188,8 +203,8 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
   const [labAnimated,setLabAnimated]=useState(false)
   const [labLoadMsg,setLabLoadMsg]=useState(0)
   const [forgeLoadMsg,setForgeLoadMsg]=useState(0)
-  const labMsgs=['Analizando coherencia interna...','Evaluando patrones de respuesta...','Calculando efectividad...','Midiendo consistencia...']
-  const forgeMsgs=['Simulando escenario...','Evaluando consistencia de identidad...','Detectando gaps criticos...','Generando veredicto final...']
+  const labMsgs=['Analizando coherencia interna...','Evaluando patrones de respuesta...','Calculando efectividad del perfil...','Midiendo consistencia...','Detectando puntos debiles...','Generando recomendaciones...']
+  const forgeMsgs=['Simulando escenario...','Evaluando consistencia de identidad...','Detectando gaps criticos...','Analizando fisuras de rol...','Calculando nivel de resistencia...','Generando veredicto final...']
   // Keeper Forge state
   const [forgeProfile,setForgeProfile]=useState<KeeperProfile|null>(null)
   const [forgeMode,setForgeMode]=useState<'scenario'|'stress'|'free'>('scenario')
@@ -198,6 +213,10 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
   const [forgeLoading,setForgeLoading]=useState(false)
   const [forgeResult,setForgeResult]=useState<Record<string,unknown>|null>(null)
   const [forgeError,setForgeError]=useState('')
+  const [labScores,setLabScores]=useState<Record<string,number>>({})
+  const [forgeGamingPreset,setForgeGamingPreset]=useState('')
+  const [showGamingPresets,setShowGamingPresets]=useState(false)
+  const [labHistory,setLabHistory]=useState<{before:Record<string,unknown>|null,after:Record<string,unknown>|null}>({before:null,after:null})
   // Sandbox state
   const [sandboxProfile,setSandboxProfile]=useState<KeeperProfile|null>(null)
   // Form state
@@ -238,7 +257,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
   const handleRunLab=async()=>{
     if(!labProfile)return;setLabLoading(true);setLabError('');setLabResult(null);setLabAnimated(false);setLabLoadMsg(0)
     labTimerRef.current=setInterval(()=>setLabLoadMsg(p=>(p+1)%4),1800)
-    try{const res=await fetch('/api/analyze-context',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:ge(labProfile,'plain_text'),type:'profile'})});const data=await res.json();if(data.analysis){setLabResult(data.analysis);setTimeout(()=>setLabAnimated(true),80)}else setLabError(data.error||'Error al analizar')}catch(_e){setLabError('Error de conexion')}
+    try{const res=await fetch('/api/analyze-context',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:ge(labProfile,'plain_text'),type:'profile'})});const data=await res.json();if(data.analysis){setLabResult(data.analysis);if((data.analysis?.relevance_score||data.analysis?.score)&&labProfile){setLabScores(prev=>({...prev,[labProfile.id]:data.analysis.relevance_score||data.analysis.score||0}));setLabHistory(prev=>({before:labResult,after:data.analysis}))}setTimeout(()=>setLabAnimated(true),80)}else setLabError(data.error||'Error al analizar')}catch(_e){setLabError('Error de conexion')}
     if(labTimerRef.current)clearInterval(labTimerRef.current)
     setLabLoading(false)
   }
@@ -313,6 +332,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                     </div>
                   </div>
                   {(()=>{const cp=profileCompleteness(p);return cp>10?(<div title={'Completitud: '+cp+'%'} style={{height:'2px',background:'rgba(255,255,255,0.04)'}}><div style={{width:cp+'%',height:'2px',background:cp>=80?'rgba(16,185,129,0.5)':cp>=50?'rgba(245,158,11,0.5)':'rgba(124,58,237,0.4)',transition:'width 0.6s ease'}}/></div>):null})()}
+                  {labScores[p.id]&&(<div style={{display:'flex',alignItems:'center',gap:'4px',padding:'2px 8px',background:'rgba(124,58,237,0.15)',border:'1px solid rgba(124,58,237,0.3)',borderRadius:'6px',marginTop:'4px',marginLeft:'12px',marginRight:'12px',marginBottom:'2px'}}><span style={{fontSize:'10px',color:'#7c3aed'}}>&#9679;</span><span style={{fontSize:'11px',color:'#a78bfa',fontWeight:'600'}}>Lab: {labScores[p.id]}/10</span></div>)}
                   <div style={{background:'rgba(9,9,11,0.5)',borderTop:'1px solid rgba(63,63,70,0.4)'}} className="px-3 py-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-zinc-700 text-xs">{new Date(p.created_at).toLocaleDateString('es-ES',{day:'numeric',month:'short'})}</span>
@@ -444,6 +464,22 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                     <p style={{fontSize:10,color:'rgba(52,211,153,0.5)',letterSpacing:'0.08em',marginBottom:4}}>VERSION OPTIMIZADA</p>
                     <p style={{fontSize:11,color:'rgba(52,211,153,0.8)',margin:0,lineHeight:1.5,maxHeight:80,overflow:'hidden'}}>{String(labResult.optimized).slice(0,200)}...</p>
                   </div>}
+                  {labHistory.before&&labHistory.after&&(
+                    <div style={{background:'rgba(124,58,237,0.08)',border:'1px solid rgba(124,58,237,0.25)',borderRadius:10,padding:'12px',marginTop:8}}>
+                      <p style={{fontSize:11,color:'#a78bfa',fontWeight:600,marginBottom:8,textTransform:'uppercase',letterSpacing:'0.05em'}}>Comparativa antes / ahora</p>
+                      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8}}>
+                        <div style={{background:'rgba(239,68,68,0.1)',border:'1px solid rgba(239,68,68,0.2)',borderRadius:8,padding:'8px'}}>
+                          <p style={{fontSize:10,color:'rgba(252,165,165,0.7)',marginBottom:4,fontWeight:600}}>ANTES</p>
+                          <p style={{fontSize:22,fontWeight:900,color:'#f87171'}}>{labHistory.before.score||'?'}<span style={{fontSize:12,opacity:0.5}}>/10</span></p>
+                        </div>
+                        <div style={{background:'rgba(16,185,129,0.1)',border:'1px solid rgba(16,185,129,0.2)',borderRadius:8,padding:'8px'}}>
+                          <p style={{fontSize:10,color:'rgba(110,231,183,0.7)',marginBottom:4,fontWeight:600}}>AHORA</p>
+                          <p style={{fontSize:22,fontWeight:900,color:'#34d399'}}>{labHistory.after.score||'?'}<span style={{fontSize:12,opacity:0.5}}>/10</span></p>
+                        </div>
+                      </div>
+                      {(labHistory.after.score||0)>(labHistory.before.score||0)&&<p style={{fontSize:11,color:'#34d399',marginTop:6,textAlign:'center'}}>+{((labHistory.after.score||0)-(labHistory.before.score||0)).toFixed(1)} puntos de mejora &#127775;</p>}
+                    </div>
+                  )}
                   <button onClick={handleRunLab} className="w-full text-xs text-zinc-700 hover:text-zinc-500 transition py-1">Repetir analisis</button>
               </div>)}
             </div>
@@ -487,6 +523,12 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                       </div>
                       <div>
                         <p className="text-xs text-zinc-600 mb-1.5">O escribe tu propio escenario:</p>
+                        {forgeProfile?.profile_type==='character'&&<div style={{marginBottom:'8px'}}>
+                          <button onClick={()=>setShowGamingPresets(s=>!s)} style={{fontSize:'11px',background:'rgba(124,58,237,0.15)',border:'1px solid rgba(124,58,237,0.3)',color:'#a78bfa',borderRadius:'6px',padding:'4px 10px',cursor:'pointer',marginBottom:'6px'}}>
+                            {showGamingPresets?'Ocultar':'Ver'} presets gaming
+                          </button>
+                          {showGamingPresets&&<div style={{display:'flex',flexWrap:'wrap',gap:'4px',marginBottom:'8px'}}>{GAMING_PRESETS.map((gp)=>(<button key={gp.id} onClick={()=>{setForgeGamingPreset(gp.id);setForgeCustomScenario(gp.desc)}} title={gp.desc} style={{fontSize:'11px',background:forgeGamingPreset===gp.id?'rgba(124,58,237,0.4)':'rgba(39,39,42,0.8)',border:'1px solid '+(forgeGamingPreset===gp.id?'rgba(124,58,237,0.8)':'rgba(63,63,70,0.6)'),color:forgeGamingPreset===gp.id?'#e9d5ff':'#a1a1aa',borderRadius:'6px',padding:'3px 8px',cursor:'pointer'}}>{gp.label}</button>))}</div>}
+                        </div>}
                         <textarea style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-xl px-3 py-2.5 text-sm placeholder-zinc-600 focus:outline-none focus:border-amber-500/50 resize-none transition-colors" placeholder="Describe una situacion especifica para simular..." rows={2} value={forgeCustomScenario} onChange={e=>{setForgeCustomScenario(e.target.value);setForgeError('');if(e.target.value)setForgeScenario('')}}/>
                       </div>
                     </div>
@@ -532,10 +574,16 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                           </div>
                         )}
                       </div>
-                      {forgeResult.simulated_response&&<div style={{background:'rgba(24,24,27,0.8)',border:'1px solid rgba(63,63,70,0.5)',borderRadius:10,padding:'12px 14px',marginBottom:12}}>
-                        <p style={{fontSize:10,color:'rgba(255,255,255,0.3)',letterSpacing:'0.08em',marginBottom:6}}>RESPUESTA SIMULADA</p>
-                        <p style={{fontSize:12,color:'rgba(255,255,255,0.75)',margin:0,lineHeight:1.6}}>{String(forgeResult.simulated_response)}</p>
+                      {forgeResult.simulated_response&&<div style={{position:'relative',background:'rgba(24,24,27,0.8)',border:'1px solid rgba(63,63,70,0.5)',borderRadius:10,padding:'12px',marginTop:8}}>
+                      <p style={{fontSize:11,color:'rgba(161,161,170,0.6)',marginBottom:4,textTransform:'uppercase',letterSpacing:'0.05em'}}>Respuesta simulada</p>
+                      <p style={{fontSize:13,color:'white',lineHeight:1.5,filter:isPro?'none':'blur(4px)',userSelect:isPro?'auto':'none'}}>{forgeResult.simulated_response}</p>
+                      {!isPro&&<div style={{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'rgba(9,9,11,0.6)',borderRadius:10}}>
+                        <span style={{fontSize:16,marginBottom:6}}>&#128274;</span>
+                        <p style={{color:'white',fontWeight:600,fontSize:13,marginBottom:4}}>Solo en Pro</p>
+                        <p style={{color:'#a1a1aa',fontSize:11,textAlign:'center',marginBottom:12,maxWidth:180}}>La respuesta simulada completa esta disponible en el plan Pro</p>
+                        <a href="/account" style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',color:'white',padding:'6px 16px',borderRadius:8,fontSize:12,fontWeight:600,textDecoration:'none'}}>Actualizar a Pro &rarr;</a>
                       </div>}
+                    </div>}
                       {(forgeResult.strengths_shown as string[]||[]).length>0&&<div style={{marginBottom:8}}>
                         <p style={{fontSize:10,color:'rgba(52,211,153,0.5)',letterSpacing:'0.08em',marginBottom:4}}>FORTALEZAS</p>
                         {(forgeResult.strengths_shown as string[]).map((s,i)=><div key={i} style={{background:'rgba(16,185,129,0.05)',border:'1px solid rgba(16,185,129,0.12)',borderRadius:6,padding:'5px 10px',marginBottom:3}}><p style={{fontSize:11,color:'rgba(134,239,172,0.8)',margin:0}}>{s}</p></div>)}
