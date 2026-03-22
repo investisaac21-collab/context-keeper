@@ -90,6 +90,7 @@ CRITICO: JSON en una sola linea. Sin markdown. Responde SOLO el JSON.`
       const sanitized = inner.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t')
       return '"' + sanitized + '"'
     })
+    rawJson = rawJson.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '')
 
     let result: Record<string, unknown>
     try {
