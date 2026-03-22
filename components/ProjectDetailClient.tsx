@@ -1,7 +1,7 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase'
 import type { Project } from '@/lib/types'
 import HistoryModal from './HistoryModal'
 import ProjectModal from './ProjectModal'
@@ -30,7 +30,7 @@ interface Props {
 
 export default function ProjectDetailClient({ project: initialProject, plan, userId, userEmail }: Props) {
   const router = useRouter()
-  const supabase = createClientComponentClient()
+  const supabase = createClient()
   const [project, setProject] = useState<Project>(initialProject)
   const [showHistory, setShowHistory] = useState(false)
   const [showEdit, setShowEdit] = useState(false)
