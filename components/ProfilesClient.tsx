@@ -318,16 +318,55 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                       <span className="text-zinc-700 text-xs">{new Date(p.created_at).toLocaleDateString('es-ES',{day:'numeric',month:'short'})}</span>
                       {p.lab_score!=null&&<div style={{background:p.lab_score>=75?'rgba(16,185,129,0.12)':p.lab_score>=50?'rgba(245,158,11,0.12)':'rgba(239,68,68,0.1)',border:'1px solid '+( p.lab_score>=75?'rgba(16,185,129,0.25)':p.lab_score>=50?'rgba(245,158,11,0.25)':'rgba(239,68,68,0.2)'),color:p.lab_score>=75?'#34d399':p.lab_score>=50?'#fbbf24':'#f87171'}} className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-bold leading-none"><svg width="7" height="7" fill="currentColor" viewBox="0 0 24 24"><path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>{p.lab_score}</div>}
                     </div>
-                    <div className="flex items-center flex-wrap gap-0">
-                      {isPro?(<button onClick={()=>{setLabProfile(p);setLabResult(null);setLabError('');setLabAnimated(false)}} className="flex items-center gap-1 text-xs text-zinc-600 hover:text-blue-400 px-1.5 py-1 rounded-lg hover:bg-blue-900/20 transition-colors"><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>Lab</button>):(<span className="flex items-center gap-1 text-xs text-zinc-700 px-1.5 py-1 cursor-not-allowed"><svg width="9" height="9" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>Lab</span>)}
-                      <span className="text-zinc-800 px-0.5">|</span>
-                      {isPro?(<button onClick={()=>openForge(p)} style={{color:'rgba(251,191,36,0.8)'}} className="flex items-center gap-1 text-xs px-1.5 py-1 rounded-lg hover:bg-amber-900/20 transition-colors hover:text-amber-300"><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/><path strokeLinecap="round" strokeLinejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/></svg>Forge</button>):(<span style={{color:'rgba(113,113,122,0.5)'}} className="flex items-center gap-1 text-xs px-1.5 py-1 cursor-not-allowed"><svg width="9" height="9" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>Forge</span>)}
-                      <span className="text-zinc-800 px-0.5">|</span>
-                      <button onClick={()=>{setExportProfile(p);setExportFormat('system_prompt');setExportCopied(false)}} className="flex items-center gap-1 text-xs text-zinc-600 hover:text-zinc-200 px-1.5 py-1 rounded-lg hover:bg-zinc-700/30 transition-colors"><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>Export</button>
-                      <span className="text-zinc-800 px-0.5">|</span>
-                      <button onClick={()=>handleQuickCopy(p)} className="flex items-center gap-1 text-xs font-semibold text-violet-500 hover:text-violet-300 px-1.5 py-1 rounded-lg hover:bg-violet-900/20 transition-colors">{copying===p.id?<><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>Ok</>:<><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>Copiar</>}</button>
-                      <span className="text-zinc-800 px-0.5">|</span>
-                      <button onClick={()=>{if(sandboxProfile?.id===p.id){setSandboxProfile(null)}else{setSandboxProfile(p);setChatProfileId(null)}}} style={sandboxProfile?.id===p.id?{color:'#34d399'}:{}} className="flex items-center gap-1 text-xs text-zinc-600 hover:text-emerald-400 px-1.5 py-1 rounded-lg hover:bg-emerald-900/20 transition-colors"><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>{sandboxProfile?.id===p.id?'Cerrar':'Sandbox'}</button>
+                    <div className="space-y-2 mt-1">
+                      <div className="flex gap-1.5">
+                        <button
+                          onClick={()=>{setLabProfile(p);setLabResult(null);setLabError('');setLabAnimated(false)}}
+                          style={{flex:1,background:'rgba(59,130,246,0.1)',border:'1px solid rgba(59,130,246,0.25)',color:'rgba(147,197,253,0.9)',padding:'6px 0',borderRadius:8,fontSize:12,fontWeight:600,letterSpacing:'0.02em',display:'flex',alignItems:'center',justifyContent:'center',gap:5,cursor:'pointer',transition:'all 0.15s'}}
+                          onMouseOver={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(59,130,246,0.18)'}}
+                          onMouseOut={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(59,130,246,0.1)'}}
+                        >
+                          <svg style={{width:11,height:11}} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                          Lab{p.lab_score?<span style={{fontSize:10,opacity:0.7,marginLeft:2}}>{p.lab_score}</span>:null}
+                        </button>
+                        {isPro?(
+                          <button
+                            onClick={()=>openForge(p)}
+                            style={{flex:1,background:'rgba(251,191,36,0.08)',border:'1px solid rgba(251,191,36,0.22)',color:'rgba(253,230,138,0.9)',padding:'6px 0',borderRadius:8,fontSize:12,fontWeight:600,letterSpacing:'0.02em',display:'flex',alignItems:'center',justifyContent:'center',gap:5,cursor:'pointer',transition:'all 0.15s'}}
+                            onMouseOver={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(251,191,36,0.15)'}}
+                            onMouseOut={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(251,191,36,0.08)'}}
+                          >
+                            <svg style={{width:11,height:11}} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            Forge
+                          </button>
+                        ):(
+                          <div
+                            style={{flex:1,background:'rgba(251,191,36,0.03)',border:'1px solid rgba(251,191,36,0.08)',color:'rgba(253,230,138,0.3)',padding:'6px 0',borderRadius:8,fontSize:12,fontWeight:600,display:'flex',alignItems:'center',justifyContent:'center',gap:5,cursor:'not-allowed'}}
+                            title="Disponible en Pro"
+                          >
+                            <svg style={{width:10,height:10}} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            Forge
+                          </div>
+                        )}
+                      </div>
+                      <div style={{display:'flex',gap:4}}>
+                        <button
+                          onClick={()=>handleQuickCopy(p)}
+                          style={{flex:1,background:'transparent',border:'1px solid rgba(255,255,255,0.07)',color:'rgba(255,255,255,0.4)',padding:'5px 0',borderRadius:6,fontSize:11,cursor:'pointer',transition:'all 0.15s'}}
+                          onMouseOver={e=>{(e.currentTarget as HTMLButtonElement).style.color='rgba(255,255,255,0.7)'}}
+                          onMouseOut={e=>{(e.currentTarget as HTMLButtonElement).style.color='rgba(255,255,255,0.4)'}}
+                        >Copiar</button>
+                        <button
+                          onClick={()=>setExportProfile(p)}
+                          style={{flex:1,background:'transparent',border:'1px solid rgba(255,255,255,0.07)',color:'rgba(255,255,255,0.4)',padding:'5px 0',borderRadius:6,fontSize:11,cursor:'pointer',transition:'all 0.15s'}}
+                          onMouseOver={e=>{(e.currentTarget as HTMLButtonElement).style.color='rgba(255,255,255,0.7)'}}
+                          onMouseOut={e=>{(e.currentTarget as HTMLButtonElement).style.color='rgba(255,255,255,0.4)'}}
+                        >Export</button>
+                        <button
+                          onClick={()=>{if(sandboxProfile?.id===p.id){setSandboxProfile(null)}else{setSandboxProfile(p)}}}
+                          style={{flex:1,background:sandboxProfile?.id===p.id?'rgba(34,197,94,0.1)':'transparent',border:sandboxProfile?.id===p.id?'1px solid rgba(34,197,94,0.25)':'1px solid rgba(255,255,255,0.07)',color:sandboxProfile?.id===p.id?'rgba(134,239,172,0.9)':'rgba(255,255,255,0.4)',padding:'5px 0',borderRadius:6,fontSize:11,cursor:'pointer',transition:'all 0.15s'}}
+                        >Chat</button>
+                      </div>
                     </div>
                   </div>
                 </div>
