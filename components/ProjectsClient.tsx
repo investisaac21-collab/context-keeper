@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 import { useState, useMemo } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase'
 import type { Project, UserVariable } from '@/lib/types'
 import ProjectCard from './ProjectCard'
 import ProjectModal from './ProjectModal'
@@ -37,8 +37,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   const [loading, setLoading] = useState(false)
   const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null)
   const [tab, setTab] = useState<'contexts' | 'templates'>('contexts')
-
-  const supabase = createClientComponentClient()
+  const supabase = createClient()
 
   function showToast(msg: string, type: 'success' | 'error' = 'success') {
     setToast({ msg, type })
@@ -50,7 +49,6 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
       navigator.clipboard.writeText(text).then(() => {
         showToast('Copiado al portapapeles')
       }).catch(() => {
-        // Fallback
         const el = document.createElement('textarea')
         el.value = text
         el.style.position = 'fixed'
@@ -90,31 +88,35 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         if (editingProject.context !== data.context) {
           await saveVersion(editingProject.id, editingProject.context || '')
         }
-        const { data: updated, error } = await supabase
-          .from('projects')
-          .update({ ...data, updated_at: new Date().toISOString() })
-          .eq('id', editingProject.id)
-          .select()
-          .single()
-        if (error) throw error
-        setProjects(prev => prev.map(p => p.id === editingProject.id ? updated : p))
-        showToast('Contexto actualizado')
-      } else {
-        if (!isPro && projects.length >= FREE_LIMIT) {
-          showToast('Límite del plan Free alcanzado. Actualiza a Pro.', 'error')
+        const res = await fetch('/api/projects', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: editingProject.id, ...data })
+        })
+        const json = await res.json()
+        if (!res.ok) {
+          showToast(json.error || 'Error al guardar', 'error')
           setLoading(false)
           return
         }
-        const { data: created, error } = await supabase
-          .from('projects')
-          .insert([{ ...data, user_id: userId, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }])
-          .select()
-          .single()
-        if (error) throw error
-        setProjects(prev => [created, ...prev])
+        setProjects(prev => prev.map(p => p.id === editingProject.id ? json.project : p))
+        showToast('Contexto actualizado')
+      } else {
+        const res = await fetch('/api/projects', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        })
+        const json = await res.json()
+        if (!res.ok) {
+          showToast(json.error || 'Error al crear', 'error')
+          setLoading(false)
+          return
+        }
+        setProjects(prev => [json.project, ...prev])
         showToast('Contexto creado')
       }
-    } catch (err) {
+    } catch (_e) {
       showToast('Error al guardar', 'error')
     }
     setLoading(false)
@@ -124,23 +126,33 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('¿Eliminar este contexto?')) return
-    const { error } = await supabase.from('projects').delete().eq('id', id)
-    if (error) { showToast('Error al eliminar', 'error'); return }
+    if (!confirm('Eliminar este contexto?')) return
+    const res = await fetch('/api/projects?id=' + id, { method: 'DELETE' })
+    if (!res.ok) {
+      showToast('Error al eliminar', 'error')
+      return
+    }
     setProjects(prev => prev.filter(p => p.id !== id))
     showToast('Contexto eliminado')
   }
 
   async function handleDuplicate(project: Project) {
-    if (!isPro && projects.length >= FREE_LIMIT) {
-      showToast('Límite del plan Free alcanzado', 'error'); return
+    const res = await fetch('/api/projects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: project.name + ' (copia)',
+        tag: project.tag,
+        category: project.category,
+        context: project.context
+      })
+    })
+    const json = await res.json()
+    if (!res.ok) {
+      showToast(json.error || 'Error al duplicar', 'error')
+      return
     }
-    const { data: created, error } = await supabase
-      .from('projects')
-      .insert([{ ...project, id: undefined, title: project.title + ' (copia)', user_id: userId, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }])
-      .select().single()
-    if (error) { showToast('Error al duplicar', 'error'); return }
-    setProjects(prev => [created, ...prev])
+    setProjects(prev => [json.project, ...prev])
     showToast('Contexto duplicado')
   }
 
@@ -148,7 +160,10 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
     const json = JSON.stringify({ projects, variables }, null, 2)
     const blob = new Blob([json], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
-    const a = document.createElement('a'); a.href = url; a.download = 'context-keeper-export.json'; a.click()
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'context-keeper-export.json'
+    a.click()
     URL.revokeObjectURL(url)
     showToast('Exportado correctamente')
   }
@@ -161,10 +176,20 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
       const parsed = JSON.parse(text)
       const toImport = parsed.projects || []
       for (const p of toImport) {
-        await supabase.from('projects').insert([{ ...p, id: undefined, user_id: userId, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }])
+        await fetch('/api/projects', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: p.name,
+            tag: p.tag,
+            category: p.category,
+            context: p.context
+          })
+        })
       }
-      const { data } = await supabase.from('projects').select('*').eq('user_id', userId).order('created_at', { ascending: false })
-      setProjects(data || [])
+      const res = await fetch('/api/projects')
+      const data = await res.json()
+      setProjects(data.projects || [])
       showToast('Importado correctamente')
     } catch (_e) {
       showToast('Error al importar', 'error')
@@ -178,7 +203,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
 
   const filtered = useMemo(() => {
     return projects.filter(p => {
-      const matchSearch = !search || p.title?.toLowerCase().includes(search.toLowerCase()) || p.context?.toLowerCase().includes(search.toLowerCase())
+      const matchSearch = !search || p.name?.toLowerCase().includes(search.toLowerCase()) || p.context?.toLowerCase().includes(search.toLowerCase())
       const matchCat = category === 'all' || p.category === category
       return matchSearch && matchCat
     })
@@ -192,79 +217,59 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
-      {/* Toast notification */}
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-2xl text-sm font-medium transition-all border ${toast.type === 'success' ? 'bg-zinc-900 border-violet-700 text-violet-300' : 'bg-zinc-900 border-red-700 text-red-300'}`}>
+        <div className={"fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-2xl text-sm font-medium transition-all border " + (toast.type === 'success' ? 'bg-zinc-900 border-violet-700 text-violet-300' : 'bg-zinc-900 border-red-700 text-red-300')}>
           {toast.msg}
         </div>
       )}
-
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-
         {/* Header */}
         <div className="flex items-start justify-between mb-8">
           <div>
             <div className="flex items-center gap-3 mb-1">
               <h1 className="text-2xl font-bold text-white">Memoria operativa</h1>
-              <span className={`text-xs px-2 py-1 rounded-full font-semibold ${plan === 'pro' ? 'bg-violet-900/50 text-violet-300 border border-violet-700' : plan === 'team' ? 'bg-blue-900/50 text-blue-300 border border-blue-700' : 'bg-zinc-800 text-zinc-400 border border-zinc-700'}`}>
+              <span className={"text-xs px-2 py-1 rounded-full font-semibold " + (plan === 'pro' ? 'bg-violet-900/50 text-violet-300 border border-violet-700' : plan === 'team' ? 'bg-blue-900/50 text-blue-300 border border-blue-700' : 'bg-zinc-800 text-zinc-400 border border-zinc-700')}>
                 {planLabel}
               </span>
             </div>
             <p className="text-zinc-500 text-sm">
-              {isPro ? 'Contextos ilimitados activos' : `${projects.length} / ${FREE_LIMIT} contextos`}
+              {isPro ? 'Contextos ilimitados activos' : projects.length + ' / ' + FREE_LIMIT + ' contextos'}
             </p>
           </div>
-
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowVariables(!showVariables)}
-              className="px-3 py-2 text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-lg transition-all hidden sm:flex items-center gap-1.5"
-            >
+            <button onClick={() => setShowVariables(!showVariables)} className="px-3 py-2 text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-lg transition-all hidden sm:flex items-center gap-1.5">
               <span>Variables</span>
               {variables.length > 0 && <span className="bg-violet-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">{variables.length}</span>}
             </button>
-            <button
-              onClick={() => setShowOnboarding(!showOnboarding)}
-              className="p-2 text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-lg transition-all"
-              title="Guía de inicio"
-            >
+            <button onClick={() => setShowOnboarding(!showOnboarding)} className="p-2 text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-lg transition-all" title="Guia de inicio">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
             </button>
-            <button
-              onClick={() => { setEditingProject(null); setTemplateData(null); setShowModal(true) }}
-              className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold rounded-lg transition-all flex items-center gap-1.5"
-            >
+            <button onClick={() => { setEditingProject(null); setTemplateData(null); setShowModal(true) }} className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold rounded-lg transition-all flex items-center gap-1.5">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
               Nuevo contexto
             </button>
           </div>
         </div>
 
-        {/* Onboarding */}
         {showOnboarding && (
           <div className="mb-6">
             <OnboardingChecklist {...onboarding} />
           </div>
         )}
 
-        {/* Variables panel */}
         {showVariables && (
           <div className="mb-6">
-            <UserVariablesPanel
-              variables={variables}
-              userId={userId}
-              plan={plan}
-            />
+            <UserVariablesPanel variables={variables} userId={userId} plan={plan} />
           </div>
         )}
 
-        {/* Stats row */}
+        {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
           {[
             { label: 'Contextos', value: projects.length, icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
             { label: 'Variables', value: variables.length, icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' },
             { label: 'Plan', value: planLabel, icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z' },
-            { label: 'Categorías', value: Math.max(0, categories.length - 1), icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
+            { label: 'Categorias', value: Math.max(0, categories.length - 1), icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
           ].map(stat => (
             <div key={stat.label} className="bg-zinc-900/80 border border-zinc-800/80 rounded-2xl p-4 hover:border-violet-500/25 hover:bg-zinc-900 transition-all duration-400 group/stat cursor-default">
               <div className="flex items-center gap-2 mb-1.5">
@@ -278,7 +283,6 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           ))}
         </div>
 
-        {/* Upgrade nudge for Free plan */}
         {!isPro && (
           <div className="mb-6 flex items-center gap-4 p-4 bg-zinc-900 border border-zinc-800 rounded-xl">
             <div className="flex-1">
@@ -287,10 +291,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
                 <span className="text-zinc-400 text-xs">{projects.length} / {FREE_LIMIT}</span>
               </div>
               <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                <div
-                  className={"h-full rounded-full transition-all " + (projects.length >= FREE_LIMIT ? "bg-red-500" : projects.length >= 2 ? "bg-amber-500" : "bg-violet-500")}
-                  style={{width: Math.min(100, (projects.length / FREE_LIMIT) * 100) + '%'}}
-                />
+                <div className={"h-full rounded-full transition-all " + (projects.length >= FREE_LIMIT ? "bg-red-500" : projects.length >= 2 ? "bg-amber-500" : "bg-violet-500")} style={{width: Math.min(100, (projects.length / FREE_LIMIT) * 100) + '%'}} />
               </div>
             </div>
             <a href="/pricing" className="px-3 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold rounded-lg transition-all flex-shrink-0 whitespace-nowrap">
@@ -302,28 +303,19 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
         {/* Tabs */}
         <div className="flex items-center gap-1 mb-6 bg-zinc-900 border border-zinc-800 rounded-xl p-1 w-fit">
           {(['contexts', 'templates'] as const).map(t => (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${tab === t ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-white'}`}
-            >
+            <button key={t} onClick={() => setTab(t)} className={"px-4 py-1.5 text-sm font-medium rounded-lg transition-all " + (tab === t ? 'bg-violet-600 text-white' : 'text-zinc-400 hover:text-white')}>
               {t === 'contexts' ? 'Mis contextos' : 'Plantillas'}
             </button>
           ))}
         </div>
 
         {tab === 'templates' ? (
-          /* Templates Grid */
           <div>
-            <p className="text-zinc-500 text-sm mb-4">Elige una plantilla para empezar rápido</p>
+            <p className="text-zinc-500 text-sm mb-4">Elige una plantilla para empezar rapido</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {TEMPLATES.map((tpl, i) => (
-                <button
-                  key={i}
-                  onClick={() => { setTemplateData(tpl); setEditingProject(null); setShowModal(true); setTab('contexts') }}
-                  className="text-left p-5 bg-zinc-900 border border-zinc-800 hover:border-violet-600 rounded-xl transition-all group"
-                >
-                  <div className="text-2xl mb-3">{tpl.emoji || '◆'}</div>
+                <button key={i} onClick={() => { setTemplateData(tpl); setEditingProject(null); setShowModal(true); setTab('contexts') }} className="text-left p-5 bg-zinc-900 border border-zinc-800 hover:border-violet-600 rounded-xl transition-all group">
+                  <div className="text-2xl mb-3">{tpl.emoji || '\u25c6'}</div>
                   <h3 className="font-semibold text-white text-sm mb-1 group-hover:text-violet-300 transition-colors">{tpl.name}</h3>
                   <p className="text-zinc-500 text-xs">{tpl.tag || 'Plantilla'}</p>
                 </button>
@@ -331,37 +323,22 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
             </div>
           </div>
         ) : (
-          /* Contexts tab */
           <div>
-            {/* Filters */}
             <div className="flex flex-col sm:flex-row gap-3 mb-6">
               <div className="relative flex-1">
                 <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                <input
-                  type="text"
-                  placeholder="Buscar contextos..."
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors"
-                />
+                <input type="text" placeholder="Buscar contextos..." value={search} onChange={e => setSearch(e.target.value)} className="w-full pl-9 pr-4 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-violet-500 transition-colors" />
               </div>
-              <select
-                value={category}
-                onChange={e => setCategory(e.target.value)}
-                className="px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 transition-colors"
-              >
-                <option value="all">Todas las categorías</option>
+              <select value={category} onChange={e => setCategory(e.target.value)} className="px-3 py-2.5 bg-zinc-900 border border-zinc-700 rounded-xl text-sm text-white focus:outline-none focus:border-violet-500 transition-colors">
+                <option value="all">Todas las categorias</option>
                 {categories.filter(c => c !== 'all').map(c => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
               <div className="flex gap-2">
-                <button
-                  onClick={handleExport}
-                  className="px-3 py-2 text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-xl text-sm transition-all flex items-center gap-1.5"
-                >
+                <button onClick={handleExport} className="px-3 py-2 text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 rounded-xl text-sm transition-all flex items-center gap-1.5">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                   <span className="hidden sm:inline">Exportar</span>
                 </button>
@@ -373,20 +350,18 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
               </div>
             </div>
 
-            {/* Limit warning */}
             {!isPro && projects.length >= FREE_LIMIT && (
               <div className="mb-6 p-4 bg-violet-950/50 border border-violet-700/50 rounded-xl flex items-start gap-3">
                 <svg className="w-5 h-5 text-violet-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
                 <div>
-                  <p className="text-violet-200 text-sm font-medium">Límite del plan Free alcanzado</p>
+                  <p className="text-violet-200 text-sm font-medium">Limite del plan Free alcanzado</p>
                   <p className="text-violet-400 text-xs mt-0.5">Tienes {projects.length} contextos. Actualiza a Pro para crear ilimitados.</p>
                 </div>
               </div>
             )}
 
-            {/* Projects Grid */}
             {filtered.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <div className="w-16 h-16 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-4">
@@ -394,7 +369,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
                 </div>
-                {search || category !== 'all' ? (
+                {(search || category !== 'all') ? (
                   <>
                     <p className="text-zinc-400 font-medium mb-1">Sin resultados</p>
                     <p className="text-zinc-600 text-sm">Prueba con otros filtros</p>
@@ -402,19 +377,13 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
                   </>
                 ) : (
                   <>
-                    <p className="text-zinc-400 font-medium mb-1">Aún no tienes contextos</p>
+                    <p className="text-zinc-400 font-medium mb-1">Aun no tienes contextos</p>
                     <p className="text-zinc-600 text-sm mb-4">Crea tu primer contexto o usa una plantilla</p>
                     <div className="flex gap-3">
-                      <button
-                        onClick={() => { setEditingProject(null); setTemplateData(null); setShowModal(true) }}
-                        className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-all"
-                      >
+                      <button onClick={() => { setEditingProject(null); setTemplateData(null); setShowModal(true) }} className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-all">
                         Crear contexto
                       </button>
-                      <button
-                        onClick={() => setTab('templates')}
-                        className="px-4 py-2 border border-zinc-700 hover:border-zinc-500 text-zinc-300 text-sm font-medium rounded-lg transition-all"
-                      >
+                      <button onClick={() => setTab('templates')} className="px-4 py-2 border border-zinc-700 hover:border-zinc-500 text-zinc-300 text-sm font-medium rounded-lg transition-all">
                         Ver plantillas
                       </button>
                     </div>
@@ -439,21 +408,18 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           </div>
         )}
 
-        {/* Promo Code Section - only for Free users */}
         {!isPro && (
           <div className="mt-12 pt-8 border-t border-zinc-800">
             <div className="max-w-lg">
               <p className="text-zinc-500 text-xs font-mono uppercase tracking-wider mb-2">Plan Free</p>
-              <h3 className="text-white font-semibold mb-1">¿Tienes un código de acceso?</h3>
-              <p className="text-zinc-500 text-sm mb-4">Intróducelo para activar Pro al instante, sin tarjeta.</p>
-              <PromoInput onSuccess={(newPlan) => { window.location.reload() }} />
+              <h3 className="text-white font-semibold mb-1">Tienes un codigo de acceso?</h3>
+              <p className="text-zinc-500 text-sm mb-4">Introducelo para activar Pro al instante, sin tarjeta.</p>
+              <PromoInput onSuccess={() => { window.location.reload() }} />
             </div>
           </div>
         )}
-
       </div>
 
-      {/* Modals */}
       {showModal && (
         <ProjectModal
           project={editingProject}
@@ -465,9 +431,7 @@ export default function ProjectsClient({ initialProjects, initialVariables, user
           onClose={() => { setShowModal(false); setEditingProject(null); setTemplateData(null) }}
         />
       )}
-
       <KeeperBot userId={userId} plan={plan || 'free'} />
-
     </div>
   )
 }
@@ -491,16 +455,15 @@ function PromoInput({ onSuccess }: { onSuccess?: (plan: string) => void }) {
         setStatus('success')
         setMsg(data.message || 'Plan activado')
         setTimeout(() => {
-          if (onSuccess) onSuccess(data.plan)
-          else window.location.reload()
+          if (onSuccess) { onSuccess(data.plan) } else { window.location.reload() }
         }, 1500)
       } else {
         setStatus('error')
-        setMsg(data.error || 'Código no válido')
+        setMsg(data.error || 'Codigo no valido')
       }
     } catch (_e) {
       setStatus('error')
-      setMsg('Error de conexión')
+      setMsg('Error de conexion')
     }
   }
 
@@ -512,7 +475,7 @@ function PromoInput({ onSuccess }: { onSuccess?: (plan: string) => void }) {
           placeholder="KEEPER2025"
           value={code}
           onChange={e => setCode(e.target.value.toUpperCase())}
-          onKeyDown={e => e.key === 'Enter' && apply()}
+          onKeyDown={e => { if (e.key === 'Enter') { apply() } }}
           disabled={status === 'loading' || status === 'success'}
           className="flex-1 px-4 py-2.5 bg-zinc-900 border border-zinc-700 focus:border-violet-500 rounded-xl text-sm text-white placeholder-zinc-600 font-mono focus:outline-none transition-colors"
         />
@@ -525,7 +488,7 @@ function PromoInput({ onSuccess }: { onSuccess?: (plan: string) => void }) {
         </button>
       </div>
       {msg && (
-        <p className={`text-xs mt-2 ${status === 'success' ? 'text-green-400' : 'text-red-400'}`}>{msg}</p>
+        <p className={"text-xs mt-2 " + (status === 'success' ? 'text-green-400' : 'text-red-400')}>{msg}</p>
       )}
     </div>
   )
