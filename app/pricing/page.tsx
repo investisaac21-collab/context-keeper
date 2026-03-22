@@ -1,285 +1,145 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import Navbar from '@/components/Navbar'
 import Link from 'next/link'
-
-const PLANS = [
-  {
-    name: 'Free',
-    price: 0,
-    currency: '',
-    desc: 'Empieza a guardar tu memoria operativa',
-    features: [
-      'Hasta 3 contextos',
-      'Variables de contexto dinámicas',
-      'Importar / exportar JSON',
-      'Plantillas predefinidas',
-    ],
-    cta: 'Empezar gratis',
-    ctaHref: '/login',
-    highlight: false,
-    badge: null,
-  },
-  {
-    name: 'Pro',
-    price: 9,
-    currency: '€',
-    desc: 'Memoria completa, sin límites',
-    features: [
-      'Todo lo del plan Free',
-      'Contextos ilimitados',
-      'Historial de versiones y rollback',
-      'Tokens de memoria globales',
-      'Soporte prioritario',
-      'Acceso anticipado a Keeper Lab',
-    ],
-    cta: 'Hazte Pro',
-    ctaHref: null,
-    highlight: true,
-    badge: 'MÁS POPULAR',
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO,
-  },
-  {
-    name: 'Team',
-    price: 20,
-    currency: '€',
-    desc: 'Memoria compartida para todo el equipo',
-    features: [
-      'Todo lo del plan Pro',
-      'Hasta 5 miembros',
-      'Contextos compartidos entre miembros',
-      'Panel de administrador',
-      'Facturación centralizada',
-      'Permisos por rol (admin, editor, viewer)',
-    ],
-    cta: 'Empezar con Team',
-    ctaHref: null,
-    highlight: false,
-    badge: 'PARA EQUIPOS',
-    priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_TEAM,
-  },
-]
+import { useRouter } from 'next/navigation'
 
 export default function PricingPage() {
-  const [loading, setLoading] = useState<string | null>(null)
-  const [user, setUser] = useState<any>(null)
-  const [currentPlan, setCurrentPlan] = useState('free')
-  const [mounted, setMounted] = useState(false)
-  const router = useRouter()
-  const supabase = createClientComponentClient()
-
-  useEffect(() => {
-    setTimeout(() => setMounted(true), 50)
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        setUser(data.user)
-        supabase.from('subscriptions').select('plan').eq('user_id', data.user.id).single().then(({ data: sub }) => {
-          if (sub) setCurrentPlan(sub.plan)
-        })
-      }
-    })
-  }, [])
-
-  const handleUpgrade = async (priceId: string | undefined, planName: string) => {
-    if (!priceId) return
-    if (!user) { router.push('/login'); return }
-    setLoading(planName)
-    const res = await fetch('/api/stripe/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ priceId, userId: user.id }),
-    })
-    const data = await res.json()
-    if (data.url) {
-      window.location.href = data.url
-    } else {
-      setLoading(null)
-      alert('Error al iniciar el pago. Inténtalo de nuevo.')
-    }
-  }
-
-  const CheckIcon = () => (
-    <svg className="w-4 h-4 text-violet-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-    </svg>
-  )
-
   return (
-    <div className="min-h-screen bg-[#080808] relative overflow-hidden">
-      {/* Atmospheric glows */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full"
-          style={{ background: 'radial-gradient(ellipse at top, rgba(109,40,217,0.12) 0%, transparent 60%)', filter: 'blur(40px)' }}
-        />
-        <div className="absolute top-[40%] left-[-10%] w-[500px] h-[500px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(109,40,217,0.06) 0%, transparent 60%)', filter: 'blur(80px)' }}
-        />
-        <div className="absolute top-[30%] right-[-5%] w-[400px] h-[400px] rounded-full"
-          style={{ background: 'radial-gradient(circle, rgba(67,20,160,0.08) 0%, transparent 60%)', filter: 'blur(60px)' }}
-        />
-        {/* Subtle grid */}
-        <div className="absolute inset-0" style={{
-          backgroundImage: 'linear-gradient(rgba(109,40,217,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(109,40,217,0.04) 1px, transparent 1px)',
-          backgroundSize: '80px 80px',
-          maskImage: 'radial-gradient(ellipse at 50% 30%, black 20%, transparent 70%)'
-        }} />
-      </div>
+    <div className="min-h-screen text-white" style={{background:'#080808'}}>
+      {/* Nav */}
+      <nav style={{background:'rgba(8,8,8,0.85)',backdropFilter:'blur(16px)',borderBottom:'1px solid rgba(255,255,255,0.06)'}} className="sticky top-0 z-50 flex items-center justify-between px-6 py-4">
+        <div style={{position:'absolute',top:0,left:0,right:0,height:'1px',background:'linear-gradient(90deg,transparent,rgba(139,92,246,0.4),transparent)'}} />
+        <Link href="/" className="flex items-center gap-2.5">
+          <div style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 0 12px rgba(124,58,237,0.4)',width:'28px',height:'28px',borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center'}}>
+            <span className="text-white font-bold text-xs">K</span>
+          </div>
+          <span className="font-semibold text-sm text-white">Keeper</span>
+        </Link>
+        <Link href="/login" style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)'}} className="text-sm font-semibold px-4 py-2 rounded-lg text-white hover:opacity-90 transition-opacity">Empieza gratis</Link>
+      </nav>
 
-      <Navbar userEmail={user?.email} plan={currentPlan} />
-
-      <div className={
-        'relative z-10 max-w-5xl mx-auto px-6 py-20 transition-all duration-700 ' +
-        (mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6')
-      }>
+      <div className="max-w-5xl mx-auto px-6 py-20">
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium text-violet-400 mb-6"
-            style={{ background: 'rgba(109,40,217,0.1)', border: '1px solid rgba(109,40,217,0.25)' }}
-          >
-            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <div style={{border:'1px solid rgba(139,92,246,0.3)',background:'rgba(139,92,246,0.08)',color:'rgba(196,181,253,1)',display:'inline-flex',alignItems:'center',gap:'6px',padding:'4px 14px',borderRadius:'999px'}} className="text-xs font-bold mb-6">
             Planes simples. Sin sorpresas.
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-4 tracking-tight">
-            Elige tu plan
-          </h1>
-          <p className="text-zinc-500 text-lg max-w-md mx-auto">
-            Desde gratis hasta ilimitado. Cancela cuando quieras.
-          </p>
+          <h1 className="text-4xl sm:text-5xl font-bold mb-4">Elige tu plan</h1>
+          <p style={{color:'rgba(255,255,255,0.4)'}} className="text-lg">Desde gratis hasta ilimitado. Cancela cuando quieras.</p>
         </div>
 
-        {/* Plans grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-16">
-          {PLANS.map((plan, i) => (
-            <div
-              key={plan.name}
-              className="relative rounded-2xl p-6 flex flex-col transition-all duration-300 group"
-              style={plan.highlight
-                ? {
-                    background: 'linear-gradient(160deg, rgba(109,40,217,0.12) 0%, rgba(67,20,160,0.08) 100%)',
-                    border: '1px solid rgba(109,40,217,0.35)',
-                    boxShadow: '0 0 40px rgba(109,40,217,0.12), inset 0 1px 0 rgba(109,40,217,0.2)',
-                  }
-                : {
-                    background: 'rgba(255,255,255,0.02)',
-                    border: '1px solid rgba(255,255,255,0.07)',
-                  }
-              }
-            >
-              {/* Hover glow for non-highlight */}
-              {!plan.highlight && (
-                <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                  style={{ background: 'rgba(109,40,217,0.04)', boxShadow: '0 0 20px rgba(109,40,217,0.08)' }}
-                />
-              )}
+        {/* Plans */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
 
-              {/* Badge */}
-              {plan.badge && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="px-3 py-1 text-xs font-bold tracking-widest rounded-full"
-                    style={plan.highlight
-                      ? { background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', color: 'white', boxShadow: '0 4px 12px rgba(109,40,217,0.4)' }
-                      : { background: 'rgba(255,255,255,0.08)', color: 'rgba(161,161,170,0.8)', border: '1px solid rgba(255,255,255,0.1)' }
-                    }
-                  >
-                    {plan.badge}
-                  </span>
-                </div>
-              )}
-
-              {/* Plan name + price */}
-              <div className="mb-5">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-bold text-white">{plan.name}</h3>
-                  {currentPlan === plan.name.toLowerCase() && (
-                    <span className="text-xs px-2 py-0.5 rounded-full text-violet-300" style={{ background: 'rgba(109,40,217,0.2)', border: '1px solid rgba(109,40,217,0.3)' }}>
-                      Actual
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-end gap-1 mb-2">
-                  {plan.price === 0 ? (
-                    <span className="text-4xl font-bold text-white">Gratis</span>
-                  ) : (
-                    <>
-                      <span className="text-4xl font-bold text-white">{plan.price}</span>
-                      <span className="text-zinc-500 text-base mb-1.5">&#x20ac;/mes</span>
-                    </>
-                  )}
-                </div>
-                <p className="text-sm text-zinc-600">{plan.desc}</p>
-              </div>
-
-              {/* CTA */}
-              <div className="mb-6">
-                {plan.ctaHref ? (
-                  <Link href={plan.ctaHref}
-                    className="block w-full py-2.5 rounded-xl text-sm font-semibold text-center transition-all duration-200"
-                    style={{
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      color: 'rgba(255,255,255,0.7)'
-                    }}
-                  >
-                    {plan.cta}
-                  </Link>
-                ) : (
-                  <button
-                    onClick={() => handleUpgrade(plan.priceId, plan.name)}
-                    disabled={loading === plan.name || currentPlan === plan.name.toLowerCase()}
-                    className="w-full py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 disabled:opacity-50 relative overflow-hidden group/cta"
-                    style={plan.highlight
-                      ? {
-                          background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-                          color: 'white',
-                          boxShadow: '0 4px 16px rgba(109,40,217,0.3), inset 0 1px 0 rgba(255,255,255,0.1)',
-                        }
-                      : {
-                          background: 'rgba(255,255,255,0.05)',
-                          border: '1px solid rgba(255,255,255,0.1)',
-                          color: 'rgba(255,255,255,0.7)',
-                        }
-                    }
-                  >
-                    <div className="absolute inset-0 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-300"
-                      style={plan.highlight
-                        ? { background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' }
-                        : { background: 'rgba(109,40,217,0.08)' }
-                      }
-                    />
-                    <span className="relative z-10">
-                      {loading === plan.name ? 'Redirigiendo...' :
-                        currentPlan === plan.name.toLowerCase() ? 'Plan actual' : plan.cta}
-                    </span>
-                  </button>
-                )}
-              </div>
-
-              {/* Divider */}
-              <div className="h-px mb-5" style={{ background: 'rgba(255,255,255,0.06)' }} />
-
-              {/* Features */}
-              <ul className="space-y-3 flex-1">
-                {plan.features.map((f, j) => (
-                  <li key={j} className="flex items-start gap-3">
-                    <CheckIcon />
-                    <span className="text-sm text-zinc-400 leading-tight">{f}</span>
-                  </li>
-                ))}
-              </ul>
+          {/* FREE */}
+          <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)'}} className="rounded-2xl p-7 flex flex-col">
+            <div className="mb-6">
+              <p style={{color:'rgba(255,255,255,0.5)'}} className="text-xs font-bold mb-2 tracking-wide uppercase">Free</p>
+              <p className="text-4xl font-black text-white mb-1">Gratis</p>
+              <p style={{color:'rgba(255,255,255,0.35)'}} className="text-sm">Empieza a guardar tu memoria operativa</p>
             </div>
-          ))}
+            <Link href="/login" style={{border:'1px solid rgba(255,255,255,0.12)',color:'rgba(255,255,255,0.6)'}} className="w-full py-2.5 rounded-xl text-sm font-semibold text-center hover:border-white/25 hover:text-white transition-colors mb-7">
+              Empezar gratis
+            </Link>
+            <ul className="space-y-3 flex-1">
+              {[
+                ['Hasta 3 Keeper Profiles',''],
+                ['System Prompt + Texto plano','2 formatos de exportaci&#xF3;n'],
+                ['Sandbox libre','chatea con tus profiles'],
+                ['Variables de contexto','din&#xE1;micas'],
+                ['Importar / Exportar JSON',''],
+                ['Plantillas predefinidas',''],
+              ].map(([f,sub],i)=>(
+                <li key={i} className="flex items-start gap-3">
+                  <svg className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color:'rgba(255,255,255,0.25)'}} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/></svg>
+                  <div>
+                    <span style={{color:'rgba(255,255,255,0.65)'}} className="text-sm" dangerouslySetInnerHTML={{__html:f}} />
+                    {sub&&<p style={{color:'rgba(255,255,255,0.3)'}} className="text-xs mt-0.5" dangerouslySetInnerHTML={{__html:sub}} />}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* PRO */}
+          <div style={{background:'rgba(109,40,217,0.1)',border:'1px solid rgba(139,92,246,0.4)',boxShadow:'0 0 60px rgba(109,40,217,0.1)'}} className="rounded-2xl p-7 flex flex-col relative">
+            <div style={{position:'absolute',top:'-12px',left:'50%',transform:'translateX(-50%)',background:'linear-gradient(135deg,#7c3aed,#6d28d9)',color:'white',fontSize:'11px',fontWeight:'bold',padding:'3px 14px',borderRadius:'999px'}}>MAS POPULAR</div>
+            <div className="mb-6">
+              <p style={{color:'#c4b5fd'}} className="text-xs font-bold mb-2 tracking-wide uppercase">Pro</p>
+              <div className="flex items-baseline gap-1 mb-1">
+                <p className="text-4xl font-black text-white">9</p>
+                <p style={{color:'rgba(255,255,255,0.5)'}} className="text-lg font-medium">&#x20AC;/mes</p>
+              </div>
+              <p style={{color:'rgba(255,255,255,0.35)'}} className="text-sm">Memoria completa, sin l&#xED;mites</p>
+            </div>
+            <Link href="/login" style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 4px 20px rgba(109,40,217,0.35)'}} className="w-full py-3 rounded-xl text-sm font-bold text-white text-center hover:opacity-90 transition-opacity mb-7">
+              Empezar con Pro
+            </Link>
+            <ul className="space-y-3 flex-1">
+              {[
+                ['Todo lo del plan Free',''],
+                ['Profiles ilimitados','sin restricciones'],
+                ['Keeper Lab','an&#xE1;lisis 4D: Claridad, Consistencia, Completitud, Efectividad'],
+                ['Keeper Forge','simulaci&#xF3;n en 3 modos: Escenario, Estr&#xE9;s, Libre'],
+                ['9 formatos de exportaci&#xF3;n','JSON, YAML, Markdown, Char Sheet, NPC Sheet, Brand Brief, Perfil T&#xE9;cnico'],
+                ['Campos avanzados','base_memory, response_patterns, dynamic_variables, relationships'],
+                ['Historial y versiones',''],
+                ['Soporte prioritario',''],
+                ['Acceso anticipado a novedades','Lab, Forge y pr&#xF3;ximas funciones'],
+              ].map(([f,sub],i)=>(
+                <li key={i} className="flex items-start gap-3">
+                  <svg className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color:'#a78bfa'}} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/></svg>
+                  <div>
+                    <span style={{color:'rgba(255,255,255,0.8)'}} className="text-sm font-medium" dangerouslySetInnerHTML={{__html:f}} />
+                    {sub&&<p style={{color:'rgba(255,255,255,0.35)'}} className="text-xs mt-0.5" dangerouslySetInnerHTML={{__html:sub}} />}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* TEAM */}
+          <div style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.08)'}} className="rounded-2xl p-7 flex flex-col">
+            <div style={{position:'absolute',top:'0',right:'0',background:'rgba(59,130,246,0.15)',border:'1px solid rgba(59,130,246,0.3)',color:'#93c5fd',fontSize:'10px',fontWeight:'bold',padding:'2px 10px',borderRadius:'0 14px 0 8px'}} className="relative">EQUIPOS</div>
+            <div className="mb-6">
+              <p style={{color:'rgba(255,255,255,0.5)'}} className="text-xs font-bold mb-2 tracking-wide uppercase">Team</p>
+              <div className="flex items-baseline gap-1 mb-1">
+                <p className="text-4xl font-black text-white">20</p>
+                <p style={{color:'rgba(255,255,255,0.5)'}} className="text-lg font-medium">&#x20AC;/mes</p>
+              </div>
+              <p style={{color:'rgba(255,255,255,0.35)'}} className="text-sm">Memoria compartida para todo el equipo</p>
+            </div>
+            <Link href="/login" style={{border:'1px solid rgba(59,130,246,0.35)',color:'#93c5fd'}} className="w-full py-2.5 rounded-xl text-sm font-semibold text-center hover:bg-blue-900/20 transition-colors mb-7">
+              Empezar con Team
+            </Link>
+            <ul className="space-y-3 flex-1">
+              {[
+                ['Todo lo del plan Pro',''],
+                ['Hasta 5 miembros',''],
+                ['Profiles compartidos entre miembros',''],
+                ['Panel de administrador',''],
+                ['Facturaci&#xF3;n centralizada',''],
+                ['Soporte dedicado',''],
+              ].map(([f,sub],i)=>(
+                <li key={i} className="flex items-start gap-3">
+                  <svg className="w-4 h-4 flex-shrink-0 mt-0.5" style={{color:'#60a5fa'}} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/></svg>
+                  <div>
+                    <span style={{color:'rgba(255,255,255,0.65)'}} className="text-sm" dangerouslySetInnerHTML={{__html:f}} />
+                    {sub&&<p style={{color:'rgba(255,255,255,0.3)'}} className="text-xs mt-0.5" dangerouslySetInnerHTML={{__html:sub}} />}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
         </div>
 
-        {/* Bottom CTA for free users */}
-        <div className="text-center">
-          <p className="text-zinc-600 text-sm">
-            ¿Tienes un c&#xF3;digo promocional?{' '}
-            <Link href="/dashboard" className="text-violet-400 hover:text-violet-300 transition-colors duration-200 underline underline-offset-2">
-              Aplícalo en el dashboard
-            </Link>
-          </p>
+        {/* CTA Final */}
+        <div style={{background:'rgba(109,40,217,0.06)',border:'1px solid rgba(139,92,246,0.2)'}} className="rounded-2xl p-10 text-center">
+          <h3 className="text-2xl font-bold text-white mb-3">Empieza gratis hoy</h3>
+          <p style={{color:'rgba(255,255,255,0.4)'}} className="text-sm mb-7">Sin tarjeta. Sin l&#xED;mite de tiempo. Actualiza cuando quieras.</p>
+          <Link href="/login" style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 4px 24px rgba(109,40,217,0.3)'}} className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-white font-bold text-sm hover:opacity-90 transition-opacity">
+            Crear cuenta gratis &#x2192;
+          </Link>
         </div>
       </div>
     </div>
