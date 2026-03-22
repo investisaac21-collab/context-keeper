@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 
 interface KeeperProfile {
@@ -39,7 +39,7 @@ function getColor(name: string): string {
 }
 
 export default function ProfilesClient({ userId, userEmail, plan, initialProfiles }: Props) {
-  const supabase = createClientComponentClient()
+  const supabase = createClient()
   const isPro = plan === 'pro' || plan === 'team'
   const [aiDesc, setAiDesc] = useState('')
   const [aiLoading, setAiLoading] = useState(false)
