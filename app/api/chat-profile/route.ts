@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
 
 export async function POST(request: Request) {
   const supabase = createRouteHandlerClient({ cookies })
@@ -48,7 +48,7 @@ Mantente siempre en el personaje. Responde de manera natural y coherente con tu 
       body: JSON.stringify({
         system_instruction: { parts: [{ text: systemPrompt }] },
         contents: chatHistory,
-        generationConfig: { temperature: 0.7, maxOutputTokens: 800 }
+        generationConfig: { temperature: 0.7, maxOutputTokens: 1500 }
       })
     })
     const data = await res.json()

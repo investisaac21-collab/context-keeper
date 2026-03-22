@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
 
 function sanitizeJson(raw: string): string {
   let text = raw.replace(/```(?:json)?\s*/gi, '').replace(/```\s*/g, '').trim()
@@ -49,7 +49,7 @@ Maximo 2 variables relevantes. Todo en el mismo idioma que la descripcion.`
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.6, maxOutputTokens: 500 }
+        generationConfig: { temperature: 0.6, maxOutputTokens: 1000 }
       })
     })
     const data = await res.json()

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
 
 function sanitizeJson(raw: string): string {
   let text = raw.replace(/```(?:json)?\s*/gi, '').replace(/```\s*/g, '').trim()
@@ -82,7 +82,7 @@ Realiza una prueba libre de interaccion con este perfil. Responde SOLO con JSON 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.4, maxOutputTokens: 1500 }
+        generationConfig: { temperature: 0.4, maxOutputTokens: 2500 }
       })
     })
     const data = await res.json()
