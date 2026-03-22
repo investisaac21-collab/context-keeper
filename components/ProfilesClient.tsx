@@ -121,7 +121,7 @@ function ge(p:KeeperProfile,fmt:string):string{
     return ls.join('\n')
   }
   if(fmt==='npc_sheet'){
-    const ls:string[]=['[NPC PROFILE — '+p.name.toUpperCase()+']','']
+    const ls:string[]=['[NPC PROFILE â '+p.name.toUpperCase()+']','']
     if(p.role)ls.push('IDENTITY: '+p.role)
     if(p.tone)ls.push('VOICE STYLE: '+p.tone)
     if(p.goals)ls.push('MOTIVATION: '+p.goals)
@@ -387,7 +387,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
         )}
         {sandboxProfile&&<div className="mt-6"><KeeperSandbox profile={sandboxProfile} onClose={()=>setSandboxProfile(null)}/></div>}
         {chatProfile&&<div className="mt-6"><ProfileChat profile={chatProfile} onClose={()=>setChatProfileId(null)}/></div>}
-        {profiles.length>0&&<div style={{background:'rgba(24,24,27,0.5)',border:'1px solid rgba(63,63,70,0.4)'}} className="mt-6 p-4 rounded-xl flex items-start gap-3"><svg width="14" height="14" fill="none" stroke="rgba(139,92,246,0.6)" strokeWidth="2" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p className="text-zinc-600 text-xs"><strong className="text-zinc-400">Flujo recomendado:</strong> Crea el perfil → Lab (analiza) → Forge (simula escenarios) → Export (portabilidad). Sandbox para chatear directamente.</p></div>}
+        {profiles.length>0&&<div style={{background:'rgba(24,24,27,0.5)',border:'1px solid rgba(63,63,70,0.4)'}} className="mt-6 p-4 rounded-xl flex items-start gap-3"><svg width="14" height="14" fill="none" stroke="rgba(139,92,246,0.6)" strokeWidth="2" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p className="text-zinc-600 text-xs"><strong className="text-zinc-400">Flujo recomendado:</strong> Crea el perfil â Lab (analiza) â Forge (simula escenarios) â Export (portabilidad). Sandbox para chatear directamente.</p></div>}
       </div>
       {exportProfile&&(
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={e=>{if(e.target===e.currentTarget)setExportProfile(null)}}>
@@ -407,7 +407,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
             <div style={{borderBottom:'1px solid rgba(59,130,246,0.15)',background:'rgba(59,130,246,0.03)'}} className="flex items-center justify-between px-6 py-4 flex-shrink-0"><div className="flex items-center gap-3"><div style={{background:'rgba(59,130,246,0.12)',border:'1px solid rgba(59,130,246,0.25)'}} className="w-8 h-8 rounded-xl flex items-center justify-center"><svg width="14" height="14" fill="none" stroke="#60a5fa" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div><div><h2 className="font-bold text-white text-sm">Keeper Lab</h2><p className="text-blue-500/60 text-xs">{labProfile.name}</p></div></div><button onClick={()=>{setLabProfile(null);setLabResult(null)}} className="w-8 h-8 rounded-lg hover:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-white transition-colors"><svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
             <div className="p-6 space-y-4 overflow-y-auto">
               {!labResult&&!labLoading&&!labError&&<div className="text-center py-6"><p className="text-zinc-400 text-sm mb-2 leading-relaxed">Analisis en 4 dimensiones:</p><div className="flex justify-center gap-4 mb-6">{[['Claridad','text-blue-400'],['Consistencia','text-violet-400'],['Completitud','text-emerald-400'],['Efectividad','text-amber-400']].map(([label,color])=><div key={label} className="text-center"><div style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.5)'}} className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1"><span className={"text-sm font-black "+color}>?</span></div><span className="text-xs text-zinc-600">{label}</span></div>)}</div><button onClick={handleRunLab} style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 4px 20px rgba(139,92,246,0.25)'}} className="flex items-center gap-2 text-white text-sm font-semibold px-6 py-3 rounded-xl hover:opacity-90 transition-opacity mx-auto"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Analizar perfil</button></div>}
-              {labLoading&&<div className="flex flex-col items-center py-8 gap-4"><div className="relative w-12 h-12"><div style={{border:'2px solid rgba(59,130,246,0.15)',borderTop:'2px solid #3b82f6'}} className="absolute inset-0 rounded-full animate-spin"/><div style={{border:'2px solid rgba(139,92,246,0.1)',borderBottom:'2px solid #7c3aed',animationDuration:'1.4s'}} className="absolute inset-1.5 rounded-full animate-spin"/></div><div className="text-center space-y-1"><p className="text-blue-400 text-sm font-medium" style={{transition:'opacity 0.4s'}}>{labMsgs[labLoadMsg]}</p><p className="text-zinc-700 text-xs">Keeper Lab · Analisis profundo</p></div></div>}
+              {labLoading&&<div className="flex flex-col items-center py-8 gap-4"><div className="relative w-12 h-12"><div style={{border:'2px solid rgba(59,130,246,0.15)',borderTop:'2px solid #3b82f6'}} className="absolute inset-0 rounded-full animate-spin"/><div style={{border:'2px solid rgba(139,92,246,0.1)',borderBottom:'2px solid #7c3aed',animationDuration:'1.4s'}} className="absolute inset-1.5 rounded-full animate-spin"/></div><div className="text-center space-y-1"><p className="text-blue-400 text-sm font-medium" style={{transition:'opacity 0.4s'}}>{labMsgs[labLoadMsg]}</p><p className="text-zinc-700 text-xs">Keeper Lab Â· Analisis profundo</p></div></div>}
               {labError&&<div style={{background:'rgba(239,68,68,0.07)',border:'1px solid rgba(239,68,68,0.2)'}} className="p-4 rounded-xl"><p className="text-red-400 text-sm">{labError}</p><button onClick={handleRunLab} className="mt-3 text-xs text-violet-400 hover:text-violet-300">Reintentar</button></div>}
               {labResult&&(<div className="space-y-5">
                   <div style={{textAlign:'center',padding:'20px 0 12px'}}>
@@ -456,7 +456,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
             <div style={{borderBottom:'1px solid rgba(63,63,70,0.4)',background:'rgba(245,158,11,0.04)'}} className="flex items-center justify-between px-6 py-4 flex-shrink-0">
               <div className="flex items-center gap-3">
                 <div style={{background:'rgba(245,158,11,0.12)',border:'1px solid rgba(245,158,11,0.25)'}} className="w-8 h-8 rounded-xl flex items-center justify-center"><svg width="14" height="14" fill="none" stroke="#fbbf24" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/><path strokeLinecap="round" strokeLinejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/></svg></div>
-                <div><h2 className="font-bold text-white text-sm">Keeper Forge</h2><p className="text-zinc-500 text-xs">Simulacion profunda — {forgeProfile.name}</p></div>
+                <div><h2 className="font-bold text-white text-sm">Keeper Forge</h2><p className="text-zinc-500 text-xs">Simulacion profunda â {forgeProfile.name}</p></div>
               </div>
               <button onClick={()=>{setForgeProfile(null);setForgeResult(null)}} className="w-8 h-8 rounded-lg hover:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-white transition-colors"><svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
             </div>
@@ -520,7 +520,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                             letterSpacing:'0.06em',
                             color:forgeResult.verdict==='SOLIDO'?'rgba(134,239,172,0.95)':forgeResult.verdict==='ACEPTABLE'?'rgba(253,230,138,0.95)':'rgba(252,165,165,0.95)',
                             lineHeight:1
-                          }}>{String(forgeResult.verdict||'—')}</div>
+                          }}>{String(forgeResult.verdict||'â')}</div>
                           <div style={{fontSize:9,letterSpacing:'0.12em',opacity:0.5,marginTop:4,color:'white'}}>VEREDICTO FORGE</div>
                         </div>
                         {forgeResult.consistency_score!=null&&(
@@ -561,12 +561,12 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                           background:forgeResult.overall_verdict==='ROBUSTO'?'rgba(34,197,94,0.1)':forgeResult.overall_verdict==='FRAGIL'?'rgba(239,68,68,0.08)':'rgba(251,191,36,0.08)',
                           border:forgeResult.overall_verdict==='ROBUSTO'?'1px solid rgba(34,197,94,0.3)':forgeResult.overall_verdict==='FRAGIL'?'1px solid rgba(239,68,68,0.25)':'1px solid rgba(251,191,36,0.25)'
                         }}>
-                          <div style={{fontSize:28,fontWeight:900,letterSpacing:'0.06em',color:forgeResult.overall_verdict==='ROBUSTO'?'rgba(134,239,172,0.95)':forgeResult.overall_verdict==='FRAGIL'?'rgba(252,165,165,0.95)':'rgba(253,230,138,0.95)',lineHeight:1}}>{String(forgeResult.overall_verdict||'—')}</div>
-                          <div style={{fontSize:9,letterSpacing:'0.12em',opacity:0.5,marginTop:4,color:'white'}}>ESTRÉS FORGE</div>
+                          <div style={{fontSize:28,fontWeight:900,letterSpacing:'0.06em',color:forgeResult.overall_verdict==='ROBUSTO'?'rgba(134,239,172,0.95)':forgeResult.overall_verdict==='FRAGIL'?'rgba(252,165,165,0.95)':'rgba(253,230,138,0.95)',lineHeight:1}}>{String(forgeResult.overall_verdict||'â')}</div>
+                          <div style={{fontSize:9,letterSpacing:'0.12em',opacity:0.5,marginTop:4,color:'white'}}>ESTRÃS FORGE</div>
                         </div>
                       </div>
                       {(forgeResult.stress_questions as string[]||[]).length>0&&<div style={{marginBottom:10}}>
-                        <p style={{fontSize:10,color:'rgba(251,191,36,0.5)',letterSpacing:'0.08em',marginBottom:6}}>PREGUNTAS DE ESTRÉS</p>
+                        <p style={{fontSize:10,color:'rgba(251,191,36,0.5)',letterSpacing:'0.08em',marginBottom:6}}>PREGUNTAS DE ESTRÃS</p>
                         {(forgeResult.stress_questions as string[]).map((q,i)=><div key={i} style={{borderLeft:'2px solid rgba(251,191,36,0.3)',paddingLeft:10,marginBottom:6}}><p style={{fontSize:11,color:'rgba(253,230,138,0.75)',margin:0}}>{q}</p></div>)}
                       </div>}
                       {(forgeResult.critical_gaps as string[]||[]).length>0&&<div style={{marginBottom:8}}>
@@ -590,7 +590,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                           background:forgeResult.quick_verdict==='COHERENTE'?'rgba(34,197,94,0.1)':'rgba(239,68,68,0.08)',
                           border:forgeResult.quick_verdict==='COHERENTE'?'1px solid rgba(34,197,94,0.3)':'1px solid rgba(239,68,68,0.25)'
                         }}>
-                          <div style={{fontSize:26,fontWeight:900,letterSpacing:'0.06em',color:forgeResult.quick_verdict==='COHERENTE'?'rgba(134,239,172,0.95)':'rgba(252,165,165,0.95)',lineHeight:1}}>{String(forgeResult.quick_verdict||'—')}</div>
+                          <div style={{fontSize:26,fontWeight:900,letterSpacing:'0.06em',color:forgeResult.quick_verdict==='COHERENTE'?'rgba(134,239,172,0.95)':'rgba(252,165,165,0.95)',lineHeight:1}}>{String(forgeResult.quick_verdict||'â')}</div>
                           <div style={{fontSize:9,letterSpacing:'0.12em',opacity:0.5,marginTop:4,color:'white'}}>VERIFICACION LIBRE</div>
                         </div>
                       </div>
@@ -656,88 +656,251 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
   )
 }
 function KeeperSandbox({profile,onClose}:{profile:KeeperProfile;onClose:()=>void}){
-  const [messages,setMessages]=useState<Array<{role:'user'|'assistant';content:string}>>([{role:'assistant',content:'Sandbox activo. Soy '+profile.name+(profile.role?'. Rol: '+profile.role+'.':'')+' Cualquier mensaje que me envies sera respondido exactamente como defina mi identidad. Empieza cuando quieras.'}])
-  const [input,setInput]=useState('')
-  const [loading,setLoading]=useState(false)
-  const [mode,setMode]=useState<'chat'|'test'>('chat')
-  const [testQ,setTestQ]=useState('')
-  const sp=[profile.name&&'Nombre: '+profile.name,profile.role&&'Rol: '+profile.role,profile.tone&&'Tono: '+profile.tone,profile.goals&&'Objetivo: '+profile.goals,(profile.rules?.length)&&'Reglas: '+profile.rules.join(' | '),profile.limits&&'Limites: '+profile.limits,profile.base_memory&&'Memoria de fondo: '+profile.base_memory,profile.response_patterns&&'Patrones: '+profile.response_patterns,profile.relationships&&'Relaciones: '+profile.relationships,profile.extra&&'Contexto: '+profile.extra].filter(Boolean).join('\n')
+  const [conversations,setConversations]=React.useState<Array<{id:string;title:string;messages:Array<{role:'user'|'assistant';content:string}>;updated_at:string}>>([])
+  const [activeConvId,setActiveConvId]=React.useState<string|null>(null)
+  const [messages,setMessages]=React.useState<Array<{role:'user'|'assistant';content:string}>>([])
+  const [input,setInput]=React.useState('')
+  const [loading,setLoading]=React.useState(false)
+  const [loadingHistory,setLoadingHistory]=React.useState(true)
+  const [showHistory,setShowHistory]=React.useState(false)
+  const [savingId,setSavingId]=React.useState<string|null>(null)
+  const [statusMsg,setStatusMsg]=React.useState('')
+  const bottomRef=React.useRef<HTMLDivElement>(null)
+  const saveTimeout=React.useRef<NodeJS.Timeout|null>(null)
 
-  // Persist conversation to localStorage by profile id
-  useEffect(()=>{
-    const key='ck_sandbox_'+profile.id
-    const saved=localStorage.getItem(key)
-    if(saved){try{const parsed=JSON.parse(saved);if(Array.isArray(parsed)&&parsed.length>1)setMessages(parsed)}catch(_e){}}
+  // Load conversations for this profile on mount
+  React.useEffect(()=>{
+    loadConversations()
   },[profile.id])
-  useEffect(()=>{
-    const key='ck_sandbox_'+profile.id
-    localStorage.setItem(key,JSON.stringify(messages))
-  },[messages,profile.id])
-    const send=async(msg?:string)=>{
-    const userMsg=(msg||input).trim();if(!userMsg||loading)return;setInput('');setMessages(prev=>[...prev,{role:'user',content:userMsg}]);setLoading(true)
-    try{const res=await fetch('/api/chat-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:userMsg,systemPrompt:sp,history:messages.slice(-8)})});const data=await res.json();setMessages(prev=>[...prev,{role:'assistant',content:data.reply||data.error||'Error'}])}catch(_e){setMessages(prev=>[...prev,{role:'assistant',content:'Error de conexion'}])}
-    setLoading(false)
-  }
-  const TEST_PROMPTS=['Describe quien eres en una sola oracion','Dame un ejemplo de como responderas a una pregunta tipica','Cual es lo que NUNCA harias?','Actua como si alguien te desafiara fuera de tu rol']
-  return(
-    <div style={{background:'rgba(18,18,20,0.95)',border:'1px solid rgba(16,185,129,0.25)',boxShadow:'0 0 30px rgba(16,185,129,0.04)'}} className="rounded-2xl overflow-hidden">
-      <div style={{background:'rgba(16,185,129,0.04)',borderBottom:'1px solid rgba(16,185,129,0.15)'}} className="flex items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-3">
-          {profile.avatar_url?<img src={profile.avatar_url} alt={profile.name} className="w-9 h-9 rounded-xl object-cover border border-zinc-700"/>:<div style={{boxShadow:'0 0 12px rgba(16,185,129,0.15)'}} className={"w-9 h-9 rounded-xl bg-gradient-to-br "+gc(profile.name)+" flex items-center justify-center text-white font-bold text-sm"}>{profile.name[0].toUpperCase()}</div>}
-          <div>
-            <div className="flex items-center gap-2"><p className="text-sm font-bold text-white">{profile.name}</p><div style={{background:'rgba(16,185,129,0.12)',border:'1px solid rgba(16,185,129,0.25)'}} className="flex items-center gap-1 px-1.5 py-0.5 rounded-md"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"/><span className="text-emerald-400 text-xs font-bold">SANDBOX</span></div></div>
-            {profile.role&&<p className="text-xs text-zinc-500 line-clamp-1">{profile.role}</p>}
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <div style={{background:'rgba(39,39,42,0.8)',border:'1px solid rgba(63,63,70,0.5)'}} className="flex rounded-lg overflow-hidden">
-            <button onClick={()=>setMode('chat')} style={{background:mode==='chat'?'rgba(16,185,129,0.15)':'transparent',color:mode==='chat'?'#34d399':'#52525b'}} className="text-xs px-3 py-1.5 font-semibold transition-all">Chat libre</button>
-            <button onClick={()=>setMode('test')} style={{background:mode==='test'?'rgba(139,92,246,0.15)':'transparent',color:mode==='test'?'#a78bfa':'#52525b'}} className="text-xs px-3 py-1.5 font-semibold transition-all">Pruebas</button>
-          </div>
-          <button onClick={onClose} className="p-1.5 text-zinc-600 hover:text-white transition-colors"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg></button>
-        </div>
-      </div>
-      {mode==='test'&&(
-        <div style={{background:'rgba(139,92,246,0.04)',borderBottom:'1px solid rgba(63,63,70,0.4)'}} className="px-4 py-3">
-          <p className="text-xs text-zinc-500 mb-2 font-semibold">Preguntas de prueba rapidas</p>
-          <div className="flex flex-wrap gap-2">{TEST_PROMPTS.map((q,i)=><button key={i} onClick={()=>send(q)} style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.5)'}} className="text-xs text-zinc-400 px-2.5 py-1.5 rounded-lg hover:border-violet-500/40 hover:text-violet-300 transition-colors">{q}</button>)}</div>
-        </div>
-      )}
-      <div className="h-72 overflow-y-auto p-4 space-y-3">
-        {messages.map((msg,i)=><div key={i} className={"flex "+(msg.role==='user'?'justify-end':'justify-start')}><div style={msg.role==='assistant'?{background:'rgba(39,39,42,0.8)',border:'1px solid rgba(63,63,70,0.5)',maxWidth:'80%'}:{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',maxWidth:'80%'}} className={"px-3 py-2.5 rounded-xl text-sm leading-relaxed "+(msg.role==='user'?'text-white':'text-zinc-100')}>{msg.content}</div></div>)}
-        {loading&&<div className="flex justify-start"><div style={{background:'rgba(39,39,42,0.8)',border:'1px solid rgba(63,63,70,0.5)'}} className="px-3 py-2.5 rounded-xl"><div className="flex gap-1 items-center">{[0,150,300].map(d=><div key={d} className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce" style={{animationDelay:d+'ms'}}/>)}</div></div></div>}
-      </div>
-      <div style={{borderTop:'1px solid rgba(63,63,70,0.4)'}} className="p-3 flex gap-2">
-        <input type="text" value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')send()}} placeholder={'Escribe a '+profile.name+'...'} disabled={loading} style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.5)',color:'white'}} className="flex-1 px-3 py-2 rounded-xl text-sm placeholder-zinc-600 focus:outline-none focus:border-emerald-500/50 transition-colors"/>
-        <button onClick={()=>send()} disabled={!input.trim()||loading} style={{background:'linear-gradient(135deg,#059669,#047857)'}} className="px-4 py-2 disabled:opacity-40 text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg></button>
-      </div>
-    </div>
-  )
-}
 
-function ProfileChat({profile,onClose}:{profile:KeeperProfile;onClose:()=>void}){
-  const [messages,setMessages]=useState<Array<{role:'user'|'assistant';content:string}>>([{role:'assistant',content:'Hola! Soy '+profile.name+'. '+(profile.role?'Mi rol es: '+profile.role+'. ':'')+' En que te ayudo?'}])
-  const [input,setInput]=useState('')
-  const [loading,setLoading]=useState(false)
-  const send=async()=>{
-    if(!input.trim()||loading)return;const userMsg=input.trim();setInput('');setMessages(prev=>[...prev,{role:'user',content:userMsg}]);setLoading(true)
-    try{const sp=[profile.name&&'Nombre: '+profile.name,profile.role&&'Rol: '+profile.role,profile.tone&&'Tono: '+profile.tone,profile.goals&&'Objetivo: '+profile.goals,(profile.rules?.length)&&'Reglas: '+profile.rules.join(', '),profile.limits&&'Limites: '+profile.limits,profile.base_memory&&'Memoria: '+profile.base_memory,profile.extra&&'Contexto: '+profile.extra].filter(Boolean).join('\n');const res=await fetch('/api/chat-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:userMsg,systemPrompt:sp,history:messages.slice(-6)})});const data=await res.json();setMessages(prev=>[...prev,{role:'assistant',content:data.reply||data.error||'Error'}])}catch(_e){setMessages(prev=>[...prev,{role:'assistant',content:'Error de conexion'}])}
+  // Scroll to bottom when messages change
+  React.useEffect(()=>{
+    bottomRef.current?.scrollIntoView({behavior:'smooth'})
+  },[messages])
+
+  async function loadConversations(){
+    setLoadingHistory(true)
+    try {
+      const res=await fetch('/api/sandbox?profile_id='+profile.id)
+      const data=await res.json()
+      const convs=data.conversations||[]
+      setConversations(convs)
+      if(convs.length>0){
+        // Load most recent conversation
+        const latest=convs[0]
+        setActiveConvId(latest.id)
+        setMessages(latest.messages||[])
+        setStatusMsg('Conversacion recuperada')
+        setTimeout(()=>setStatusMsg(''),2000)
+      } else {
+        // No conversations yet - show welcome message
+        setMessages([{role:'assistant',content:'Sandbox activo. Soy '+profile.name+(profile.role?'. Rol: '+profile.role:'')+'. Empieza cuando quieras.'}])
+        setActiveConvId(null)
+      }
+    } catch (_e) {
+      setMessages([{role:'assistant',content:'Sandbox activo. Soy '+profile.name+(profile.role?'. Rol: '+profile.role:'')+'. Empieza cuando quieras.'}])
+    }
+    setLoadingHistory(false)
+  }
+
+  async function autoSave(newMessages:Array<{role:'user'|'assistant';content:string}>){
+    if(saveTimeout.current) clearTimeout(saveTimeout.current)
+    saveTimeout.current=setTimeout(async()=>{
+      try {
+        if(activeConvId){
+          setSavingId(activeConvId)
+          await fetch('/api/sandbox',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:activeConvId,messages:newMessages})})
+          setSavingId(null)
+          // Update local conversations list
+          setConversations(prev=>prev.map(c=>c.id===activeConvId?{...c,messages:newMessages,updated_at:new Date().toISOString()}:c))
+        } else {
+          // Create new conversation
+          const firstUserMsg=newMessages.find(m=>m.role==='user')
+          const title=firstUserMsg?firstUserMsg.content.slice(0,40)+'...':'Nueva conversacion'
+          const res=await fetch('/api/sandbox',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profile_id:profile.id,title,messages:newMessages})})
+          const data=await res.json()
+          if(data.conversation){
+            setActiveConvId(data.conversation.id)
+            setConversations(prev=>[data.conversation,...prev])
+          }
+        }
+      } catch (_e) { /* noop */ }
+    },1000)
+  }
+
+  async function handleSend(){
+    if(!input.trim()||loading) return
+    const userMsg={role:'user' as const,content:input.trim()}
+    const newMessages=[...messages,userMsg]
+    setMessages(newMessages)
+    setInput('')
+    setLoading(true)
+    setStatusMsg('Pensando...')
+    try {
+      const history=messages.filter(m=>m.role==='user'||m.role==='assistant').map(m=>({role:m.role,content:m.content}))
+      const res=await fetch('/api/chat-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profileId:profile.id,message:input.trim(),history})})
+      const data=await res.json()
+      const reply=data.reply||'Sin respuesta'
+      const withReply=[...newMessages,{role:'assistant' as const,content:reply}]
+      setMessages(withReply)
+      setStatusMsg('')
+      autoSave(withReply)
+    } catch (_e) {
+      const withError=[...newMessages,{role:'assistant' as const,content:'Error al conectar. Intenta de nuevo.'}]
+      setMessages(withError)
+      setStatusMsg('')
+    }
     setLoading(false)
   }
-  return(
-    <div style={{background:'rgba(24,24,27,0.9)',border:'1px solid rgba(63,63,70,0.5)'}} className="rounded-2xl overflow-hidden">
-      <div style={{background:'rgba(39,39,42,0.4)',borderBottom:'1px solid rgba(63,63,70,0.4)'}} className="flex items-center gap-3 px-4 py-3">
-        {profile.avatar_url?<img src={profile.avatar_url} alt={profile.name} className="w-8 h-8 rounded-xl object-cover border border-zinc-700"/>:<div style={{boxShadow:'0 0 12px rgba(139,92,246,0.15)'}} className={"w-8 h-8 rounded-xl bg-gradient-to-br "+gc(profile.name)+" flex items-center justify-center text-white font-bold text-xs"}>{profile.name[0].toUpperCase()}</div>}
-        <div><p className="text-sm font-semibold text-white">{profile.name}</p>{profile.role&&<p className="text-xs text-zinc-500 line-clamp-1">{profile.role}</p>}</div>
-        <div className="ml-auto flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"/><span className="text-xs text-zinc-600">activo</span><button onClick={onClose} className="p-1 text-zinc-600 hover:text-white transition-colors ml-1"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg></button></div>
-      </div>
-      <div className="h-64 overflow-y-auto p-4 space-y-3">
-        {messages.map((msg,i)=><div key={i} className={"flex "+(msg.role==='user'?'justify-end':'justify-start')}><div style={msg.role==='assistant'?{background:'rgba(39,39,42,0.8)',border:'1px solid rgba(63,63,70,0.5)'}:{background:'linear-gradient(135deg,#7c3aed,#6d28d9)'}} className={"max-w-xs px-3 py-2 rounded-xl text-sm "+(msg.role==='user'?'text-white':'text-zinc-200')}>{msg.content}</div></div>)}
-        {loading&&<div className="flex justify-start"><div style={{background:'rgba(39,39,42,0.8)',border:'1px solid rgba(63,63,70,0.5)'}} className="px-3 py-2 rounded-xl"><div className="flex gap-1">{[0,150,300].map(d=><div key={d} className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-bounce" style={{animationDelay:d+'ms'}}/>)}</div></div></div>}
-      </div>
-      <div style={{borderTop:'1px solid rgba(63,63,70,0.4)'}} className="p-3 flex gap-2">
-        <input type="text" value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')send()}} placeholder={'Escribele a '+profile.name+'...'} disabled={loading} style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.5)',color:'white'}} className="flex-1 px-3 py-2 rounded-xl text-sm placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors"/>
-        <button onClick={send} disabled={!input.trim()||loading} style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)'}} className="px-4 py-2 disabled:opacity-40 text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg></button>
+
+  async function handleNewConversation(){
+    // Save current if has real messages
+    const realMessages=messages.filter(m=>m.role==='user')
+    if(realMessages.length>0 && activeConvId){
+      // Already saved via auto-save
+    }
+    // Start fresh
+    setActiveConvId(null)
+    setMessages([{role:'assistant',content:'Nueva conversacion. Soy '+profile.name+(profile.role?'. Rol: '+profile.role:'')+'. Listo.'}])
+    setShowHistory(false)
+    setStatusMsg('Nueva conversacion iniciada')
+    setTimeout(()=>setStatusMsg(''),2000)
+  }
+
+  async function handleLoadConversation(conv:{id:string;title:string;messages:Array<{role:'user'|'assistant';content:string}>;updated_at:string}){
+    setActiveConvId(conv.id)
+    setMessages(conv.messages||[])
+    setShowHistory(false)
+    setStatusMsg('Conversacion cargada')
+    setTimeout(()=>setStatusMsg(''),2000)
+  }
+
+  async function handleDeleteConversation(convId:string,e:React.MouseEvent){
+    e.stopPropagation()
+    await fetch('/api/sandbox?id='+convId,{method:'DELETE'})
+    setConversations(prev=>prev.filter(c=>c.id!==convId))
+    if(activeConvId===convId){
+      setActiveConvId(null)
+      setMessages([{role:'assistant',content:'Conversacion eliminada. Empieza una nueva.'}])
+    }
+  }
+
+  function formatTime(iso:string){
+    try {
+      const d=new Date(iso)
+      const now=new Date()
+      const diff=now.getTime()-d.getTime()
+      if(diff<60000) return 'ahora'
+      if(diff<3600000) return Math.floor(diff/60000)+'m'
+      if(diff<86400000) return Math.floor(diff/3600000)+'h'
+      return Math.floor(diff/86400000)+'d'
+    } catch (_e) { return '' }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-sm">
+      <div className="bg-zinc-900 border border-zinc-700 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-2xl flex flex-col" style={{height:'85vh',maxHeight:'700px'}}>
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 flex-shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-violet-600/20 border border-violet-600/30 flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-white truncate">{profile.name}</p>
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse"/>
+                <p className="text-xs text-zinc-500">{loadingHistory?'Cargando...':(statusMsg||'Sandbox activo')}</p>
+                {savingId&&<p className="text-xs text-zinc-600">Guardando...</p>}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-1">
+            <button onClick={()=>setShowHistory(!showHistory)} className={"p-2 rounded-lg text-xs transition-all flex items-center gap-1 "+(showHistory?'bg-violet-600/20 text-violet-400':'text-zinc-400 hover:text-white hover:bg-zinc-800')} title="Historial">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span className="hidden sm:inline text-xs">{conversations.length}</span>
+            </button>
+            <button onClick={handleNewConversation} className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-lg transition-all" title="Nueva conversacion">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
+            </button>
+            <button onClick={onClose} className="p-2 text-zinc-500 hover:text-white hover:bg-zinc-800 rounded-lg transition-all">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+        </div>
+
+        {/* History Panel */}
+        {showHistory&&(
+          <div className="border-b border-zinc-800 bg-zinc-950 flex-shrink-0 max-h-48 overflow-y-auto">
+            {conversations.length===0?(
+              <p className="text-zinc-500 text-xs text-center py-4">Sin conversaciones guardadas</p>
+            ):(
+              <div className="p-2 space-y-1">
+                {conversations.map(conv=>(
+                  <button key={conv.id} onClick={()=>handleLoadConversation(conv)} className={"w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-left transition-all "+(activeConvId===conv.id?'bg-violet-600/20 border border-violet-600/30':'hover:bg-zinc-800 border border-transparent')}>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs text-zinc-200 truncate">{conv.title}</p>
+                      <p className="text-xs text-zinc-600">{formatTime(conv.updated_at)} &middot; {(conv.messages||[]).filter(m=>m.role==='user').length} msgs</p>
+                    </div>
+                    <button onClick={(e)=>handleDeleteConversation(conv.id,e)} className="p-1 text-zinc-600 hover:text-red-400 flex-shrink-0 rounded transition-colors">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          {loadingHistory?(
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"/>
+                <p className="text-zinc-500 text-xs">Cargando memoria...</p>
+              </div>
+            </div>
+          ):messages.map((msg,i)=>(
+            <div key={i} className={"flex "+(msg.role==='user'?'justify-end':'justify-start')}>
+              <div className={"max-w-xs sm:max-w-sm px-3 py-2 rounded-2xl text-sm "+(msg.role==='user'?'bg-violet-600 text-white rounded-br-sm':'bg-zinc-800 text-zinc-100 rounded-bl-sm')}>
+                {msg.content}
+              </div>
+            </div>
+          ))}
+          {loading&&(
+            <div className="flex justify-start">
+              <div className="bg-zinc-800 px-3 py-2 rounded-2xl rounded-bl-sm">
+                <div className="flex gap-1 items-center h-4">
+                  <div className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{animationDelay:'0ms'}}/>
+                  <div className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{animationDelay:'150ms'}}/>
+                  <div className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{animationDelay:'300ms'}}/>
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={bottomRef}/>
+        </div>
+
+        {/* Input */}
+        <div className="px-4 pb-4 pt-3 border-t border-zinc-800 flex-shrink-0">
+          <div className="flex gap-2 items-end">
+            <textarea
+              value={input}
+              onChange={e=>setInput(e.target.value)}
+              onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleSend()}}}
+              placeholder="Escribe un mensaje..."
+              rows={1}
+              disabled={loading||loadingHistory}
+              className="flex-1 px-4 py-2.5 bg-zinc-800 border border-zinc-700 focus:border-violet-500 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none resize-none transition-colors disabled:opacity-50"
+              style={{minHeight:'40px',maxHeight:'120px'}}
+            />
+            <button onClick={handleSend} disabled={loading||loadingHistory||!input.trim()} className="p-2.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white rounded-xl transition-all flex-shrink-0">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            </button>
+          </div>
+          <p className="text-xs text-zinc-700 mt-1.5 text-center">Enter para enviar &middot; Shift+Enter para nueva linea &middot; Auto-guardado activo</p>
+        </div>
       </div>
     </div>
   )
