@@ -54,7 +54,11 @@ export async function POST(request: Request) {
     }
     let rawJson = text.slice(jsonStart, jsonEnd + 1)
 
-    // Layer 3: escape real newlines/tabs inside string values
+    // Layer 3 (pre-sanitize): replace bare real newlines with space before regex parsing
+    // This fixes: "Bad control character in string literal in JSON"
+    rawJson = rawJson.replace(/(?<!\\)\n/g, ' ').replace(/(?<!\\)\r/g, ' ')
+
+    // Layer 4: escape real newlines/tabs inside string values
     rawJson = rawJson.replace(/"((?:[^"\\\r\n]|\\.)*)"/g, (_match: string, inner: string) => {
       const sanitized = inner
         .replace(/\n/g, '\\n')
@@ -63,7 +67,7 @@ export async function POST(request: Request) {
       return '"' + sanitized + '"'
     })
 
-    // Layer 4: strip remaining control chars U+0000-U+001F
+    // Layer 5: strip remaining control chars U+0000-U+001F
     rawJson = rawJson.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '')
 
     let analysis: Record<string, unknown>
