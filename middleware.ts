@@ -13,21 +13,32 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
 
   // Protect app routes (require login)
-  const protectedPrefixes = ['/dashboard', '/profiles', '/lab', '/forge', '/account', '/contexts']
+  const protectedPrefixes = ['/dashboard', '/profiles', '/lab', '/forge', '/account', '/contexts', '/onboarding']
   const isProtected = protectedPrefixes.some(p => pathname.startsWith(p))
 
-  if (!session && isProtected) {
+  if (isProtected && !session) {
     return NextResponse.redirect(new URL('/login', req.url))
   }
 
-  // Redirect logged-in users away from login/landing
-  if (session && (pathname === '/login' || pathname === '/')) {
+  // Redirect logged-in users away from auth pages
+  const authPaths = ['/login', '/signup', '/register']
+  const isAuthPage = authPaths.some(p => pathname.startsWith(p))
+
+  if (isAuthPage && session) {
     return NextResponse.redirect(new URL('/dashboard', req.url))
+  }
+
+  // Handle keeper.forum domain routing
+  const host = req.headers.get('host') || ''
+  if (host === 'keeper.forum' && pathname === '/') {
+    if (session) {
+      return NextResponse.redirect(new URL('/dashboard', req.url))
+    }
   }
 
   return res
 }
 
 export const config = {
-  matcher: ['/', '/login', '/dashboard/:path*', '/profiles/:path*', '/lab/:path*', '/forge/:path*', '/account/:path*', '/contexts/:path*'],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\..*).*)']
 }
