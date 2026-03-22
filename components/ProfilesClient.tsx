@@ -246,7 +246,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
     if(!forgeProfile)return;setForgeLoading(true);setForgeError('');setForgeResult(null);setForgeLoadMsg(0)
     forgeTimerRef.current=setInterval(()=>setForgeLoadMsg(p=>(p+1)%4),1800)
     const scenarioToUse=forgeMode==='scenario'?(forgeCustomScenario.trim()||forgeScenario):''
-    try{const res=await fetch('/api/forge-simulate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profile:forgeProfile,mode:forgeMode,scenario:scenarioToUse})});const data=await res.json();if(data.result)setForgeResult(data.result);supabase.from('forge_results').insert({profile_id:forgeProfile?.id,mode:forgeMode,result:data.result,scenario:forgeScenario}).then(()=>{}).catch(()=>{});else setForgeError(data.error||'Error en simulacion')}catch(_e){setForgeError('Error de conexion')}
+    try{const res=await fetch('/api/forge-simulate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profile:forgeProfile,mode:forgeMode,scenario:scenarioToUse})});const data=await res.json();if(data.result){setForgeResult(data.result);supabase.from('forge_results').insert({profile_id:forgeProfile?.id,mode:forgeMode,result:data.result,scenario:forgeScenario}).then(()=>{}).catch(()=>{})}else setForgeError(data.error||'Error en simulacion')}catch(_e){setForgeError('Error de conexion')}
     if(forgeTimerRef.current)clearInterval(forgeTimerRef.current)
     setForgeLoading(false)
   }
