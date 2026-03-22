@@ -60,8 +60,11 @@ Responde UNICAMENTE con el JSON, sin markdown, sin backticks, sin texto adiciona
     }
     let rawJson = text.slice(jsonStart, jsonEnd + 1)
 
-    // Layer 3: sanitize control characters inside JSON string values
-    // First pass: escape \n \r \t
+    // Layer 3 (pre-sanitize): replace bare real newlines with space before regex parsing
+    // This fixes: "Bad control character in string literal in JSON"
+    rawJson = rawJson.replace(/(?<!\\)\n/g, ' ').replace(/(?<!\\)\r/g, ' ')
+
+    // Layer 4: sanitize control characters inside JSON string values
     rawJson = rawJson.replace(/"((?:[^"\\\r\n]|\\.)*)"/g, (_match: string, inner: string) => {
       const sanitized = inner
         .replace(/\n/g, '\\n')
@@ -70,7 +73,7 @@ Responde UNICAMENTE con el JSON, sin markdown, sin backticks, sin texto adiciona
       return '"' + sanitized + '"'
     })
 
-    // Layer 4: strip remaining control chars U+0000-U+001F (except legal escapes already present)
+    // Layer 5: strip remaining control chars U+0000-U+001F
     rawJson = rawJson.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '')
 
     let profile: Record<string, unknown>
