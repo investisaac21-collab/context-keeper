@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     if (!content) return NextResponse.json({ error: 'Contenido requerido' }, { status: 400 })
 
     const systemPrompt = type === 'profile'
-      ? `Eres un experto en ingenieria de prompts e identidades de IA. Analiza el perfil de IA del usuario y devuelve un JSON en UNA SOLA LINEA con exactamente esta estructura: {"score":8,"clarity":8,"consistency":7,"completeness":6,"effectiveness":9,"strengths":["punto especifico 1","punto especifico 2"],"improvements":["mejora concreta con texto exacto 1","mejora concreta con texto exacto 2"],"optimized":"version mejorada del perfil lista para copiar","tip":"consejo clave actionable en una frase"}. CRITICO: score/clarity/consistency/completeness/effectiveness son numeros del 1 al 10. Las mejoras deben ser ESPECIFICAS con texto exacto a cambiar o anadir, no consejos genericos. El JSON debe estar en una sola linea. Responde SOLO el JSON.`
+      ? `Eres un experto en ingenieria de prompts e identidades de IA. Analiza el perfil de IA del usuario y devuelve un JSON en UNA SOLA LINEA con exactamente esta estructura: {"score":8,"clarity":8,"consistency":7,"completeness":6,"effectiveness":9,"strengths":["punto 1","punto 2"],"improvements":["mejora especifica 1","mejora especifica 2"],"optimized":"version mejorada del perfil lista para usar","tip":"consejo clave actionable en una frase"}. CRITICO: score/clarity/consistency/completeness/effectiveness son numeros del 1 al 10. Las mejoras deben ser ESPECIFICAS con texto exacto a cambiar o anadir, no consejos genericos. El JSON debe estar en una sola linea. Responde SOLO el JSON.`
       : `Eres un experto en ingenieria de contexto para IAs. Analiza el contexto del usuario y devuelve un JSON en UNA SOLA LINEA con exactamente esta estructura: {"score":8,"clarity":8,"consistency":7,"completeness":6,"effectiveness":9,"strengths":["punto 1","punto 2"],"improvements":["mejora 1","mejora 2"],"optimized":"version mejorada del contexto lista para usar","tip":"consejo clave en una frase","variables":["{{variable1}}","{{variable2}}"]}. CRITICO: Todos los scores del 1 al 10. JSON en una sola linea sin saltos de linea reales. Responde SOLO el JSON, sin markdown.`
 
     const response = await fetch(GROQ_URL, {
@@ -43,10 +43,10 @@ export async function POST(request: Request) {
     const groqData = await response.json()
     const rawText = groqData.choices[0]?.message?.content || '{}'
 
-    // Strip markdown fences
+    // Layer 1: strip markdown fences
     let text = rawText.replace(/```(?:json)?\s*/gi, '').replace(/```\s*/g, '').trim()
 
-    // Find JSON boundaries
+    // Layer 2: find JSON boundaries
     const jsonStart = text.indexOf('{')
     const jsonEnd = text.lastIndexOf('}')
     if (jsonStart === -1 || jsonEnd === -1) {
@@ -54,7 +54,7 @@ export async function POST(request: Request) {
     }
     let rawJson = text.slice(jsonStart, jsonEnd + 1)
 
-    // Sanitize control characters inside JSON string values
+    // Layer 3: escape real newlines/tabs inside string values
     rawJson = rawJson.replace(/"((?:[^"\\\r\n]|\\.)*)"/g, (_match: string, inner: string) => {
       const sanitized = inner
         .replace(/\n/g, '\\n')
@@ -62,6 +62,9 @@ export async function POST(request: Request) {
         .replace(/\t/g, '\\t')
       return '"' + sanitized + '"'
     })
+
+    // Layer 4: strip remaining control chars U+0000-U+001F
+    rawJson = rawJson.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '')
 
     let analysis: Record<string, unknown>
     try {
