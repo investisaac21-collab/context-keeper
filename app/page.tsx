@@ -6,7 +6,7 @@ export default function Home() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => { entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add('in-view') }) },
-      { threshold: 0.08 }
+      { threshold: 0, rootMargin: "50px 0px 50px 0px" }
     )
     document.querySelectorAll('.fade-section').forEach((el) => observer.observe(el))
     return () => observer.disconnect()
