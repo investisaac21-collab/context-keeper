@@ -295,9 +295,9 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                         <div>
                           <div className="font-bold text-white text-sm leading-tight mb-1">{p.name}</div>
                           <div className="flex items-center gap-1.5 flex-wrap">
-                            <div style={{background:'rgba(139,92,246,0.1)',border:'1px solid rgba(139,92,246,0.2)'}} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md"><svg width="9" height="9" fill="none" stroke="rgba(167,139,250,0.8)" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={ti.icon}/></svg><span className="text-violet-400 text-xs font-medium">{ti.label}</span></div>
+                            <div style={{background:ti.id==='npc'?'rgba(34,197,94,0.1)':ti.id==='brand'?'rgba(139,92,246,0.12)':ti.id==='assistant'?'rgba(59,130,246,0.1)':ti.id==='support'?'rgba(6,182,212,0.1)':ti.id==='dev'?'rgba(251,191,36,0.1)':ti.id==='character'?'rgba(236,72,153,0.1)':'rgba(113,113,122,0.1)',border:ti.id==='npc'?'1px solid rgba(34,197,94,0.25)':ti.id==='brand'?'1px solid rgba(139,92,246,0.3)':ti.id==='assistant'?'1px solid rgba(59,130,246,0.25)':ti.id==='support'?'1px solid rgba(6,182,212,0.25)':ti.id==='dev'?'1px solid rgba(251,191,36,0.25)':ti.id==='character'?'1px solid rgba(236,72,153,0.25)':'1px solid rgba(113,113,122,0.2)'}} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md"><svg width="9" height="9" fill="none" stroke={ti.id==='npc'?'rgba(134,239,172,0.9)':ti.id==='brand'?'rgba(167,139,250,0.9)':ti.id==='assistant'?'rgba(147,197,253,0.9)':ti.id==='support'?'rgba(103,232,249,0.9)':ti.id==='dev'?'rgba(253,230,138,0.9)':ti.id==='character'?'rgba(249,168,212,0.9)':'rgba(161,161,170,0.7)'} strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={ti.icon}/></svg><span style={{color:ti.id==='npc'?'rgba(134,239,172,0.9)':ti.id==='brand'?'rgba(167,139,250,0.9)':ti.id==='assistant'?'rgba(147,197,253,0.9)':ti.id==='support'?'rgba(103,232,249,0.9)':ti.id==='dev'?'rgba(253,230,138,0.9)':ti.id==='character'?'rgba(249,168,212,0.9)':'rgba(161,161,170,0.7)',fontSize:11,fontWeight:500}} >{ti.label}</span></div>
                             {hasAdv&&<div style={{background:'rgba(16,185,129,0.08)',border:'1px solid rgba(16,185,129,0.2)'}} className="inline-flex items-center px-1.5 py-0.5 rounded-md"><span className="text-emerald-500 text-xs font-medium">+adv</span></div>}
-                            {p.lab_score&&<div style={{background:'rgba(139,92,246,0.12)',border:'1px solid rgba(139,92,246,0.25)'}} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md"><span className="text-violet-300 text-xs font-bold">{p.lab_score}</span><span className="text-violet-600 text-xs">/10</span></div>}
+                            {p.lab_score?(<div style={{background:Number(p.lab_score)>=8?'rgba(34,197,94,0.12)':Number(p.lab_score)>=6?'rgba(251,191,36,0.12)':'rgba(239,68,68,0.12)',border:Number(p.lab_score)>=8?'1px solid rgba(34,197,94,0.3)':Number(p.lab_score)>=6?'1px solid rgba(251,191,36,0.3)':'1px solid rgba(239,68,68,0.3)',borderRadius:6,padding:'2px 7px',display:'inline-flex',alignItems:'center',gap:4}}><span style={{width:5,height:5,borderRadius:'50%',background:Number(p.lab_score)>=8?'#22c55e':Number(p.lab_score)>=6?'#fbbf24':'#ef4444',display:'inline-block',flexShrink:0}}></span><span style={{color:Number(p.lab_score)>=8?'#86efac':Number(p.lab_score)>=6?'#fde68a':'#fca5a5',fontSize:11,fontWeight:700,letterSpacing:'0.02em'}}>{Number(p.lab_score)>=8?'SOLIDO':Number(p.lab_score)>=6?'ACEPT.':'FRAGIL'}</span><span style={{color:'rgba(255,255,255,0.3)',fontSize:10,marginLeft:2}}>{p.lab_score}</span></div>):(<div style={{display:'inline-flex',alignItems:'center',gap:4,padding:'2px 7px',borderRadius:6,border:'1px solid rgba(251,146,60,0.25)',background:'rgba(251,146,60,0.07)'}}><span style={{width:5,height:5,borderRadius:'50%',background:'#fb923c',display:'inline-block',flexShrink:0}}></span><span style={{color:'rgba(251,146,60,0.85)',fontSize:11,fontWeight:600}}>Sin analizar</span></div>)}
                           </div>
                         </div>
                       </div>
@@ -319,33 +319,42 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                       {p.lab_score!=null&&<div style={{background:p.lab_score>=75?'rgba(16,185,129,0.12)':p.lab_score>=50?'rgba(245,158,11,0.12)':'rgba(239,68,68,0.1)',border:'1px solid '+( p.lab_score>=75?'rgba(16,185,129,0.25)':p.lab_score>=50?'rgba(245,158,11,0.25)':'rgba(239,68,68,0.2)'),color:p.lab_score>=75?'#34d399':p.lab_score>=50?'#fbbf24':'#f87171'}} className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-bold leading-none"><svg width="7" height="7" fill="currentColor" viewBox="0 0 24 24"><path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>{p.lab_score}</div>}
                     </div>
                     <div className="space-y-2 mt-1">
-                      <div className="flex gap-1.5">
+                      <div style={{display:'flex',gap:8}}>
                         <button
                           onClick={()=>{setLabProfile(p);setLabResult(null);setLabError('');setLabAnimated(false)}}
-                          style={{flex:1,background:'rgba(59,130,246,0.1)',border:'1px solid rgba(59,130,246,0.25)',color:'rgba(147,197,253,0.9)',padding:'6px 0',borderRadius:8,fontSize:12,fontWeight:600,letterSpacing:'0.02em',display:'flex',alignItems:'center',justifyContent:'center',gap:5,cursor:'pointer',transition:'all 0.15s'}}
-                          onMouseOver={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(59,130,246,0.18)'}}
-                          onMouseOut={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(59,130,246,0.1)'}}
+                          style={{flex:1,background:'rgba(59,130,246,0.1)',border:'1px solid rgba(59,130,246,0.28)',color:'rgba(147,197,253,0.95)',padding:'9px 0 8px',borderRadius:10,cursor:'pointer',transition:'all 0.15s',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:2}}
+                          onMouseOver={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(59,130,246,0.18)';(e.currentTarget as HTMLButtonElement).style.borderColor='rgba(59,130,246,0.5)'}}
+                          onMouseOut={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(59,130,246,0.1)';(e.currentTarget as HTMLButtonElement).style.borderColor='rgba(59,130,246,0.28)'}}
                         >
-                          <svg style={{width:11,height:11}} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                          Lab{p.lab_score?<span style={{fontSize:10,opacity:0.7,marginLeft:2}}>{p.lab_score}</span>:null}
+                          <div style={{display:'flex',alignItems:'center',gap:5}}>
+                            <svg style={{width:12,height:12}} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                            <span style={{fontSize:12,fontWeight:700,letterSpacing:'0.04em'}}>Lab</span>
+                          </div>
+                          <span style={{fontSize:9,color:'rgba(147,197,253,0.5)',fontWeight:400,letterSpacing:'0.02em'}}>Analizar coherencia</span>
                         </button>
                         {isPro?(
                           <button
                             onClick={()=>openForge(p)}
-                            style={{flex:1,background:'rgba(251,191,36,0.08)',border:'1px solid rgba(251,191,36,0.22)',color:'rgba(253,230,138,0.9)',padding:'6px 0',borderRadius:8,fontSize:12,fontWeight:600,letterSpacing:'0.02em',display:'flex',alignItems:'center',justifyContent:'center',gap:5,cursor:'pointer',transition:'all 0.15s'}}
-                            onMouseOver={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(251,191,36,0.15)'}}
-                            onMouseOut={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(251,191,36,0.08)'}}
+                            style={{flex:1,background:'rgba(251,191,36,0.1)',border:'1px solid rgba(251,191,36,0.28)',color:'rgba(253,230,138,0.95)',padding:'9px 0 8px',borderRadius:10,cursor:'pointer',transition:'all 0.15s',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:2}}
+                            onMouseOver={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(251,191,36,0.18)';(e.currentTarget as HTMLButtonElement).style.borderColor='rgba(251,191,36,0.5)'}}
+                            onMouseOut={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(251,191,36,0.1)';(e.currentTarget as HTMLButtonElement).style.borderColor='rgba(251,191,36,0.28)'}}
                           >
-                            <svg style={{width:11,height:11}} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                            Forge
+                            <div style={{display:'flex',alignItems:'center',gap:5}}>
+                              <svg style={{width:12,height:12}} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                              <span style={{fontSize:12,fontWeight:700,letterSpacing:'0.04em'}}>Forge</span>
+                            </div>
+                            <span style={{fontSize:9,color:'rgba(253,230,138,0.5)',fontWeight:400,letterSpacing:'0.02em'}}>Simular escenario</span>
                           </button>
                         ):(
                           <div
-                            style={{flex:1,background:'rgba(251,191,36,0.03)',border:'1px solid rgba(251,191,36,0.08)',color:'rgba(253,230,138,0.3)',padding:'6px 0',borderRadius:8,fontSize:12,fontWeight:600,display:'flex',alignItems:'center',justifyContent:'center',gap:5,cursor:'not-allowed'}}
+                            style={{flex:1,background:'rgba(251,191,36,0.03)',border:'1px solid rgba(251,191,36,0.1)',color:'rgba(253,230,138,0.3)',padding:'9px 0 8px',borderRadius:10,cursor:'not-allowed',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:2}}
                             title="Disponible en Pro"
                           >
-                            <svg style={{width:10,height:10}} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                            Forge
+                            <div style={{display:'flex',alignItems:'center',gap:5}}>
+                              <svg style={{width:10,height:10}} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                              <span style={{fontSize:12,fontWeight:700,letterSpacing:'0.04em'}}>Forge</span>
+                            </div>
+                            <span style={{fontSize:9,color:'rgba(253,230,138,0.25)',fontWeight:400}}>Solo Pro</span>
                           </div>
                         )}
                       </div>
@@ -364,7 +373,9 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                         >Export</button>
                         <button
                           onClick={()=>{if(sandboxProfile?.id===p.id){setSandboxProfile(null)}else{setSandboxProfile(p)}}}
-                          style={{flex:1,background:sandboxProfile?.id===p.id?'rgba(34,197,94,0.1)':'transparent',border:sandboxProfile?.id===p.id?'1px solid rgba(34,197,94,0.25)':'1px solid rgba(255,255,255,0.07)',color:sandboxProfile?.id===p.id?'rgba(134,239,172,0.9)':'rgba(255,255,255,0.4)',padding:'5px 0',borderRadius:6,fontSize:11,cursor:'pointer',transition:'all 0.15s'}}
+                          style={{flex:1,background:sandboxProfile?.id===p.id?'rgba(34,197,94,0.1)':'transparent',border:sandboxProfile?.id===p.id?'1px solid rgba(34,197,94,0.25)':'1px solid rgba(255,255,255,0.07)',color:sandboxProfile?.id===p.id?'rgba(134,239,172,0.8)':'rgba(255,255,255,0.4)',padding:'5px 0',borderRadius:6,fontSize:11,cursor:'pointer',transition:'all 0.15s'}}
+                          onMouseOver={e=>{(e.currentTarget as HTMLButtonElement).style.color=sandboxProfile?.id===p.id?'rgba(134,239,172,1)':'rgba(255,255,255,0.7)'}}
+                          onMouseOut={e=>{(e.currentTarget as HTMLButtonElement).style.color=sandboxProfile?.id===p.id?'rgba(134,239,172,0.8)':'rgba(255,255,255,0.4)'}}
                         >Chat</button>
                       </div>
                     </div>
