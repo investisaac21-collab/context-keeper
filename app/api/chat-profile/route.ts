@@ -1,23 +1,63 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
-export async function POST(req: NextRequest) {
+
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+
+export async function POST(request: Request) {
+  const supabase = createRouteHandlerClient({ cookies })
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+
+  const { profileId, message, history } = await request.json()
+  if (!profileId || !message) return NextResponse.json({ error: 'Datos requeridos' }, { status: 400 })
+
+  const { data: profile } = await supabase
+    .from('keeper_profiles')
+    .select('*')
+    .eq('id', profileId)
+    .eq('user_id', session.user.id)
+    .single()
+
+  if (!profile) return NextResponse.json({ error: 'Perfil no encontrado' }, { status: 404 })
+
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) return NextResponse.json({ error: 'API key no configurada' }, { status: 500 })
+
+  const systemPrompt = `Eres ${profile.name}. Tu rol es: ${profile.role}.
+
+${profile.context}
+
+${profile.rules ? `REGLAS DE COMPORTAMIENTO:\n${profile.rules}\n` : ''}
+${profile.variables?.length > 0 ? `VARIABLES DISPONIBLES:\n${profile.variables.map((v: {name: string, example: string}) => `- ${v.name}: ${v.example}`).join('\n')}` : ''}
+
+Mantente siempre en el personaje. Responde de manera natural y coherente con tu rol.`
+
+  const chatHistory = (history || []).map((msg: { role: string; content: string }) => ({
+    role: msg.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: msg.content }]
+  }))
+
+  chatHistory.push({ role: 'user', parts: [{ text: message }] })
+
+  let responseText = ''
   try {
-    const supabase = createRouteHandlerClient({ cookies })
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
-    const { message, systemPrompt, history = [] } = await req.json()
-    if (!message) return NextResponse.json({ error: 'Mensaje requerido' }, { status: 400 })
-    const groqKey = process.env.GROQ_API_KEY
-    if (!groqKey) return NextResponse.json({ error: 'GROQ no configurado' }, { status: 500 })
-    const messages = [{ role: 'system', content: systemPrompt || 'Eres un asistente de IA. Responde siempre en el idioma del usuario.' }, ...history.map((m: { role: string; content: string }) => ({ role: m.role, content: m.content })), { role: 'user', content: message }]
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method:'POST', headers:{Authorization:'Bearer '+groqKey,'Content-Type':'application/json'},
-      body:JSON.stringify({ model:'llama-3.3-70b-versatile', messages, max_tokens:800, temperature:0.7 })
+    const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: chatHistory,
+        generationConfig: { temperature: 0.7, maxOutputTokens: 800 }
+      })
     })
     const data = await res.json()
-    if (!res.ok) return NextResponse.json({ error: data.error?.message||'Error de GROQ' }, { status: 500 })
-    const reply = data.choices?.[0]?.message?.content || 'Sin respuesta'
-    return NextResponse.json({ reply })
-  } catch (err) { return NextResponse.json({ error: err instanceof Error?err.message:'Error desconocido' }, { status: 500 }) }
+    responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+  } catch (_e) {
+    return NextResponse.json({ error: 'Error de conexion con Gemini' }, { status: 500 })
+  }
+
+  if (!responseText) return NextResponse.json({ error: 'No se pudo generar respuesta' }, { status: 500 })
+
+  return NextResponse.json({ response: responseText })
 }

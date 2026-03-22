@@ -1,54 +1,78 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
 
-export async function POST(req: NextRequest) {
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+
+function sanitizeJson(raw: string): string {
+  let text = raw.replace(/```(?:json)?\s*/gi, '').replace(/```\s*/g, '').trim()
+  const s = text.indexOf('{'), e = text.lastIndexOf('}')
+  if (s === -1 || e === -1) return ''
+  let j = text.slice(s, e + 1)
+  j = j.replace(/(?<!\\)\n/g, ' ').replace(/(?<!\\)\r/g, ' ')
+  j = j.replace(/"((?:[^"\\\r\n]|\\.)*)"/g, (_m: string, inner: string) =>
+    '"' + inner.replace(/\n/g,'\\n').replace(/\r/g,'\\r').replace(/\t/g,'\\t') + '"'
+  )
+  j = j.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '')
+  return j
+}
+
+export async function POST(request: Request) {
+  const supabase = createRouteHandlerClient({ cookies })
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return NextResponse.json({ error: 'No autenticado' }, { status: 401 })
+
+  const { description } = await request.json()
+  if (!description) return NextResponse.json({ error: 'Descripcion requerida' }, { status: 400 })
+
+  const apiKey = process.env.GEMINI_API_KEY
+  if (!apiKey) return NextResponse.json({ error: 'API key no configurada' }, { status: 500 })
+
+  const prompt = `Eres un generador de perfiles de IA para un sistema llamado Keeper. Dado una descripcion, genera un perfil JSON estructurado.
+
+DESCRIPCION: "${description}"
+
+REGLAS CRITICAS:
+- Si la descripcion contiene contenido sexual, violento, ilegal o inapropiado, responde EXACTAMENTE: {"error":"Este tipo de perfil no esta disponible en Keeper"}
+- De lo contrario, genera un perfil profesional y util
+- Responde SOLO con JSON valido en UNA SOLA LINEA, sin markdown, sin explicaciones
+
+FORMATO (una sola linea):
+{"name":"[nombre corto y memorable]","role":"[rol profesional conciso]","context":"[descripcion del perfil en 2-3 oraciones]","rules":"[reglas de comportamiento en una oracion]","variables":[{"name":"nombre_var","description":"descripcion","example":"ejemplo"}]}
+
+Maximo 2 variables relevantes. Todo en el mismo idioma que la descripcion.`
+
+  let raw = ''
   try {
-    const { description } = await req.json()
-    if (!description || description.trim().length < 5) {
-      return NextResponse.json({ error: 'Descripcion demasiado corta' }, { status: 400 })
-    }
-    const apiKey = process.env.GROQ_API_KEY
-    if (!apiKey) return NextResponse.json({ error: 'API key no configurada' }, { status: 500 })
-
-    const systemPrompt = `Eres un experto en diseno de personajes y asistentes de IA para uso profesional.
-Tu tarea es generar los campos de un perfil de asistente IA basandote en la descripcion del usuario.
-Keeper es una plataforma profesional. Solo generas perfiles con proposito laboral, creativo o educativo.
-Si la descripcion solicita contenido sexual, violento, ilegal o inapropiado, responde SOLO con: {"error":"Este tipo de perfil no esta disponible en Keeper"}
-
-Responde SOLO con un objeto JSON valido en una sola linea, sin saltos de linea reales dentro de los valores:
-{"name":"Nombre corto","role":"Rol y expertise en 1-2 frases","tone":"Tono y estilo","rules":"Regla 1\\nRegla 2\\nRegla 3","extra":"Contexto adicional"}
-
-CRITICO: El JSON debe estar en UNA SOLA LINEA. NO uses saltos de linea reales dentro de strings. Usa \\n para separar reglas.
-Responde UNICAMENTE con el JSON, sin markdown, sin backticks, sin texto adicional.`
-
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: 'llama-3.1-8b-instant', messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: description.trim() }], max_tokens: 400, temperature: 0.6 }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: { temperature: 0.6, maxOutputTokens: 500 }
+      })
     })
-    const data = await response.json()
-    if (!response.ok) return NextResponse.json({ error: data.error?.message || 'Error de GROQ' }, { status: 500 })
-
-    const raw = data.choices?.[0]?.message?.content || ''
-    let text = raw.replace(/```(?:json)?\s*/gi, '').replace(/```\s*/g, '').trim()
-    const jsonStart = text.indexOf('{'), jsonEnd = text.lastIndexOf('}')
-    if (jsonStart === -1 || jsonEnd === -1) return NextResponse.json({ error: 'Describe un perfil profesional o creativo para continuar' }, { status: 400 })
-    let rawJson = text.slice(jsonStart, jsonEnd + 1)
-    rawJson = rawJson.replace(/(?<!\\)\n/g, ' ').replace(/(?<!\\)\r/g, ' ')
-    rawJson = rawJson.replace(/"((?:[^"\\\r\n]|\\.)*)"/g, (_match: string, inner: string) => '"' + inner.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t') + '"')
-    rawJson = rawJson.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '')
-
-    let profile: Record<string, unknown>
-    try { profile = JSON.parse(rawJson) }
-    catch (_e) {
-      const nm = raw.match(/"name"\s*:\s*"([^"\n\r]+)"/)
-      const rl = raw.match(/"role"\s*:\s*"([^"\n\r]+)"/)
-      const tn = raw.match(/"tone"\s*:\s*"([^"\n\r]+)"/)
-      if (nm) { profile = { name: nm[1], role: rl?.[1]||'', tone: tn?.[1]||'', rules: '', extra: '' } }
-      else return NextResponse.json({ error: 'No se pudo generar el perfil. Intenta con una descripcion mas clara.' }, { status: 400 })
-    }
-    if (profile.error) return NextResponse.json({ error: profile.error }, { status: 400 })
-    return NextResponse.json({ profile })
-  } catch (err) {
-    return NextResponse.json({ error: err instanceof Error ? err.message : 'Error desconocido' }, { status: 500 })
+    const data = await res.json()
+    raw = data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+  } catch (_e) {
+    return NextResponse.json({ error: 'Error de conexion con Gemini' }, { status: 500 })
   }
+
+  if (!raw) return NextResponse.json({ error: 'No se pudo generar el perfil' }, { status: 500 })
+
+  const sanitized = sanitizeJson(raw)
+  if (!sanitized) return NextResponse.json({ error: 'No se pudo generar el perfil' }, { status: 500 })
+
+  let parsed: Record<string, unknown>
+  try {
+    parsed = JSON.parse(sanitized)
+  } catch (_e) {
+    return NextResponse.json({ error: 'No se pudo generar el perfil' }, { status: 500 })
+  }
+
+  if (parsed.error) {
+    return NextResponse.json({ error: parsed.error }, { status: 400 })
+  }
+
+  return NextResponse.json(parsed)
 }
