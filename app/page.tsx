@@ -1,439 +1,257 @@
 'use client'
 import Link from 'next/link'
-import AIDemo from '@/components/AIDemo'
 import { useEffect } from 'react'
 
 export default function Home() {
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('in-view')
-          }
-        })
-      },
-      { threshold: 0.1 }
+      (entries) => { entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add('in-view') }) },
+      { threshold: 0.08 }
     )
     document.querySelectorAll('.fade-section').forEach((el) => observer.observe(el))
     return () => observer.disconnect()
   }, [])
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white">
+    <div className="min-h-screen text-white" style={{background:'#080808'}}>
 
       {/* NAVBAR */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 bg-[#09090b]/80 backdrop-blur-md border-b border-white/5">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-violet-600 flex items-center justify-center">
-            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
-            </svg>
+      <nav style={{background:'rgba(8,8,8,0.85)',backdropFilter:'blur(16px)',borderBottom:'1px solid rgba(255,255,255,0.06)'}} className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4">
+        <div style={{position:'absolute',top:0,left:0,right:0,height:'1px',background:'linear-gradient(90deg,transparent,rgba(139,92,246,0.4),transparent)'}} />
+        <div className="flex items-center gap-2.5">
+          <div className="relative w-7 h-7">
+            <div style={{position:'absolute',inset:0,borderRadius:'10px',background:'rgba(139,92,246,0.25)',filter:'blur(6px)'}} />
+            <div style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 0 12px rgba(124,58,237,0.4)'}} className="relative w-7 h-7 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-xs">K</span>
+            </div>
           </div>
-          <span className="font-bold text-base tracking-tight text-white">Keeper</span>
+          <span className="font-semibold text-sm text-white tracking-tight">Keeper</span>
         </div>
         <div className="hidden md:flex items-center gap-8">
-          <Link href="/pricing" className="text-sm text-white/50 hover:text-white transition-colors">Precios</Link>
-          <a href="#casos" className="text-sm text-white/50 hover:text-white transition-colors">Casos de uso</a>
-          <a href="#keeper-lab" className="text-sm text-white/50 hover:text-white transition-colors">Keeper Lab</a>
+          <Link href="/pricing" className="text-sm transition-colors" style={{color:'rgba(255,255,255,0.45)'}} onMouseEnter={e=>e.currentTarget.style.color='white'} onMouseLeave={e=>e.currentTarget.style.color='rgba(255,255,255,0.45)'}>Precios</Link>
+          <a href="#gaming" className="text-sm transition-colors" style={{color:'rgba(255,255,255,0.45)'}} onMouseEnter={e=>e.currentTarget.style.color='white'} onMouseLeave={e=>e.currentTarget.style.color='rgba(255,255,255,0.45)'}>Gaming</a>
+          <a href="#sistema" className="text-sm transition-colors" style={{color:'rgba(255,255,255,0.45)'}} onMouseEnter={e=>e.currentTarget.style.color='white'} onMouseLeave={e=>e.currentTarget.style.color='rgba(255,255,255,0.45)'}>El sistema</a>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/login" className="text-sm text-white/50 hover:text-white transition-colors hidden sm:block">Iniciar sesión</Link>
-          <Link href="/login" className="text-sm font-semibold px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white transition-colors">
+          <Link href="/login" className="text-sm transition-colors hidden sm:block" style={{color:'rgba(255,255,255,0.45)'}} onMouseEnter={e=>e.currentTarget.style.color='white'} onMouseLeave={e=>e.currentTarget.style.color='rgba(255,255,255,0.45)'}>Iniciar sesi&#xF3;n</Link>
+          <Link href="/login" style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 4px 16px rgba(124,58,237,0.3)'}} className="text-sm font-semibold px-4 py-2 rounded-lg text-white transition-opacity hover:opacity-90">
             Empieza gratis
           </Link>
         </div>
       </nav>
 
       {/* HERO */}
-      <section className="relative flex flex-col items-center justify-center min-h-screen px-6 text-center pt-20">
-
-        {/* Background glow */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-violet-600/10 blur-[120px]" />
-          <div className="absolute top-1/3 left-1/3 w-[300px] h-[300px] rounded-full bg-blue-600/8 blur-[100px]" />
-        </div>
-
+      <section className="relative flex flex-col items-center justify-center min-h-screen px-6 text-center pt-20 overflow-hidden">
+        {/* Background layers */}
+        <div style={{position:'absolute',top:'-10%',left:'50%',transform:'translateX(-50%)',width:'800px',height:'600px',background:'radial-gradient(ellipse at center top,rgba(109,40,217,0.14) 0%,transparent 65%)',pointerEvents:'none'}} />
+        <div style={{position:'absolute',inset:0,backgroundImage:'radial-gradient(circle, rgba(255,255,255,0.028) 1px, transparent 1px)',backgroundSize:'28px 28px',maskImage:'radial-gradient(ellipse at 50% 30%, black 20%, transparent 75%)',pointerEvents:'none'}} />
         {/* Badge */}
-        <div className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300 text-xs font-medium mb-8 animate-fade-up">
+        <div style={{border:'1px solid rgba(139,92,246,0.3)',background:'rgba(139,92,246,0.08)'}} className="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium mb-8 animate-fade-up" style={{border:'1px solid rgba(139,92,246,0.3)',background:'rgba(139,92,246,0.08)',color:'rgba(196,181,253,1)'}}>
           <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" />
-          Para usuarios de ChatGPT, Claude y Gemini
+          Profiles &#xB7; Lab &#xB7; Forge &#xB7; Export &#xB7; Sandbox
         </div>
-
-        {/* Keeper Core — companion visual */}
-        <div className="relative mb-10 inline-flex items-center justify-center">
-          {/* Orbital rings */}
-          <div className="absolute w-40 h-40 rounded-full border border-violet-500/10 animate-spin" style={{animationDuration: '12s'}} />
-          <div className="absolute w-32 h-32 rounded-full border border-violet-500/15 animate-spin" style={{animationDuration: '8s', animationDirection: 'reverse'}} />
-          <div className="absolute w-48 h-48 rounded-full border border-blue-500/8 animate-spin" style={{animationDuration: '20s'}} />
-          {/* Core sphere */}
-          <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center shadow-2xl shadow-violet-500/40 animate-orbit-pulse">
-            <div className="w-16 h-16 rounded-full bg-[#09090b]/50 flex items-center justify-center">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-300 to-blue-400 animate-pulse" />
-            </div>
-          </div>
-          {/* Dots on orbit */}
-          <div className="absolute w-2 h-2 rounded-full bg-violet-400/60 top-0 left-1/2 -translate-x-1/2 -translate-y-1" />
-          <div className="absolute w-1.5 h-1.5 rounded-full bg-blue-400/40 bottom-2 right-2" />
-        </div>
-
         {/* Headline */}
-        <h1 className="relative text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.05] max-w-4xl mb-6 animate-fade-up delay-200">
-          Tu IA no recuerda
-          <br />
-          <span className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">nada.</span>
-          <br />
-          Keeper sí.
+        <h1 className="text-5xl sm:text-6xl xl:text-7xl font-bold leading-[1.04] tracking-tight mb-6 animate-fade-up delay-100">
+          Tu IA.<br />
+          <span style={{background:'linear-gradient(135deg,#c4b5fd 0%,#a78bfa 40%,#7c3aed 100%)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text'}}>
+            Con identidad real.
+          </span>
         </h1>
-
-        <p className="relative text-lg sm:text-xl text-white/50 max-w-2xl mb-10 leading-relaxed animate-fade-up delay-300">
-          Guarda personalidad, instrucciones, variables y contexto.
-          Recuéralos en segundos y continúa donde lo dejaste — en cualquier sesión, con cualquier IA.
+        <p className="text-lg max-w-xl mx-auto mb-10 leading-relaxed animate-fade-up delay-200" style={{color:'rgba(255,255,255,0.4)'}}>
+          Crea perfiles de IA con memoria profunda, analiza su coherencia, simula escenarios y exporta a cualquier modelo. Todo en un sistema.
         </p>
-
-        <div className="relative flex flex-col sm:flex-row gap-4 items-center animate-fade-up delay-400">
-          <Link href="/login" className="px-8 py-3.5 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold text-base transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40">
-            Empieza gratis — sin tarjeta
+        {/* CTAs */}
+        <div className="flex flex-col sm:flex-row items-center gap-4 mb-16 animate-fade-up delay-300">
+          <Link href="/login" style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 4px 24px rgba(124,58,237,0.35)',border:'1px solid rgba(139,92,246,0.3)'}} className="inline-flex items-center gap-2.5 px-8 py-4 rounded-xl text-white font-semibold text-base transition-opacity hover:opacity-90">
+            Crear mi primer perfil
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
           </Link>
-          <Link href="/pricing" className="px-8 py-3.5 rounded-xl border border-white/10 hover:border-white/20 text-white/70 hover:text-white font-medium text-base transition-all">
-            Ver planes
+          <Link href="/pricing" style={{border:'1px solid rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.55)'}} className="inline-flex items-center gap-2 px-6 py-4 rounded-xl text-sm font-medium transition-colors hover:text-white hover:border-white/20">
+            Ver planes &#x2192;
           </Link>
         </div>
-
-        <p className="relative mt-5 text-sm text-white/25">
-          Free: hasta 3 contextos. Pro desde 9 €/mes.
-        </p>
+        {/* Flow chips */}
+        <div className="flex flex-wrap justify-center gap-2 animate-fade-up delay-400">
+          {[['Profiles','rgba(139,92,246,0.15)','rgba(139,92,246,0.4)','#c4b5fd'],['Lab','rgba(59,130,246,0.12)','rgba(59,130,246,0.35)','#93c5fd'],['Forge','rgba(245,158,11,0.12)','rgba(245,158,11,0.35)','#fcd34d'],['Export','rgba(148,163,184,0.08)','rgba(148,163,184,0.25)','#cbd5e1'],['Sandbox','rgba(16,185,129,0.12)','rgba(16,185,129,0.35)','#6ee7b7']].map(([label,bg,border,color])=>(
+            <span key={label} style={{background:bg,border:'1px solid '+border,color:color}} className="px-3 py-1.5 rounded-full text-xs font-semibold">{label}</span>
+          ))}
+        </div>
+        {/* Stats */}
+        <div className="flex gap-12 mt-14 animate-fade-up delay-500">
+          {[['Profiles','7 tipos'],['Formatos','9 export'],['Modos','Forge x3']].map(([n,label])=>(
+            <div key={n} className="text-center">
+              <p className="text-xl font-bold text-white">{n}</p>
+              <p className="text-xs mt-0.5" style={{color:'rgba(255,255,255,0.3)'}}>{label}</p>
+            </div>
+          ))}
+        </div>
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce" style={{color:'rgba(255,255,255,0.2)'}}>
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7"/></svg>
+        </div>
       </section>
 
-      {/* PROBLEMA */}
-      <section className="py-24 px-6 fade-section">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-xs font-semibold tracking-widest text-violet-400 uppercase mb-4 text-center">El problema real</p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4 leading-tight animate-fade-up delay-100">
-            Cada sesión nueva,<br />
-            <span className="text-white/40">empiezas desde cero.</span>
-          </h2>
-          <p className="text-white/40 text-center max-w-xl mx-auto mb-16 text-lg">
-            Tu IA es poderosa. Pero no recuerda quién eres, cómo trabajas ni dónde lo dejaste.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* EL SISTEMA — 5 modulos */}
+      <section id="sistema" className="py-24 px-6 fade-section" style={{borderTop:'1px solid rgba(255,255,255,0.05)'}}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-xs font-bold tracking-widest mb-3 uppercase" style={{color:'rgba(139,92,246,0.8)'}}>El sistema completo</p>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 leading-tight">
+              Un flujo. Cinco herramientas.<br />
+              <span style={{color:'rgba(255,255,255,0.45)'}}>Cada una especializada.</span>
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
             {[
-              { icon: '&#128257;', title: 'Repites siempre lo mismo', desc: 'Tu tono, tu estilo, tus reglas, el contexto del proyecto. Una y otra vez, en cada sesión nueva.' },
-              { icon: '&#128203;', title: 'Pierdes continuidad', desc: 'La IA no sabe dónde está el trabajo, qué se decidió antes ni cómo se llegó aquí.' },
-              { icon: '&#9889;', title: 'Pierdes consistencia', desc: 'Sin un sistema claro, cada respuesta puede sonar diferente. Tu voz no es coherente.' },
-            ].map((item, i) => (
-              <div key={i} className="p-6 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
-                <div className="text-2xl mb-3" dangerouslySetInnerHTML={{__html: item.icon}} />
-                <h3 className="font-semibold text-white mb-2">{item.title}</h3>
-                <p className="text-white/40 text-sm leading-relaxed">{item.desc}</p>
+              {name:'Profiles',icon:'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',desc:'Define la identidad, lore, voz y reglas. 7 tipos de perfil.',color:'#a78bfa',bg:'rgba(139,92,246,0.08)',border:'rgba(139,92,246,0.2)',num:'01'},
+              {name:'Lab',icon:'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',desc:'Analiza coherencia en 4 dimensiones: Claridad, Consistencia, Completitud, Efectividad.',color:'#93c5fd',bg:'rgba(59,130,246,0.08)',border:'rgba(59,130,246,0.2)',num:'02'},
+              {name:'Forge',icon:'M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z',desc:'Simula escenarios reales, stress tests y validaciones libres.',color:'#fcd34d',bg:'rgba(245,158,11,0.08)',border:'rgba(245,158,11,0.2)',num:'03'},
+              {name:'Export',icon:'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12',desc:'9 formatos: System Prompt, JSON, YAML, NPC Sheet, Brand Brief y m&#xE1;s.',color:'#cbd5e1',bg:'rgba(148,163,184,0.06)',border:'rgba(148,163,184,0.15)',num:'04'},
+              {name:'Sandbox',icon:'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',desc:'Chatea con tu perfil en modo libre o ejecuta prompts de prueba.',color:'#6ee7b7',bg:'rgba(16,185,129,0.08)',border:'rgba(16,185,129,0.2)',num:'05'},
+            ].map((m)=>(
+              <div key={m.name} style={{background:m.bg,border:'1px solid '+m.border,transition:'transform 0.2s'}} className="rounded-2xl p-5 flex flex-col hover:scale-[1.02]">
+                <div className="flex items-center justify-between mb-4">
+                  <div style={{background:m.border,borderRadius:'10px',padding:'7px'}}>
+                    <svg width="16" height="16" fill="none" stroke={m.color} strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={m.icon}/></svg>
+                  </div>
+                  <span style={{color:'rgba(255,255,255,0.15)'}} className="text-xs font-mono">{m.num}</span>
+                </div>
+                <p style={{color:m.color}} className="font-bold text-sm mb-2">{m.name}</p>
+                <p style={{color:'rgba(255,255,255,0.4)'}} className="text-xs leading-relaxed">{m.desc}</p>
               </div>
             ))}
           </div>
+          {/* Flow arrow */}
+          <div className="flex items-center justify-center gap-2 mt-8" style={{color:'rgba(255,255,255,0.2)'}}>
+            <span className="text-xs">Crea</span>
+            <span>&#x2192;</span>
+            <span className="text-xs">Analiza</span>
+            <span>&#x2192;</span>
+            <span className="text-xs">Simula</span>
+            <span>&#x2192;</span>
+            <span className="text-xs">Exporta</span>
+            <span>&#x2192;</span>
+            <span className="text-xs">Chatea</span>
+          </div>
         </div>
       </section>
 
-      {/* SOLUCIÓN — 4 capas */}
-      <section className="py-24 px-6 border-t border-white/5 fade-section">
+      {/* GAMING / NPCs / WORLDBUILDING */}
+      <section id="gaming" className="py-24 px-6 fade-section" style={{borderTop:'1px solid rgba(255,255,255,0.05)'}}>
         <div className="max-w-5xl mx-auto">
-          <p className="text-xs font-semibold tracking-widest text-violet-400 uppercase mb-4 text-center">La solución</p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4 leading-tight">
-            La memoria operativa<br />que tu IA no tiene.
-          </h2>
-          <p className="text-white/40 text-center max-w-xl mx-auto mb-16 text-lg">
-            Keeper guarda lo que hace que tu IA responda bien — y te lo devuelve cuando lo necesitas.
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {[
-              {
-                num: '01', color: 'from-violet-600 to-violet-800', label: 'Memoria',
-                title: 'Guarda lo que importa',
-                desc: 'Personalidad, tono, instrucciones, contexto de proyecto, reglas de respuesta. Una sola fuente de verdad para todo lo que tu IA necesita saber.'
-              },
-              {
-                num: '02', color: 'from-blue-600 to-blue-800', label: 'Continuidad',
-                title: 'Continúa donde lo dejaste',
-                desc: 'Cada contexto es una sesión que puede retomarse. Abre ChatGPT, pega tu contexto y tu IA sabe exactamente dónde está el trabajo.'
-              },
-              {
-                num: '03', color: 'from-indigo-600 to-indigo-800', label: 'Consistencia',
-                title: 'Tu voz, siempre igual',
-                desc: 'Variables dinámicas, plantillas de tono, instrucciones fijas. Tu IA responde con tu estilo, no con el suyo.'
-              },
-              {
-                num: '04', color: 'from-purple-600 to-purple-800', label: 'Refinamiento',
-                title: 'Mejora con el tiempo',
-                desc: 'Historial de versiones, rollback, iteración. Tu contexto evoluciona con tu trabajo. Pronto: Keeper Lab te ayuda a refinarlo automáticamente.'
-              },
-            ].map((item, i) => (
-              <div key={i} className="p-6 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors group">
-                <div className="flex items-start gap-4">
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center flex-shrink-0`}>
-                    <span className="text-xs font-bold text-white/80">{item.num}</span>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <div style={{background:'rgba(139,92,246,0.12)',border:'1px solid rgba(139,92,246,0.3)',display:'inline-flex',alignItems:'center',gap:'6px',padding:'4px 12px',borderRadius:'999px'}} className="mb-6">
+                <div className="w-1.5 h-1.5 rounded-full bg-violet-400" />
+                <span style={{color:'#c4b5fd'}} className="text-xs font-bold">Para game writers y worldbuilders</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold mb-6 leading-tight">
+                NPCs con memoria.<br />
+                <span style={{color:'rgba(255,255,255,0.45)'}}>Personajes que no olvidan qui&#xE9;nes son.</span>
+              </h2>
+              <p className="text-base leading-relaxed mb-8" style={{color:'rgba(255,255,255,0.45)'}}>
+                Crea personajes con lore profundo, secretos, motivaciones y relaciones. Simula c&#xF3;mo responden en cualquier escenario. Exporta como NPC Sheet o Character Sheet listo para usar.
+              </p>
+              <div className="space-y-3 mb-8">
+                {[
+                  ['base_memory','Historia, traumas, secretos y motivaciones del personaje'],
+                  ['relationships','Relaciones din&#xE1;micas con otros personajes o facciones'],
+                  ['Forge','Simula primer encuentro, traici&#xF3;n, interrogatorio o crisis'],
+                  ['NPC Sheet','Exporta la ficha completa para tu juego o mod'],
+                ].map(([tag,desc])=>(
+                  <div key={tag} className="flex items-start gap-3">
+                    <span style={{background:'rgba(139,92,246,0.15)',border:'1px solid rgba(139,92,246,0.3)',color:'#a78bfa',fontFamily:'monospace'}} className="text-xs px-2 py-0.5 rounded-md flex-shrink-0 mt-0.5">{tag}</span>
+                    <span style={{color:'rgba(255,255,255,0.5)'}} className="text-sm" dangerouslySetInnerHTML={{__html:desc}} />
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Link href="/login" style={{background:'rgba(139,92,246,0.15)',border:'1px solid rgba(139,92,246,0.35)',color:'#c4b5fd'}} className="text-sm font-semibold px-5 py-2.5 rounded-xl transition-opacity hover:opacity-90">Crear NPC ahora</Link>
+                <span style={{color:'rgba(255,255,255,0.3)'}} className="text-xs self-center">Game writers &#xB7; Devs indie &#xB7; Modders &#xB7; Worldbuilders</span>
+              </div>
+            </div>
+            {/* NPC Card mockup */}
+            <div className="relative">
+              <div style={{background:'rgba(14,14,18,0.95)',border:'1px solid rgba(139,92,246,0.25)',boxShadow:'0 0 60px rgba(109,40,217,0.1)'}} className="rounded-2xl overflow-hidden">
+                <div style={{background:'rgba(139,92,246,0.06)',borderBottom:'1px solid rgba(63,63,70,0.5)'}} className="px-5 py-4 flex items-center gap-3">
+                  <div style={{background:'linear-gradient(135deg,#4c1d95,#6d28d9)',boxShadow:'0 0 16px rgba(109,40,217,0.4)'}} className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold">V</div>
+                  <div>
+                    <p className="text-white font-bold text-sm">Valdris el Archimago</p>
+                    <div style={{background:'rgba(139,92,246,0.15)',border:'1px solid rgba(139,92,246,0.3)'}} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md mt-0.5">
+                      <span style={{color:'#a78bfa'}} className="text-xs font-bold">NPC</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="px-5 py-4 space-y-3">
+                  <div>
+                    <p style={{color:'rgba(255,255,255,0.3)'}} className="text-xs font-semibold mb-1">ROL</p>
+                    <p style={{color:'rgba(255,255,255,0.7)'}} className="text-xs">Archimago ca&#xED;do que guarda el secreto de la Grieta Oscura</p>
                   </div>
                   <div>
-                    <span className="text-xs font-semibold text-violet-400 uppercase tracking-wider">{item.label}</span>
-                    <h3 className="font-semibold text-white mt-1 mb-2 text-lg">{item.title}</h3>
-                    <p className="text-white/40 text-sm leading-relaxed">{item.desc}</p>
+                    <p style={{color:'rgba(255,255,255,0.3)'}} className="text-xs font-semibold mb-1">BASE MEMORY</p>
+                    <p style={{color:'rgba(255,255,255,0.55)'}} className="text-xs leading-relaxed">Traicion&#xF3; a su orden hace 300 a&#xF1;os. Vive con culpa. Solo el jugador elegido puede saber la verdad.</p>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CASOS DE USO */}
-      <section id="casos" className="py-24 px-6 border-t border-white/5">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-xs font-semibold tracking-widest text-violet-400 uppercase mb-4 text-center">Para quién es</p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4 leading-tight">
-            Cada tipo de trabajo,<br />su propia memoria.
-          </h2>
-          <p className="text-white/40 text-center max-w-xl mx-auto mb-16 text-lg">
-            Keeper no es solo para prompts sueltos. Es para cualquiera que use IA de forma seria y continua.
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              { icon: '&#128187;', label: 'Programación', title: 'Asistentes por stack', desc: 'Memoria de arquitectura, reglas de código, contexto por proyecto. Tu IA conoce tu codebase.' },
-              { icon: '&#9997;&#65039;', label: 'Creatividad', title: 'Voz y estilo consistentes', desc: 'Tono de marca, personajes reutilizables, narrativa continua. Tu IA escribe como tú.' },
-              { icon: '&#128218;', label: 'Storytelling', title: 'Continuidad narrativa', desc: 'Lore, personajes, arc argumental. Tu IA no olvida qué pasó en el capítulo anterior.' },
-              { icon: '&#127918;', label: 'Videojuegos', title: 'Mundos y personajes vivos', desc: 'Reglas del mundo, dialecto, personalidad de NPCs. Contexto persistente para cada sesión.' },
-              { icon: '&#128200;', label: 'Marketing', title: 'Voz de marca guardada', desc: 'Brief de marca, tono de comunicación, instrucciones de canal. Coherencia en cada pieza.' },
-              { icon: '&#128101;', label: 'Equipos', title: 'Memoria compartida', desc: 'Contexto común, instrucciones del equipo, tono unificado. Todos usan la IA igual de bien.' },
-            ].map((item, i) => (
-              <div key={i} className="p-5 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
-                <div className="text-2xl mb-3" dangerouslySetInnerHTML={{__html: item.icon}} />
-                <span className="text-xs font-semibold text-violet-400 uppercase tracking-wider">{item.label}</span>
-                <h3 className="font-semibold text-white mt-1 mb-1">{item.title}</h3>
-                <p className="text-white/40 text-sm leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CÓMO FUNCIONA */}
-      <section className="py-24 px-6 border-t border-white/5 fade-section">
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-xs font-semibold tracking-widest text-violet-400 uppercase mb-4">Cómo funciona</p>
-          <h2 className="text-3xl sm:text-4xl font-bold mb-16 leading-tight">Tres pasos.<br />Todo el control.</h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-            {[
-              { step: '1', title: 'Guarda tu contexto', desc: 'Crea un contexto con personalidad, instrucciones, tono y variables. Una vez, bien hecho.' },
-              { step: '2', title: 'Organiza por espacio', desc: 'Proyectos, clientes, personajes, stacks. Cada contexto en su lugar, listo para usar.' },
-              { step: '3', title: 'Recúperalo en segundos', desc: 'Un clic para copiar. Tu IA recibe el contexto completo y ya sabe cómo trabajar contigo.' },
-            ].map((item, i) => (
-              <div key={i} className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center font-bold text-lg mb-4 shadow-lg shadow-violet-500/20">
-                  {item.step}
-                </div>
-                <h3 className="font-semibold text-white mb-2">{item.title}</h3>
-                <p className="text-white/40 text-sm leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* PRODUCT PREVIEW */}
-      <section className="py-24 px-6 border-t border-white/5 fade-section">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-xs font-semibold tracking-widest text-violet-400 uppercase mb-4">El producto</p>
-            <h2 className="text-3xl sm:text-4xl font-bold leading-tight mb-4">
-              Tu memoria operativa,<br />
-              <span className="text-violet-400">siempre a mano.</span>
-            </h2>
-            <p className="text-white/40 max-w-lg mx-auto">Gestiona todos tus contextos desde un dashboard limpio. Copia, edita y organiza en segundos.</p>
-          </div>
-
-          <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-violet-500/10 bg-[#111113]">
-            <div className="flex items-center gap-2 px-4 py-3 bg-[#1a1a1e] border-b border-white/5">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-500/60"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-500/60"></div>
-                <div className="w-3 h-3 rounded-full bg-green-500/60"></div>
-              </div>
-              <div className="flex-1 mx-4">
-                <div className="bg-white/5 rounded-md px-3 py-1 text-xs text-white/30 text-center max-w-xs mx-auto">context-keeper-alpha.vercel.app/dashboard</div>
-              </div>
-            </div>
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <div className="text-white font-bold text-lg">Mis Contextos</div>
-                  <div className="text-white/40 text-xs mt-0.5">3 contextos activos</div>
-                </div>
-                <div className="bg-violet-600 text-white text-xs font-semibold px-4 py-2 rounded-xl">+ Nuevo contexto</div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {[
-                  { name: "Asistente de Marketing", desc: "Tono persuasivo, enfocado en conversion. Voz de marca premium.", tag: "Marketing", color: "violet" },
-                  { name: "Dev Backend Senior", desc: "TypeScript estricto. Sin comentarios obvios. Prefiere funcional.", tag: "Desarrollo", color: "blue" },
-                  { name: "Redactor de Contenido", desc: "Estilo directo, sin relleno. Estructura con headers claros.", tag: "Contenido", color: "emerald" },
-                ].map((ctx, i) => (
-                  <div key={i} className="bg-white/5 rounded-xl p-4 border border-white/8 hover:border-violet-500/30 transition-colors">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className={ctx.color === "violet" ? "text-xs font-semibold px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-400" : ctx.color === "blue" ? "text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400" : "text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400"}>{ctx.tag}</div>
-                      <div className="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center">
-                        <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="text-white/40">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
-                      </div>
-                    </div>
-                    <div className="text-white text-sm font-semibold mb-1.5">{ctx.name}</div>
-                    <div className="text-white/40 text-xs leading-relaxed">{ctx.desc}</div>
-                    <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
-                      <span className="text-white/25 text-xs">Hace 2 horas</span>
-                      <span className="text-violet-400 text-xs font-medium">Copiar contexto</span>
+                  <div>
+                    <p style={{color:'rgba(255,255,255,0.3)'}} className="text-xs font-semibold mb-1">FORGE — ESCENARIO</p>
+                    <div style={{background:'rgba(245,158,11,0.08)',border:'1px solid rgba(245,158,11,0.2)',borderRadius:'10px',padding:'10px'}}>
+                      <p style={{color:'rgba(245,158,11,0.9)'}} className="text-xs font-bold mb-1">El jugador pregunta sobre la Grieta</p>
+                      <p style={{color:'rgba(255,255,255,0.5)'}} className="text-xs">Veredicto: <span style={{color:'#34d399',fontWeight:'bold'}}>S&#xD3;LIDO</span> &#xB7; Score: 91</p>
                     </div>
                   </div>
-                ))}
-              </div>
-              <div className="mt-5 flex items-center gap-3">
-                <div className="text-white/25 text-xs">3 de 3 contextos (Free)</div>
-                <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden max-w-xs">
-                  <div className="h-full bg-violet-500 rounded-full w-full"></div>
                 </div>
-                <div className="text-violet-400 text-xs font-medium cursor-pointer">Hazte Pro</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* KEEPER LAB PREVIEW */}
-      <section id="keeper-lab" className="py-24 px-6 border-t border-white/5">
-        <div className="max-w-4xl mx-auto">
-          <div className="relative rounded-3xl border border-violet-500/20 bg-gradient-to-br from-violet-950/50 to-blue-950/30 p-10 sm:p-14 overflow-hidden text-center">
-            {/* Glow */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[200px] bg-violet-600/15 blur-[80px] pointer-events-none" />
-
-            {/* Keeper Core en modo lab */}
-            <div className="relative inline-flex mb-8">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center shadow-2xl shadow-violet-500/40">
-                <div className="w-10 h-10 rounded-full bg-[#09090b]/70 flex items-center justify-center">
-                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-violet-300 to-blue-300" />
+      {/* PROFESIONAL */}
+      <section className="py-24 px-6 fade-section" style={{borderTop:'1px solid rgba(255,255,255,0.05)'}}>
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            {/* Cards mockup */}
+            <div className="space-y-3">
+              {[
+                {name:'Brand Voice — Keeper',type:'Marca',color:'#fcd34d',bg:'rgba(245,158,11,0.08)',border:'rgba(245,158,11,0.2)',score:88},
+                {name:'Support Agent Pro',type:'Asistente',color:'#a78bfa',bg:'rgba(139,92,246,0.08)',border:'rgba(139,92,246,0.2)',score:94},
+                {name:'Dev Lead AI',type:'T&#xE9;cnico',color:'#93c5fd',bg:'rgba(59,130,246,0.08)',border:'rgba(59,130,246,0.2)',score:79},
+              ].map((p)=>(
+                <div key={p.name} style={{background:p.bg,border:'1px solid '+p.border}} className="rounded-xl p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div style={{background:p.border,width:'36px',height:'36px',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                      <span style={{color:p.color,fontWeight:'bold',fontSize:'14px'}} dangerouslySetInnerHTML={{__html:p.name[0]}} />
+                    </div>
+                    <div>
+                      <p className="text-white font-semibold text-sm" dangerouslySetInnerHTML={{__html:p.name}} />
+                      <span style={{background:'rgba(255,255,255,0.06)',color:'rgba(255,255,255,0.4)',fontSize:'10px',padding:'1px 6px',borderRadius:'4px'}} dangerouslySetInnerHTML={{__html:p.type}} />
+                    </div>
+                  </div>
+                  <div style={{background:p.score>=90?'rgba(16,185,129,0.12)':'rgba(245,158,11,0.12)',border:'1px solid '+(p.score>=90?'rgba(16,185,129,0.3)':'rgba(245,158,11,0.3)'),color:p.score>=90?'#34d399':'#fbbf24'}} className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-bold">
+                    <svg width="8" height="8" fill="currentColor" viewBox="0 0 24 24"><path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    {p.score}
+                  </div>
                 </div>
-              </div>
-              <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-violet-400/20 border border-violet-400/40 flex items-center justify-center">
-                <div className="w-2 h-2 rounded-full bg-violet-400" />
-              </div>
+              ))}
             </div>
-
-            <div className="relative">
-              <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-violet-500/20 text-violet-300 border border-violet-500/30 mb-4">
-                Próximamente — Pro y Team
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-bold mb-4 leading-tight">
-                Keeper Lab
+            <div>
+              <div style={{background:'rgba(59,130,246,0.12)',border:'1px solid rgba(59,130,246,0.3)',display:'inline-flex',alignItems:'center',gap:'6px',padding:'4px 12px',borderRadius:'999px'}} className="mb-6">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                <span style={{color:'#93c5fd'}} className="text-xs font-bold">Para profesionales y equipos</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold mb-6 leading-tight">
+                Identidades IA<br />
+                <span style={{color:'rgba(255,255,255,0.45)'}}>que se comportan igual siempre.</span>
               </h2>
-              <p className="text-white/50 text-lg max-w-xl mx-auto leading-relaxed mb-6">
-                Tu contexto guardado puede ser mejor. Keeper Lab lo analiza, detecta redundancias, reorganiza la estructura y te devuelve una versión más clara y efectiva — lista para que tu IA responda mejor que nunca.
+              <p className="text-base leading-relaxed mb-8" style={{color:'rgba(255,255,255,0.45)'}}>
+                Define asistentes, brand voices y agentes con personalidad precisa. Anal&#xED;zalos con Lab, test&#xE9;alos con Forge y despli&#xE9;galos a cualquier modelo en segundos.
               </p>
-              <div className="flex flex-wrap justify-center gap-3 text-sm text-white/40">
-                {['Refinamiento profundo', 'Detección de redundancias', 'Optimización de estructura', 'Versión mejorada lista para usar'].map((tag, i) => (
-                  <span key={i} className="px-3 py-1 rounded-full border border-white/10 bg-white/[0.03]">{tag}</span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-      {/* KEEPER PROFILES — vision futura */}
-      <section className="py-24 px-6 border-t border-white/5 fade-section">
-        <div className="max-w-5xl mx-auto">
-          <p className="text-xs font-semibold tracking-widest text-violet-400 uppercase mb-4 text-center">Próximamente — Fase 3</p>
-          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4 leading-tight">
-            Keeper Profiles.<br />
-            <span className="text-white/40">No solo contexto. Identidad.</span>
-          </h2>
-          <p className="text-white/40 text-center max-w-2xl mx-auto mb-16 text-lg">
-            La siguiente capa de Keeper. Guarda no solo qué decirle a tu IA, sino quién quieres que sea — su tono, sus reglas, su estilo, su comportamiento. Reutilizable. Consistente. Tuyo.
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
-            {[
-              { icon: '&#128187;', label: 'Programación', title: 'Asistente por stack', desc: 'Memoria de arquitectura, reglas de código, contexto técnico persistente por repositorio.' },
-              { icon: '&#9997;&#65039;', label: 'Creatividad', title: 'Personajes con voz', desc: 'Tono, lore, forma de hablar. Tu personaje responde igual en cada sesión.' },
-              { icon: '&#128200;', label: 'Marcas', title: 'Voz de marca persistente', desc: 'Brief, estilo, palabras clave. Tu asistente de comunicación siempre en caracter.' },
-              { icon: '&#128101;', label: 'Equipos', title: 'Perfiles compartidos', desc: 'El mismo asistente, configurado una vez, disponible para todo el equipo.' },
-            ].map((item, i) => (
-              <div key={i} className="p-5 rounded-2xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] transition-colors">
-                <div className="text-2xl mb-3" dangerouslySetInnerHTML={{__html: item.icon}} />
-                <span className="text-xs font-semibold text-violet-400 uppercase tracking-wider">{item.label}</span>
-                <h3 className="font-semibold text-white mt-1 mb-1 text-sm">{item.title}</h3>
-                <p className="text-white/30 text-xs leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Visual diferenciador: Contexto vs. Perfil */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
-            <div className="p-6 rounded-2xl border border-white/10 bg-white/[0.02]">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-6 h-6 rounded-lg bg-violet-600/30 flex items-center justify-center">
-                  <svg className="w-3 h-3 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <span className="text-sm font-semibold text-white">Contexto</span>
-                <span className="text-xs text-violet-400 bg-violet-400/10 px-2 py-0.5 rounded-full">Ya disponible</span>
-              </div>
-              <p className="text-white/40 text-sm leading-relaxed">Instrucciones, prompt base, variables. Lo que le dices a tu IA para que entienda una tarea.</p>
-            </div>
-            <div className="p-6 rounded-2xl border border-violet-500/30 bg-violet-500/5">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-6 h-6 rounded-lg bg-violet-600/50 flex items-center justify-center">
-                  <svg className="w-3 h-3 text-violet-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-                <span className="text-sm font-semibold text-white">Keeper Profile</span>
-                <span className="text-xs text-white/30 bg-white/5 px-2 py-0.5 rounded-full">Próximamente</span>
-              </div>
-              <p className="text-white/40 text-sm leading-relaxed">Personalidad, tono, reglas, comportamiento. Quién es tu IA para este proyecto — de forma persistente y reutilizable.</p>
-            </div>
-          </div>
-
-          {/* Profile card mockup */}
-          <div className="mt-14 max-w-sm mx-auto">
-            <div className="text-center mb-4">
-              <span className="text-xs text-white/30 uppercase tracking-widest">Así se verá un Keeper Profile</span>
-            </div>
-            <div className="rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-950/40 to-[#111113] p-6 shadow-xl shadow-violet-500/10 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-violet-600/10 rounded-full blur-2xl"></div>
-              <div className="flex items-center gap-3 mb-5">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center font-bold text-white text-sm shadow-lg shadow-violet-500/30">M</div>
-                <div>
-                  <div className="text-white font-semibold text-sm">Marketing Lead</div>
-                  <div className="text-violet-400 text-xs">Keeper Profile · Pro</div>
-                </div>
-                <div className="ml-auto">
-                  <span className="text-xs bg-violet-500/20 text-violet-300 px-2 py-0.5 rounded-full font-medium">Activo</span>
-                </div>
-              </div>
-              <div className="space-y-2 mb-4">
-                {[
-                  { label: 'Tono', value: 'Persuasivo, premium, sin jerga' },
-                  { label: 'Rol', value: 'CMO experto en B2B SaaS' },
-                  { label: 'Regla', value: 'Siempre terminar con CTA claro' },
-                ].map((row, i) => (
-                  <div key={i} className="flex items-start gap-2">
-                    <span className="text-white/30 text-xs w-14 flex-shrink-0 pt-0.5">{row.label}</span>
-                    <span className="text-white/70 text-xs leading-relaxed">{row.value}</span>
+              <div className="grid grid-cols-2 gap-3">
+                {[['Asistentes especializados','rol, tono, l&#xED;mites y objetivos precisos'],['Brand Voices','voz de marca consistente en cualquier canal'],['Agentes t&#xE9;cnicos','patrones de respuesta y variables din&#xE1;micas'],['Equipos','profiles compartidos entre miembros']].map(([t,d])=>(
+                  <div key={t} style={{background:'rgba(255,255,255,0.03)',border:'1px solid rgba(255,255,255,0.07)'}} className="p-3 rounded-xl">
+                    <p className="text-white font-semibold text-xs mb-1" dangerouslySetInnerHTML={{__html:t}} />
+                    <p style={{color:'rgba(255,255,255,0.35)'}} className="text-xs leading-relaxed" dangerouslySetInnerHTML={{__html:d}} />
                   </div>
                 ))}
-              </div>
-              <div className="pt-4 border-t border-white/5 flex items-center justify-between">
-                <span className="text-white/25 text-xs">Usado hace 1h en ChatGPT</span>
-                <div className="bg-violet-600/80 text-white text-xs font-semibold px-3 py-1.5 rounded-lg opacity-60 cursor-not-allowed">Usar perfil</div>
               </div>
             </div>
           </div>
@@ -441,98 +259,73 @@ export default function Home() {
       </section>
 
       {/* PRICING PREVIEW */}
-      <section className="py-24 px-6 border-t border-white/5 fade-section">
+      <section className="py-24 px-6 fade-section" style={{borderTop:'1px solid rgba(255,255,255,0.05)'}}>
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-xs font-semibold tracking-widest text-violet-400 uppercase mb-4">Precios</p>
+          <p className="text-xs font-bold tracking-widest mb-3 uppercase" style={{color:'rgba(139,92,246,0.8)'}}>Planes</p>
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">Simple y directo.</h2>
-          <p className="text-white/40 text-lg mb-12">Empieza gratis. Escala cuando necesites más.</p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+          <p className="text-base mb-12" style={{color:'rgba(255,255,255,0.4)'}}>Empieza gratis. Escala cuando necesites.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             {[
-              { name: 'Free', price: '0', period: '/mes', desc: 'Empieza aquí', features: ['3 contextos', 'Variables dinámicas', 'Importar / exportar JSON'], cta: 'Empezar gratis', primary: false },
-              { name: 'Pro', price: '9', period: '/mes', desc: 'Tu memoria completa', features: ['Contextos ilimitados', 'Historial de versiones', 'Generación con IA', 'Acceso anticipado a Keeper Lab'], cta: 'Hazte Pro', primary: true },
-              { name: 'Team', price: '20', period: '/mes', desc: 'Memoria compartida', features: ['Todo lo de Pro', 'Hasta 5 miembros', 'Contextos del equipo', 'Panel de administrador'], cta: 'Empezar con Team', primary: false },
-            ].map((plan, i) => (
-              <div key={i} className={`relative p-6 rounded-2xl border transition-colors ${plan.primary ? 'border-violet-500/50 bg-violet-600/10' : 'border-white/5 bg-white/[0.02]'}`}>
-                {plan.primary && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-semibold bg-violet-600 text-white">
-                    Más popular
-                  </div>
-                )}
-                <div className="text-left">
-                  <p className="font-bold text-white text-lg">{plan.name}</p>
-                  <p className="text-white/30 text-sm mb-3">{plan.desc}</p>
-                  <div className="flex items-baseline gap-1 mb-5">
-                    <span className="text-4xl font-bold text-white">{plan.price} €</span>
-                    <span className="text-white/30 text-sm">{plan.period}</span>
-                  </div>
-                  <ul className="space-y-2 mb-6">
-                    {plan.features.map((f, j) => (
-                      <li key={j} className="flex items-start gap-2 text-sm text-white/50">
-                        <svg className="w-4 h-4 text-violet-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href={i === 0 ? '/login' : '/pricing'} className={`block text-center py-2.5 rounded-xl font-semibold text-sm transition-all ${plan.primary ? 'bg-violet-600 hover:bg-violet-500 text-white' : 'border border-white/10 hover:border-white/20 text-white/60 hover:text-white'}`}>
-                    {plan.cta}
-                  </Link>
-                </div>
+              {plan:'Free',price:'Gratis',sub:'Para empezar',features:['3 profiles','System Prompt + Texto plano','Sandbox libre'],highlight:false},
+              {plan:'Pro',price:'9 &#x20AC;/mes',sub:'M&#xE1;s popular',features:['Profiles ilimitados','Keeper Lab (an&#xE1;lisis 4D)','Keeper Forge (simulaci&#xF3;n)','9 formatos de exportaci&#xF3;n','Campos avanzados (lore, relaciones)'],highlight:true},
+              {plan:'Team',price:'20 &#x20AC;/mes',sub:'Para equipos',features:['Todo lo de Pro','Hasta 5 miembros','Profiles compartidos','Panel de administrador'],highlight:false},
+            ].map((p)=>(
+              <div key={p.plan} style={{background:p.highlight?'rgba(109,40,217,0.12)':'rgba(255,255,255,0.03)',border:'1px solid '+(p.highlight?'rgba(139,92,246,0.4)':'rgba(255,255,255,0.08)'),boxShadow:p.highlight?'0 0 40px rgba(109,40,217,0.1)':undefined}} className="rounded-2xl p-6 text-left">
+                <p style={{color:p.highlight?'#c4b5fd':'rgba(255,255,255,0.6)'}} className="text-xs font-bold mb-1">{p.plan}</p>
+                <p className="text-2xl font-bold text-white mb-0.5" dangerouslySetInnerHTML={{__html:p.price}} />
+                <p style={{color:'rgba(255,255,255,0.35)'}} className="text-xs mb-5" dangerouslySetInnerHTML={{__html:p.sub}} />
+                <ul className="space-y-2">
+                  {p.features.map((f,i)=>(
+                    <li key={i} className="flex items-start gap-2 text-xs" style={{color:'rgba(255,255,255,0.55)'}}>
+                      <svg className="w-3 h-3 flex-shrink-0 mt-0.5" style={{color:p.highlight?'#a78bfa':'rgba(255,255,255,0.3)'}} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/></svg>
+                      <span dangerouslySetInnerHTML={{__html:f}} />
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
-          <p className="text-white/20 text-sm">Sin tarjeta de crédito para empezar. Cancela cuando quieras.</p>
+          <Link href="/pricing" style={{color:'rgba(139,92,246,0.8)'}} className="text-sm hover:text-violet-300 transition-colors">Ver comparativa completa &#x2192;</Link>
         </div>
       </section>
 
       {/* CTA FINAL */}
-      <section className="py-24 px-6 border-t border-white/5">
+      <section className="py-28 px-6 fade-section" style={{borderTop:'1px solid rgba(255,255,255,0.05)'}}>
         <div className="max-w-3xl mx-auto text-center">
-          {/* Keeper Core final */}
-          <div className="inline-flex mb-8">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center shadow-2xl shadow-violet-500/30">
-              <div className="w-13 h-13 rounded-full bg-[#09090b]/60 flex items-center justify-center">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-300 to-blue-300 animate-pulse" />
-              </div>
+          <div className="relative inline-block mb-10">
+            <div style={{position:'absolute',inset:'-20px',background:'radial-gradient(circle,rgba(109,40,217,0.2),transparent 70%)',borderRadius:'50%',filter:'blur(20px)'}} />
+            <div style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 0 40px rgba(109,40,217,0.5)',width:'72px',height:'72px',borderRadius:'20px',display:'flex',alignItems:'center',justifyContent:'center'}} className="relative mx-auto">
+              <span className="text-white font-black text-2xl">K</span>
             </div>
           </div>
-
           <h2 className="text-4xl sm:text-5xl font-bold mb-6 leading-tight">
-            Haz que tu IA no<br />
-            <span className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">empiece de cero.</span>
+            Crea tu primera<br />
+            <span style={{background:'linear-gradient(135deg,#c4b5fd,#a78bfa,#7c3aed)',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent',backgroundClip:'text'}}>identidad IA hoy.</span>
           </h2>
-          <p className="text-white/40 text-lg mb-10 max-w-lg mx-auto leading-relaxed">
-            Guarda tu contexto una vez. Recúperalo siempre. Continúa donde lo dejaste en cualquier sesión con cualquier IA.
+          <p className="text-lg mb-10 max-w-md mx-auto" style={{color:'rgba(255,255,255,0.4)'}}>
+            En 2 minutos. Sin tarjeta. Gratis para siempre.
           </p>
-          <Link href="/login" className="inline-flex items-center gap-2 px-10 py-4 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold text-base transition-all shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50">
-            Empieza gratis — sin tarjeta
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
+          <Link href="/login" style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 4px 32px rgba(109,40,217,0.4)',border:'1px solid rgba(139,92,246,0.4)'}} className="inline-flex items-center gap-3 px-10 py-4 rounded-xl text-white font-bold text-base transition-opacity hover:opacity-90">
+            Empezar gratis &#x2192;
           </Link>
-          <p className="mt-4 text-white/20 text-sm">Free para siempre. Pro desde 9 €/mes.</p>
+          <p className="mt-5 text-xs" style={{color:'rgba(255,255,255,0.2)'}}>Free para siempre &#xB7; Pro desde 9 &#x20AC;/mes &#xB7; Cancela cuando quieras</p>
         </div>
       </section>
 
-      <AIDemo />
-
       {/* FOOTER */}
-      <footer className="py-10 px-6 border-t border-white/5">
+      <footer style={{borderTop:'1px solid rgba(255,255,255,0.05)'}} className="py-10 px-6">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md bg-violet-600 flex items-center justify-center">
-              <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
-              </svg>
+            <div style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',width:'22px',height:'22px',borderRadius:'6px',display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <span className="text-white font-bold text-xs">K</span>
             </div>
-            <span className="font-semibold text-sm text-white/60">Keeper</span>
+            <span style={{color:'rgba(255,255,255,0.4)'}} className="font-semibold text-sm">Keeper</span>
           </div>
-          <p className="text-white/20 text-xs">La memoria operativa de tu IA. © 2025 Keeper.</p>
+          <p style={{color:'rgba(255,255,255,0.2)'}} className="text-xs">La memoria operativa de tu IA. &#xA9; 2025 Keeper.</p>
           <div className="flex items-center gap-6">
-            <Link href="/pricing" className="text-white/30 hover:text-white/60 text-xs transition-colors">Precios</Link>
-            <Link href="/login" className="text-white/30 hover:text-white/60 text-xs transition-colors">Acceder</Link>
+            <Link href="/pricing" style={{color:'rgba(255,255,255,0.3)'}} className="hover:text-white/60 text-xs transition-colors">Precios</Link>
+            <Link href="/privacy" style={{color:'rgba(255,255,255,0.3)'}} className="hover:text-white/60 text-xs transition-colors">Privacidad</Link>
+            <Link href="/login" style={{color:'rgba(255,255,255,0.3)'}} className="hover:text-white/60 text-xs transition-colors">Acceder</Link>
           </div>
         </div>
       </footer>
