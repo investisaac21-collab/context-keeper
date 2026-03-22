@@ -77,11 +77,11 @@ export default function Home() {
           ))}
         </div>
         {/* Stats */}
-        <div className="flex gap-12 mt-14 animate-fade-up delay-500">
-          {[['Profiles','7 tipos'],['Formatos','9 export'],['Modos','Forge x3']].map(([n,label])=>(
-            <div key={n} className="text-center">
-              <p className="text-xl font-bold text-white">{n}</p>
-              <p className="text-xs mt-0.5" style={{color:'rgba(255,255,255,0.3)'}}>{label}</p>
+        <div className="flex gap-5 mt-14 animate-fade-up delay-500 flex-wrap justify-center">
+          {([['7','Tipos de perfil','rgba(139,92,246,0.12)','rgba(139,92,246,0.3)','#c4b5fd'],['9','Formatos de export','rgba(59,130,246,0.1)','rgba(59,130,246,0.25)','#93c5fd'],['3','Modos Forge','rgba(251,191,36,0.1)','rgba(251,191,36,0.25)','#fde68a']] as [string,string,string,string,string][]).map(([n,label,bg,border,color])=>(
+            <div key={n} style={{background:bg,border:'1px solid '+border,borderRadius:12,padding:'12px 20px',textAlign:'center',minWidth:100}}>
+              <p style={{fontSize:28,fontWeight:800,color:color,lineHeight:1.1}}>{n}</p>
+              <p style={{fontSize:11,color:'rgba(255,255,255,0.45)',marginTop:4,fontWeight:500}}>{label}</p>
             </div>
           ))}
         </div>
@@ -91,52 +91,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* EL SISTEMA — 5 modulos */}
-      <section id="sistema" className="py-24 px-6 fade-section" style={{borderTop:'1px solid rgba(255,255,255,0.05)'}}>
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-xs font-bold tracking-widest mb-3 uppercase" style={{color:'rgba(139,92,246,0.8)'}}>El sistema completo</p>
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4 leading-tight">
-              Un flujo. Cinco herramientas.<br />
-              <span style={{color:'rgba(255,255,255,0.45)'}}>Cada una especializada.</span>
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-            {[
-              {name:'Profiles',icon:'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',desc:'Define la identidad, lore, voz y reglas. 7 tipos de perfil.',color:'#a78bfa',bg:'rgba(139,92,246,0.08)',border:'rgba(139,92,246,0.2)',num:'01'},
-              {name:'Lab',icon:'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',desc:'Analiza coherencia en 4 dimensiones: Claridad, Consistencia, Completitud, Efectividad.',color:'#93c5fd',bg:'rgba(59,130,246,0.08)',border:'rgba(59,130,246,0.2)',num:'02'},
-              {name:'Forge',icon:'M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z',desc:'Simula escenarios reales, stress tests y validaciones libres.',color:'#fcd34d',bg:'rgba(245,158,11,0.08)',border:'rgba(245,158,11,0.2)',num:'03'},
-              {name:'Export',icon:'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12',desc:'9 formatos: System Prompt, JSON, YAML, NPC Sheet, Brand Brief y m&#xE1;s.',color:'#cbd5e1',bg:'rgba(148,163,184,0.06)',border:'rgba(148,163,184,0.15)',num:'04'},
-              {name:'Sandbox',icon:'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',desc:'Chatea con tu perfil en modo libre o ejecuta prompts de prueba.',color:'#6ee7b7',bg:'rgba(16,185,129,0.08)',border:'rgba(16,185,129,0.2)',num:'05'},
-            ].map((m)=>(
-              <div key={m.name} style={{background:m.bg,border:'1px solid '+m.border,transition:'transform 0.2s'}} className="rounded-2xl p-5 flex flex-col hover:scale-[1.02]">
-                <div className="flex items-center justify-between mb-4">
-                  <div style={{background:m.border,borderRadius:'10px',padding:'7px'}}>
-                    <svg width="16" height="16" fill="none" stroke={m.color} strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={m.icon}/></svg>
-                  </div>
-                  <span style={{color:'rgba(255,255,255,0.15)'}} className="text-xs font-mono">{m.num}</span>
-                </div>
-                <p style={{color:m.color}} className="font-bold text-sm mb-2">{m.name}</p>
-                <p style={{color:'rgba(255,255,255,0.4)'}} className="text-xs leading-relaxed">{m.desc}</p>
-              </div>
-            ))}
-          </div>
-          {/* Flow arrow */}
-          <div className="flex items-center justify-center gap-2 mt-8" style={{color:'rgba(255,255,255,0.2)'}}>
-            <span className="text-xs">Crea</span>
-            <span>&#x2192;</span>
-            <span className="text-xs">Analiza</span>
-            <span>&#x2192;</span>
-            <span className="text-xs">Simula</span>
-            <span>&#x2192;</span>
-            <span className="text-xs">Exporta</span>
-            <span>&#x2192;</span>
-            <span className="text-xs">Chatea</span>
-          </div>
-        </div>
-      </section>
-
-      {/* GAMING / NPCs / WORLDBUILDING */}
       <section id="gaming" className="py-24 px-6 fade-section" style={{borderTop:'1px solid rgba(255,255,255,0.05)'}}>
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -192,7 +146,7 @@ export default function Home() {
                     <p style={{color:'rgba(255,255,255,0.55)'}} className="text-xs leading-relaxed">Traicion&#xF3; a su orden hace 300 a&#xF1;os. Vive con culpa. Solo el jugador elegido puede saber la verdad.</p>
                   </div>
                   <div>
-                    <p style={{color:'rgba(255,255,255,0.3)'}} className="text-xs font-semibold mb-1">FORGE — ESCENARIO</p>
+                    <p style={{color:'rgba(255,255,255,0.3)'}} className="text-xs font-semibold mb-1">FORGE a?? ESCENARIO</p>
                     <div style={{background:'rgba(245,158,11,0.08)',border:'1px solid rgba(245,158,11,0.2)',borderRadius:'10px',padding:'10px'}}>
                       <p style={{color:'rgba(245,158,11,0.9)'}} className="text-xs font-bold mb-1">El jugador pregunta sobre la Grieta</p>
                       <p style={{color:'rgba(255,255,255,0.5)'}} className="text-xs">Veredicto: <span style={{color:'#34d399',fontWeight:'bold'}}>S&#xD3;LIDO</span> &#xB7; Score: 91</p>
@@ -205,14 +159,57 @@ export default function Home() {
         </div>
       </section>
 
-      {/* PROFESIONAL */}
+      <section id="sistema" className="py-24 px-6 fade-section" style={{borderTop:'1px solid rgba(255,255,255,0.05)'}}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-xs font-bold tracking-widest mb-3 uppercase" style={{color:'rgba(139,92,246,0.8)'}}>El sistema completo</p>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 leading-tight">
+              Un flujo. Cinco herramientas.<br />
+              <span style={{color:'rgba(255,255,255,0.45)'}}>Cada una especializada.</span>
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            {[
+              {name:'Profiles',stat:'7 tipos',icon:'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',desc:'Define la identidad, lore, voz y reglas.',color:'#a78bfa',bg:'rgba(139,92,246,0.08)',border:'rgba(139,92,246,0.2)',num:'01'},
+              {name:'Lab',stat:'Score 4D',icon:'M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',desc:'Analiza coherencia: Claridad, Consistencia, Completitud, Efectividad.',color:'#93c5fd',bg:'rgba(59,130,246,0.08)',border:'rgba(59,130,246,0.2)',num:'02'},
+              {name:'Forge',stat:'3 modos',icon:'M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z',desc:'Simula escenarios reales, stress tests y validaciones libres.',color:'#fcd34d',bg:'rgba(245,158,11,0.08)',border:'rgba(245,158,11,0.2)',num:'03'},
+              {name:'Export',stat:'9 formatos',icon:'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12',desc:'System Prompt, JSON, YAML, NPC Sheet, Brand Brief y mas.',color:'#cbd5e1',bg:'rgba(148,163,184,0.06)',border:'rgba(148,163,184,0.15)',num:'04'},
+              {name:'Sandbox',icon:'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',desc:'Chatea con tu perfil en modo libre o ejecuta prompts de prueba.',color:'#6ee7b7',bg:'rgba(16,185,129,0.08)',border:'rgba(16,185,129,0.2)',num:'05'},
+            ].map((m)=>(
+              <div key={m.name} style={{background:m.bg,border:'1px solid '+m.border,transition:'transform 0.2s'}} className="rounded-2xl p-5 flex flex-col hover:scale-[1.02]">
+                <div className="flex items-center justify-between mb-4">
+                  <div style={{background:m.border,borderRadius:'10px',padding:'7px'}}>
+                    <svg width="16" height="16" fill="none" stroke={m.color} strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={m.icon}/></svg>
+                  </div>
+                  <div style={{display:'flex',alignItems:'center',gap:6}}>{m.stat&&<span style={{background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',color:'rgba(255,255,255,0.5)',fontSize:9,fontWeight:700,padding:'2px 7px',borderRadius:20,letterSpacing:'0.04em'}}>{m.stat}</span>}<span style={{color:'rgba(255,255,255,0.15)'}} className="text-xs font-mono">{m.num}</span></div>
+                </div>
+                <p style={{color:m.color}} className="font-bold text-sm mb-2">{m.name}</p>
+                <p style={{color:'rgba(255,255,255,0.4)'}} className="text-xs leading-relaxed">{m.desc}</p>
+              </div>
+            ))}
+          </div>
+          {/* Flow arrow */}
+          <div className="flex items-center justify-center gap-2 mt-8" style={{color:'rgba(255,255,255,0.2)'}}>
+            <span className="text-xs">Crea</span>
+            <span>&#x2192;</span>
+            <span className="text-xs">Analiza</span>
+            <span>&#x2192;</span>
+            <span className="text-xs">Simula</span>
+            <span>&#x2192;</span>
+            <span className="text-xs">Exporta</span>
+            <span>&#x2192;</span>
+            <span className="text-xs">Chatea</span>
+          </div>
+        </div>
+      </section>
+
       <section className="py-24 px-6 fade-section" style={{borderTop:'1px solid rgba(255,255,255,0.05)'}}>
         <div className="max-w-5xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             {/* Cards mockup */}
             <div className="space-y-3">
               {[
-                {name:'Brand Voice — Keeper',type:'Marca',color:'#fcd34d',bg:'rgba(245,158,11,0.08)',border:'rgba(245,158,11,0.2)',score:88},
+                {name:'Brand Voice a?? Keeper',type:'Marca',color:'#fcd34d',bg:'rgba(245,158,11,0.08)',border:'rgba(245,158,11,0.2)',score:88},
                 {name:'Support Agent Pro',type:'Asistente',color:'#a78bfa',bg:'rgba(139,92,246,0.08)',border:'rgba(139,92,246,0.2)',score:94},
                 {name:'Dev Lead AI',type:'T&#xE9;cnico',color:'#93c5fd',bg:'rgba(59,130,246,0.08)',border:'rgba(59,130,246,0.2)',score:79},
               ].map((p)=>(
@@ -258,7 +255,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* PRICING PREVIEW */}
       <section className="py-24 px-6 fade-section" style={{borderTop:'1px solid rgba(255,255,255,0.05)'}}>
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-xs font-bold tracking-widest mb-3 uppercase" style={{color:'rgba(139,92,246,0.8)'}}>Planes</p>
@@ -289,7 +285,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA FINAL */}
       <section className="py-28 px-6 fade-section" style={{borderTop:'1px solid rgba(255,255,255,0.05)'}}>
         <div className="max-w-3xl mx-auto text-center">
           <div className="relative inline-block mb-10">
