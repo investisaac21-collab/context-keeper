@@ -1,3 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-const GEMINI_URL='https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent'
-export async function POST(req: NextRequest){try{const{description,language}=await req.json();if(!description||description.trim().length<5)return NextResponse.json({error:'Descripcion demasiado corta'},{status:400});const apiKey=process.env.GEMINI_API_KEY;if(!apiKey)return NextResponse.json({error:'GEMINI_API_KEY no configurada'},{status:500});const langNames:Record<string,string>={es:'espanol',en:'English',fr:'francais',de:'Deutsch',pt:'portugues',it:'italiano',zh:'chino',ja:'japones'};const targetLang=langNames[language||'es']||'espanol';const prompt=`Eres un experto en diseno de prompts para modelos de IA. Genera un prompt profesional, claro y reutilizable. Escribe el prompt en ${targetLang}. Usa variables dinamicas con doble llave: {{nombre_variable}}. El prompt debe ser directo, estructurado y listo para usar. NO incluyas explicaciones, solo el prompt final. NO uses markdown. Descripcion: ${description.trim()}`;const res=await fetch(`${GEMINI_URL}?key=${apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:0.7,maxOutputTokens:800}})});const data=await res.json();if(!res.ok)return NextResponse.json({error:data.error?.message||'Error Gemini'},{status:500});const generatedPrompt=data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();if(!generatedPrompt)return NextResponse.json({error:'Respuesta vacia de IA'},{status:500});return NextResponse.json({prompt:generatedPrompt})}catch(error){console.error('generate-prompt error:',error);return NextResponse.json({error:'Error interno del servidor'},{status:500})}}
+export async function POST(req: NextRequest) {
+  try {
+    const { description, language } = await req.json()
+    if (!description || description.trim().length < 5) return NextResponse.json({ error: 'Descripcion demasiado corta' }, { status: 400 })
+    const apiKey = process.env.GROQ_API_KEY
+    if (!apiKey) return NextResponse.json({ error: 'API key no configurada' }, { status: 500 })
+    const langNames: Record<string,string> = { es:'espanol',en:'English',fr:'francais',de:'Deutsch',pt:'portugues',it:'italiano',zh:'chino',ja:'japones' }
+    const targetLang = langNames[language||'es']||'espanol'
+    const systemPrompt = `Eres un experto en diseno de prompts para modelos de IA (ChatGPT, Claude, Gemini). Genera un prompt profesional, claro y reutilizable. Escribe en ${targetLang}. Usa variables dinamicas con doble llave: {{nombre_variable}}. NO incluyas explicaciones, solo el prompt final. NO uses markdown.`
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method:'POST', headers:{'Authorization':`Bearer ${apiKey}`,'Content-Type':'application/json'},
+      body:JSON.stringify({ model:'llama-3.1-8b-instant', messages:[{role:'system',content:systemPrompt},{role:'user',content:description.trim()}], max_tokens:800, temperature:0.7 })
+    })
+    if (!response.ok) { const err=await response.text(); return NextResponse.json({error:'Error al llamar a Groq'},{status:500}) }
+    const data = await response.json()
+    const generatedPrompt = data.choices?.[0]?.message?.content?.trim()
+    if (!generatedPrompt) return NextResponse.json({ error: 'Respuesta vacia de la IA' }, { status: 500 })
+    return NextResponse.json({ prompt: generatedPrompt })
+  } catch (error) { return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 }) }
+}
