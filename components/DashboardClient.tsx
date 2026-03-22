@@ -28,7 +28,7 @@ export default function DashboardClient({ projects, stats, plan, userName }: Das
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
   const isPro = plan === 'pro' || plan === 'team'
-  const firstName = userName?.split(' ')[0] || userName?.split('@')[0] || 'ahí'
+  const firstName = userName?.split(' ')[0] || userName?.split('@')[0] || 'ah??'
 
   const copyContext = async (project: Project) => {
     const text = `[${project.name}]\n${project.description || ''}`
@@ -39,7 +39,7 @@ export default function DashboardClient({ projects, stats, plan, userName }: Das
 
   const getGreeting = () => {
     const h = new Date().getHours()
-    if (h < 12) return 'Buenos días'
+    if (h < 12) return 'Buenos d??as'
     if (h < 20) return 'Buenas tardes'
     return 'Buenas noches'
   }
@@ -53,13 +53,13 @@ export default function DashboardClient({ projects, stats, plan, userName }: Das
           <div>
             <p className="text-zinc-500 text-sm mb-1">{getGreeting()},</p>
             <h1 className="text-3xl font-bold text-white">{firstName} <span className="text-violet-400">&#9670;</span></h1>
-            <p className="text-zinc-400 text-sm mt-1">Tu memoria operativa está activa.</p>
+            <p className="text-zinc-400 text-sm mt-1">Tu memoria operativa est?? activa.</p>
           </div>
           <div className="flex items-center gap-3">
             {!isPro && (
               <Link href="/pricing" className="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white text-sm px-4 py-2 rounded-full font-medium transition-all">
                 <span dangerouslySetInnerHTML={{ __html: '&#9670;' }} />
-                Hazte Pro — 9 €/mes
+                Hazte Pro a?? 9 a??/mes
               </Link>
             )}
             {isPro && (
@@ -77,10 +77,10 @@ export default function DashboardClient({ projects, stats, plan, userName }: Das
         {/* Stats row */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
           {[
-            { label: 'Contextos', value: stats.totalContextos, icon: '&#9632;', color: 'text-violet-400' },
-            { label: 'Perfiles', value: stats.totalProfiles, icon: '&#9632;', color: 'text-blue-400' },
-            { label: 'Versiones', value: stats.totalVersions, icon: '&#9632;', color: 'text-emerald-400' },
-            { label: 'Plan', value: isPro ? (plan === 'team' ? 'Team' : 'Pro') : 'Free', icon: '&#9670;', color: 'text-amber-400' },
+            { label: 'Perfiles activos', value: stats.totalProfiles, sub: stats.totalProfiles===0?'Crea tu primero':'Con identidad real', icon: '<svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>', color: 'text-violet-400' },
+            { label: 'Contextos', value: stats.totalContextos, sub: 'Memoria operativa', icon: '<svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>', color: 'text-cyan-400' },
+            { label: 'Plan actual', value: isPro ? (plan === 'team' ? 'Team' : 'Pro') : 'Free', sub: isPro?'Acceso completo':'Upgrade disponible', icon: '<svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>', color: isPro?'text-amber-400':'text-zinc-500' },
+            { label: 'Lab + Forge', value: isPro?'Activo':'Bloqueado', sub: isPro?'Analisis y simulacion':'Solo en Pro', icon: '<svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>', color: isPro?'text-blue-400':'text-zinc-600' },
           ].map((stat, i) => (
             <div key={i} className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
               <p className="text-zinc-500 text-xs mb-2 flex items-center gap-1.5">
@@ -88,6 +88,7 @@ export default function DashboardClient({ projects, stats, plan, userName }: Das
                 {stat.label}
               </p>
               <p className="text-2xl font-bold text-white">{stat.value}</p>
+              {stat.sub&&<p className="text-zinc-600 text-xs mt-1">{stat.sub}</p>}
             </div>
           ))}
         </div>
@@ -109,16 +110,15 @@ export default function DashboardClient({ projects, stats, plan, userName }: Das
             </div>
             <div>
               <p className="text-white text-sm font-medium">Keeper Lab</p>
-              <p className="text-zinc-500 text-xs">Analiza y mejora con IA</p>
-            </div>
-          </Link>
-          <Link href="/pricing" className="group flex items-center gap-4 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-600 rounded-xl p-4 transition-all">
-            <div className="w-10 h-10 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-400 group-hover:bg-zinc-700 transition-all">
-              <span dangerouslySetInnerHTML={{ __html: '&#10024;' }} />
+              <p className="text-zinc-500 t<Link href="/profiles" className="group flex items-center gap-4 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-amber-700/50 rounded-xl p-4 transition-all" style={{borderColor:isPro?'rgba(251,191,36,0.15)':'rgba(63,63,70,0.8)'}}>
+            <div style={{background:isPro?'rgba(251,191,36,0.1)':'rgba(63,63,70,0.4)'}} className="w-10 h-10 rounded-lg flex items-center justify-center group-hover:opacity-80 transition-all">
+              <svg width="16" height="16" fill="none" stroke={isPro?"#fbbf24":"rgba(255,255,255,0.2)"} strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </div>
             <div>
-              <p className="text-white text-sm font-medium">Ver planes</p>
-              <p className="text-zinc-500 text-xs">{isPro ? 'Gestiona tu suscripción' : 'Upgrade a Pro'}</p>
+              <p className="text-white text-sm font-medium" style={{color:isPro?'#fde68a':'rgba(255,255,255,0.4)'}}>Keeper Forge</p>
+              <p className="text-zinc-500 text-xs">{isPro?'Simula escenarios en vivo':'Solo disponible en Pro'}</p>
+            </div>
+          </Link>stiona tu suscripci??n' : 'Upgrade a Pro'}</p>
             </div>
           </Link>
         </div>
@@ -147,7 +147,21 @@ export default function DashboardClient({ projects, stats, plan, userName }: Das
             </div>
             <a href="/pricing" className="flex-shrink-0 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors whitespace-nowrap">
               Hazte Pro
-            </a>
+      {isPro && (
+          <div style={{background:'linear-gradient(135deg,rgba(251,191,36,0.06),rgba(245,158,11,0.04))',border:'1px solid rgba(251,191,36,0.18)',borderRadius:14,padding:'16px 20px',marginBottom:24,display:'flex',alignItems:'center',justifyContent:'space-between',gap:12}}>
+            <div style={{display:'flex',alignItems:'center',gap:14}}>
+              <div style={{width:36,height:36,borderRadius:10,background:'rgba(251,191,36,0.12)',border:'1px solid rgba(251,191,36,0.25)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+                <svg width="16" height="16" fill="none" stroke="#fbbf24" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              </div>
+              <div>
+                <p style={{color:'#fde68a',fontSize:13,fontWeight:700,marginBottom:2}}>Keeper Forge disponible</p>
+                <p style={{color:'rgba(253,230,138,0.5)',fontSize:11}}>Simula como responde tu IA en escenarios reales. Verificado con score de coherencia.</p>
+              </div>
+            </div>
+            <Link href="/profiles" style={{flexShrink:0,background:'rgba(251,191,36,0.12)',border:'1px solid rgba(251,191,36,0.3)',color:'#fde68a',fontSize:11,fontWeight:700,padding:'7px 14px',borderRadius:8,whiteSpace:'nowrap',letterSpacing:'0.03em'}}>Ir a Forge</Link>
+          </div>
+        )}
+              </a>
           </div>
         )}
         {/* Contextos recientes */}
@@ -164,7 +178,7 @@ export default function DashboardClient({ projects, stats, plan, userName }: Das
               </div>
               <h3 className="text-white font-semibold mb-2">Tu primera memoria</h3>
               <p className="text-zinc-400 text-sm mb-6 max-w-sm mx-auto">
-                Crea tu primer contexto. Guarda quién eres, cómo piensas, qué necesita tu IA.
+                Crea tu primer contexto. Guarda qui??n eres, c??mo piensas, qu?? necesita tu IA.
               </p>
               <Link href="/dashboard/new" className="bg-violet-600 hover:bg-violet-500 text-white px-6 py-2.5 rounded-full text-sm font-medium transition-all">
                 Crear primer contexto
@@ -181,7 +195,7 @@ export default function DashboardClient({ projects, stats, plan, userName }: Das
                     <div className="min-w-0">
                       <p className="text-white text-sm font-medium truncate">{project.name}</p>
                       <p className="text-zinc-500 text-xs">
-                        {project.versions?.length || 0} versiones · {new Date(project.updated_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
+                        {project.versions?.length || 0} versiones ?? {new Date(project.updated_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
                       </p>
                     </div>
                   </div>
@@ -211,8 +225,8 @@ export default function DashboardClient({ projects, stats, plan, userName }: Das
           <div className="mt-8 bg-gradient-to-br from-violet-900/20 to-zinc-900 border border-violet-800/30 rounded-2xl p-6">
             <div className="flex items-start gap-4 flex-wrap">
               <div className="flex-1 min-w-[200px]">
-                <p className="text-white font-medium mb-1">¿Tienes un código?</p>
-                <p className="text-zinc-400 text-sm">Aplica un código promocional para acceder a Pro gratis.</p>
+                <p className="text-white font-medium mb-1">??Tienes un c??digo?</p>
+                <p className="text-zinc-400 text-sm">Aplica un c??digo promocional para acceder a Pro gratis.</p>
               </div>
               <PromoInput />
             </div>
@@ -245,11 +259,11 @@ function PromoInput() {
         window.location.href = data.url
       } else {
         setStatus('error')
-        setMsg('Código no válido o expirado')
+        setMsg('C??digo no v??lido o expirado')
       }
     } catch {
       setStatus('error')
-      setMsg('Error al aplicar el código')
+      setMsg('Error al aplicar el c??digo')
     }
   }
 
