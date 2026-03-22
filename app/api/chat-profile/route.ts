@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
     const messages = [
       { role: 'system', content: systemPrompt || 'Eres un asistente de IA. Responde siempre en el idioma del usuario.' },
-      ...history.map((m: any) => ({ role: m.role, content: m.content })),
+      ...history.map((m: { role: string; content: string }) => ({ role: m.role, content: m.content })),
       { role: 'user', content: message }
     ]
 
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
     })
 
     const data = await res.json()
-    
+
     if (!res.ok) {
       return NextResponse.json({ error: data.error?.message || 'Error de GROQ' }, { status: 500 })
     }
