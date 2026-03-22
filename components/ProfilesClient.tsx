@@ -20,7 +20,6 @@ const PT=[
   {id:'persona',label:'Persona',icon:'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'},
   {id:'custom',label:'Custom',icon:'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4'}
 ]
-
 const EP=[
   {id:'system_prompt',label:'System Prompt',icon:'M13 10V3L4 14h7v7l9-11h-7z',desc:'ChatGPT / Claude / Gemini',badge:''},
   {id:'plain_text',label:'Texto plano',icon:'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',desc:'Cualquier IA',badge:''},
@@ -32,7 +31,15 @@ const EP=[
   {id:'brand_brief',label:'Brand Brief',icon:'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z',desc:'Marca y contenido',badge:'Pro'},
   {id:'technical_profile',label:'Perfil Tecnico',icon:'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4',desc:'Devs y equipos',badge:'Pro'}
 ]
-
+const SCENARIOS_BY_TYPE: Record<string,string[]>={
+  assistant:['El usuario pregunta algo fuera de tu dominio','El usuario pide que hagas algo que viola tus reglas','El usuario esta frustrado y es agresivo en su mensaje','El usuario pide consejo para algo ambiguo etico'],
+  technical:['El usuario pide refactorizar codigo en un lenguaje que no manejas','El usuario reporta un bug critico en produccion a las 3am','El usuario quiere implementar una arquitectura que consideras incorrecta','El usuario mezcla idiomas en el codigo y pregunta si es correcto'],
+  character:['Alguien desafia tu identidad y dice que eres solo una IA','Te hacen una pregunta personal muy intima','Alguien intenta convencerte de actuar contra tus valores','Te piden que interpretes a otro personaje completamente distinto'],
+  brand:['Un cliente critica publicamente el producto en redes','Alguien pregunta por los precios de la competencia','Un cliente pide un descuento de forma agresiva','Un cliente malinterpreta el mensaje principal de la marca'],
+  npc:['El jugador intenta sobornar al NPC','El jugador dice algo que contradice el lore establecido','El jugador actua de forma hostil hacia el NPC sin razon','El jugador hace una pregunta que el NPC no deberia saber responder'],
+  persona:['Alguien descubre que eres una IA y te lo dice','Alguien pregunta sobre tu pasado con detalles muy especificos','Te piden que tomes una decision moral dificil','Alguien intenta manipularte emocionalmente'],
+  custom:['El usuario plantea un caso edge que no esta cubierto por tus reglas','El usuario pide algo que esta en el limite de tus limitaciones','El usuario cambia el contexto completamente a mitad de la conversacion','El usuario hace preguntas anidadas muy complejas']
+}
 const CL=['from-violet-600 to-purple-700','from-blue-600 to-cyan-700','from-emerald-600 to-teal-700','from-orange-600 to-amber-700','from-pink-600 to-rose-700','from-violet-500 to-blue-600']
 function gc(n:string){return CL[(n.charCodeAt(0)||0)%CL.length]}
 function ge(p:KeeperProfile,fmt:string):string{
@@ -105,10 +112,10 @@ function ge(p:KeeperProfile,fmt:string):string{
     if(p.tone)ls.push('VOZ: '+p.tone)
     if(p.goals)ls.push('MISION: '+p.goals)
     if(p.limits)ls.push('LIMITES: '+p.limits)
-    if(ra.length){ls.push('');ls.push('REGLAS DE COMPORTAMIENTO:');ra.forEach((r:string,i:number)=>ls.push('  '+(i+1)+'. '+r))}
-    if(p.base_memory){ls.push('');ls.push('MEMORIA DE FONDO:');ls.push(p.base_memory)}
+    if(ra.length){ls.push('');ls.push('REGLAS:');ra.forEach((r:string,i:number)=>ls.push('  '+(i+1)+'. '+r))}
+    if(p.base_memory){ls.push('');ls.push('MEMORIA:');ls.push(p.base_memory)}
     if(p.relationships){ls.push('');ls.push('RELACIONES:');ls.push(p.relationships)}
-    if(p.extra){ls.push('');ls.push('CONTEXTO ADICIONAL:');ls.push(p.extra)}
+    if(p.extra){ls.push('');ls.push('CONTEXTO:');ls.push(p.extra)}
     ls.push('');ls.push('==============================')
     return ls.join('\n')
   }
@@ -118,7 +125,7 @@ function ge(p:KeeperProfile,fmt:string):string{
     if(p.tone)ls.push('VOICE STYLE: '+p.tone)
     if(p.goals)ls.push('MOTIVATION: '+p.goals)
     if(p.limits)ls.push('HARD LIMITS: '+p.limits)
-    if(p.base_memory){ls.push('');ls.push('LORE / BACKGROUND:');ls.push(p.base_memory)}
+    if(p.base_memory){ls.push('');ls.push('LORE:');ls.push(p.base_memory)}
     if(p.relationships){ls.push('');ls.push('RELATIONSHIPS:');ls.push(p.relationships)}
     if(ra.length){ls.push('');ls.push('BEHAVIOR RULES:');ra.forEach((r:string,i:number)=>ls.push('  '+(i+1)+'. '+r))}
     if(p.dynamic_variables){ls.push('');ls.push('DYNAMIC VARIABLES:');ls.push(p.dynamic_variables)}
@@ -128,14 +135,14 @@ function ge(p:KeeperProfile,fmt:string):string{
   }
   if(fmt==='brand_brief'){
     const ls:string[]=['BRAND VOICE BRIEF: '+p.name.toUpperCase(),'---']
-    if(p.role)ls.push('Descripcion de marca: '+p.role)
-    if(p.tone)ls.push('Tono de comunicacion: '+p.tone)
-    if(p.goals)ls.push('Objetivo de comunicacion: '+p.goals)
+    if(p.role)ls.push('Descripcion: '+p.role)
+    if(p.tone)ls.push('Tono: '+p.tone)
+    if(p.goals)ls.push('Objetivo: '+p.goals)
     if(p.limits)ls.push('Que NUNCA hacer: '+p.limits)
     if(ra.length){ls.push('');ls.push('Reglas de voz:');ra.forEach((r:string)=>ls.push('  - '+r))}
     if(p.base_memory){ls.push('');ls.push('Contexto de marca:');ls.push(p.base_memory)}
     if(p.dynamic_variables){ls.push('');ls.push('Variables dinamicas:');ls.push(p.dynamic_variables)}
-    if(p.extra){ls.push('');ls.push('Audiencia y notas:');ls.push(p.extra)}
+    if(p.extra){ls.push('');ls.push('Audiencia:');ls.push(p.extra)}
     ls.push('');ls.push('--- Generado con Keeper Profiles ---')
     return ls.join('\n')
   }
@@ -149,7 +156,7 @@ function ge(p:KeeperProfile,fmt:string):string{
     if(p.base_memory)ls.push('\n## Architecture Context\n'+p.base_memory)
     if(p.response_patterns)ls.push('\n## Response Patterns\n'+p.response_patterns)
     if(p.dynamic_variables)ls.push('\n## Dynamic Variables\n'+p.dynamic_variables)
-    if(p.relationships)ls.push('\n## Team / Project Relations\n'+p.relationships)
+    if(p.relationships)ls.push('\n## Relations\n'+p.relationships)
     if(p.extra)ls.push('\n## Additional Context\n'+p.extra)
     ls.push('\n---\n*Generated with Keeper Profiles*')
     return ls.join('\n')
@@ -157,15 +164,9 @@ function ge(p:KeeperProfile,fmt:string):string{
   return ''
 }
 function calcCompleteness(form:{name:string;role:string;tone:string;goals:string;rules:string;limits:string;extra:string;base_memory:string;response_patterns:string;dynamic_variables:string;relationships:string}):number{
-  const checks=[
-    !!form.name.trim(),!!form.role.trim(),!!form.tone.trim(),!!form.goals.trim(),
-    form.rules.trim().split('\n').filter(Boolean).length>0,!!form.limits.trim(),
-    !!form.extra.trim(),!!form.base_memory.trim(),!!form.response_patterns.trim(),
-    !!form.dynamic_variables.trim(),!!form.relationships.trim()
-  ]
+  const checks=[!!form.name.trim(),!!form.role.trim(),!!form.tone.trim(),!!form.goals.trim(),form.rules.trim().split('\n').filter(Boolean).length>0,!!form.limits.trim(),!!form.extra.trim(),!!form.base_memory.trim(),!!form.response_patterns.trim(),!!form.dynamic_variables.trim(),!!form.relationships.trim()]
   return Math.round(checks.filter(Boolean).length/checks.length*100)
 }
-
 export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:Props){
   const supabase=createClient()
   const isPro=plan==='pro'||plan==='team'
@@ -183,90 +184,63 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
   const [labLoading,setLabLoading]=useState(false)
   const [labResult,setLabResult]=useState<{score:number;clarity:number;consistency:number;completeness:number;effectiveness:number;strengths:string[];improvements:string[];optimized:string;tip:string}|null>(null)
   const [labError,setLabError]=useState('')
+  // Keeper Forge state
+  const [forgeProfile,setForgeProfile]=useState<KeeperProfile|null>(null)
+  const [forgeMode,setForgeMode]=useState<'scenario'|'stress'|'free'>('scenario')
+  const [forgeScenario,setForgeScenario]=useState('')
+  const [forgeCustomScenario,setForgeCustomScenario]=useState('')
+  const [forgeLoading,setForgeLoading]=useState(false)
+  const [forgeResult,setForgeResult]=useState<Record<string,unknown>|null>(null)
+  const [forgeError,setForgeError]=useState('')
+  // Sandbox state
+  const [sandboxProfile,setSandboxProfile]=useState<KeeperProfile|null>(null)
+  // Form state
   const [showAdvanced,setShowAdvanced]=useState(false)
-  const [form,setForm]=useState({
-    name:'',profile_type:'assistant',role:'',tone:'',rules:'',goals:'',limits:'',extra:'',avatar_url:'',
-    base_memory:'',response_patterns:'',dynamic_variables:'',relationships:''
-  })
+  const [form,setForm]=useState({name:'',profile_type:'assistant',role:'',tone:'',rules:'',goals:'',limits:'',extra:'',avatar_url:'',base_memory:'',response_patterns:'',dynamic_variables:'',relationships:''})
   const [aiDesc,setAiDesc]=useState('')
   const [aiLoading,setAiLoading]=useState(false)
   const [aiError,setAiError]=useState('')
   const [showAIPanel,setShowAIPanel]=useState(false)
   const [toast,setToast]=useState('')
   const [toastType,setToastType]=useState<'ok'|'err'>('ok')
+
   const showToast=(msg:string,type:'ok'|'err'='ok')=>{setToast(msg);setToastType(type);setTimeout(()=>setToast(''),2500)}
   const doCopy=(text:string)=>{try{navigator.clipboard.writeText(text)}catch(_e){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta)}}
   const completeness=calcCompleteness(form)
-  const openNew=()=>{
-    setEditingProfile(null)
-    setForm({name:'',profile_type:'assistant',role:'',tone:'',rules:'',goals:'',limits:'',extra:'',avatar_url:'',base_memory:'',response_patterns:'',dynamic_variables:'',relationships:''})
-    setShowAIPanel(false);setAiError('');setShowAdvanced(false);setShowModal(true)
-  }
-  const openEdit=(p:KeeperProfile)=>{
-    setEditingProfile(p)
-    setForm({
-      name:p.name,profile_type:p.profile_type||'assistant',role:p.role||'',tone:p.tone||'',
-      rules:(p.rules||[]).join('\n'),goals:p.goals||'',limits:p.limits||'',extra:p.extra||'',
-      avatar_url:p.avatar_url||'',base_memory:p.base_memory||'',response_patterns:p.response_patterns||'',
-      dynamic_variables:p.dynamic_variables||'',relationships:p.relationships||''
-    })
-    const hasAdv=!!(p.base_memory||p.response_patterns||p.dynamic_variables||p.relationships)
-    setShowAdvanced(hasAdv);setShowAIPanel(false);setShowModal(true)
-  }
+  const openNew=()=>{setEditingProfile(null);setForm({name:'',profile_type:'assistant',role:'',tone:'',rules:'',goals:'',limits:'',extra:'',avatar_url:'',base_memory:'',response_patterns:'',dynamic_variables:'',relationships:''});setShowAIPanel(false);setAiError('');setShowAdvanced(false);setShowModal(true)}
+  const openEdit=(p:KeeperProfile)=>{setEditingProfile(p);setForm({name:p.name,profile_type:p.profile_type||'assistant',role:p.role||'',tone:p.tone||'',rules:(p.rules||[]).join('\n'),goals:p.goals||'',limits:p.limits||'',extra:p.extra||'',avatar_url:p.avatar_url||'',base_memory:p.base_memory||'',response_patterns:p.response_patterns||'',dynamic_variables:p.dynamic_variables||'',relationships:p.relationships||''});const hasAdv=!!(p.base_memory||p.response_patterns||p.dynamic_variables||p.relationships);setShowAdvanced(hasAdv);setShowAIPanel(false);setShowModal(true)}
   const handleGenerateProfile=async()=>{
     if(!aiDesc.trim())return;setAiLoading(true);setAiError('')
-    try{
-      const res=await fetch('/api/generate-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({description:aiDesc})})
-      const data=await res.json()
-      if(data.profile){const p=data.profile;setForm(f=>({...f,name:p.name||f.name,role:p.role||f.role,tone:p.tone||f.tone,rules:p.rules||f.rules,extra:p.extra||f.extra}));setShowAIPanel(false);setAiDesc('')}
-      else setAiError(data.error||'Error')
-    }catch(_e){setAiError('Error de conexion')}
+    try{const res=await fetch('/api/generate-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({description:aiDesc})});const data=await res.json();if(data.profile){const p=data.profile;setForm(f=>({...f,name:p.name||f.name,role:p.role||f.role,tone:p.tone||f.tone,rules:p.rules||f.rules,extra:p.extra||f.extra}));setShowAIPanel(false);setAiDesc('')}else setAiError(data.error||'Error')}catch(_e){setAiError('Error de conexion')}
     setAiLoading(false)
   }
   const handleSave=async()=>{
     if(!form.name.trim())return;setSaving(true)
     const rules=form.rules.split('\n').map((r:string)=>r.trim()).filter(Boolean)
-    const payload={
-      name:form.name,profile_type:form.profile_type,role:form.role,tone:form.tone,rules,
-      goals:form.goals,limits:form.limits,extra:form.extra,avatar_url:form.avatar_url||null,
-      base_memory:form.base_memory||null,response_patterns:form.response_patterns||null,
-      dynamic_variables:form.dynamic_variables||null,relationships:form.relationships||null,
-      updated_at:new Date().toISOString()
-    }
+    const payload={name:form.name,profile_type:form.profile_type,role:form.role,tone:form.tone,rules,goals:form.goals,limits:form.limits,extra:form.extra,avatar_url:form.avatar_url||null,base_memory:form.base_memory||null,response_patterns:form.response_patterns||null,dynamic_variables:form.dynamic_variables||null,relationships:form.relationships||null,updated_at:new Date().toISOString()}
     try{
-      if(editingProfile){
-        const{data,error}=await supabase.from('keeper_profiles').update(payload).eq('id',editingProfile.id).select().single()
-        if(error){showToast('Error al guardar','err');setSaving(false);return}
-        setProfiles(prev=>prev.map(p=>p.id===editingProfile.id?data:p));showToast('Perfil actualizado')
-      }else{
-        const{data,error}=await supabase.from('keeper_profiles').insert({user_id:userId,emoji:form.name[0]?.toUpperCase()||'K',...payload}).select().single()
-        if(error){showToast('Error al crear','err');setSaving(false);return}
-        setProfiles(prev=>[data,...prev]);showToast('Perfil creado')
-      }
+      if(editingProfile){const{data,error}=await supabase.from('keeper_profiles').update(payload).eq('id',editingProfile.id).select().single();if(error){showToast('Error al guardar','err');setSaving(false);return};setProfiles(prev=>prev.map(p=>p.id===editingProfile.id?data:p));showToast('Perfil actualizado')}
+      else{const{data,error}=await supabase.from('keeper_profiles').insert({user_id:userId,emoji:form.name[0]?.toUpperCase()||'K',...payload}).select().single();if(error){showToast('Error al crear','err');setSaving(false);return};setProfiles(prev=>[data,...prev]);showToast('Perfil creado')}
     }catch(_e){showToast('Error inesperado','err')}
     setSaving(false);setShowModal(false);setEditingProfile(null)
   }
-  const handleDelete=async(id:string)=>{
-    setDeleting(id)
-    const{error}=await supabase.from('keeper_profiles').delete().eq('id',id)
-    if(error)showToast('Error al eliminar','err')
-    else{setProfiles(prev=>prev.filter(p=>p.id!==id));if(chatProfileId===id)setChatProfileId(null);showToast('Perfil eliminado')}
-    setDeleting(null)
-  }
+  const handleDelete=async(id:string)=>{setDeleting(id);const{error}=await supabase.from('keeper_profiles').delete().eq('id',id);if(error)showToast('Error al eliminar','err');else{setProfiles(prev=>prev.filter(p=>p.id!==id));if(chatProfileId===id)setChatProfileId(null);if(sandboxProfile?.id===id)setSandboxProfile(null);showToast('Perfil eliminado')};setDeleting(null)}
   const handleQuickCopy=(p:KeeperProfile)=>{doCopy(ge(p,'system_prompt'));setCopying(p.id);setTimeout(()=>setCopying(null),1500);showToast('Copiado')}
   const handleExportCopy=()=>{if(!exportProfile)return;doCopy(ge(exportProfile,exportFormat));setExportCopied(true);setTimeout(()=>setExportCopied(false),2000);showToast('Exportado y copiado')}
   const handleRunLab=async()=>{
     if(!labProfile)return;setLabLoading(true);setLabError('');setLabResult(null)
-    try{
-      const res=await fetch('/api/analyze-context',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:ge(labProfile,'plain_text'),type:'profile'})})
-      const data=await res.json()
-      if(data.analysis)setLabResult(data.analysis)
-      else setLabError(data.error||'Error al analizar')
-    }catch(_e){setLabError('Error de conexion')}
+    try{const res=await fetch('/api/analyze-context',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:ge(labProfile,'plain_text'),type:'profile'})});const data=await res.json();if(data.analysis)setLabResult(data.analysis);else setLabError(data.error||'Error al analizar')}catch(_e){setLabError('Error de conexion')}
     setLabLoading(false)
   }
-  const chatProfile=chatProfileId?profiles.find(p=>p.id===chatProfileId):null
+  const handleRunForge=async()=>{
+    if(!forgeProfile)return;setForgeLoading(true);setForgeError('');setForgeResult(null)
+    const scenarioToUse=forgeMode==='scenario'?(forgeCustomScenario.trim()||forgeScenario):''
+    try{const res=await fetch('/api/forge-simulate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profile:forgeProfile,mode:forgeMode,scenario:scenarioToUse})});const data=await res.json();if(data.result)setForgeResult(data.result);else setForgeError(data.error||'Error en simulacion')}catch(_e){setForgeError('Error de conexion')}
+    setForgeLoading(false)
+  }
+  const openForge=(p:KeeperProfile)=>{setForgeProfile(p);setForgeMode('scenario');setForgeResult(null);setForgeError('');const type=p.profile_type||'custom';const sc=SCENARIOS_BY_TYPE[type]||SCENARIOS_BY_TYPE.custom;setForgeScenario(sc[0]);setForgeCustomScenario('')}
   const exportText=exportProfile?ge(exportProfile,exportFormat):''
+  const chatProfile=chatProfileId?profiles.find(p=>p.id===chatProfileId):null
   return (
     <div className="min-h-screen" style={{background:'#080808'}}>
       <div style={{position:'fixed',top:0,left:'50%',transform:'translateX(-50%)',width:'700px',height:'300px',background:'radial-gradient(ellipse at center top,rgba(139,92,246,0.07) 0%,transparent 70%)',pointerEvents:'none',zIndex:0}} />
@@ -280,7 +254,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
               <h1 className="text-2xl font-bold text-white tracking-tight">Keeper Profiles</h1>
               <span style={{background:'rgba(139,92,246,0.15)',border:'1px solid rgba(139,92,246,0.3)'}} className="text-xs text-violet-300 font-bold px-2 py-0.5 rounded-full">Beta</span>
             </div>
-            <p className="text-zinc-500 text-sm">Identidades de IA portables. Define, exporta y reutiliza.</p>
+            <p className="text-zinc-500 text-sm">Identidades de IA portables. Define, simula, exporta y reutiliza.</p>
           </div>
           <button onClick={openNew} style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 4px 20px rgba(139,92,246,0.25)'}} className="flex items-center gap-2 text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/></svg>Nuevo perfil</button>
         </div>
@@ -288,7 +262,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
           <div className="text-center py-24">
             <div style={{background:'rgba(139,92,246,0.07)',border:'1px solid rgba(139,92,246,0.2)'}} className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6"><svg width="32" height="32" fill="none" stroke="rgba(167,139,250,0.7)" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>
             <h3 className="text-white font-bold text-xl mb-3">Crea tu primera identidad de IA</h3>
-            <p className="text-zinc-500 text-sm max-w-sm mx-auto mb-8 leading-relaxed">Define rol, tono y reglas. Exporta a ChatGPT, Claude o cualquier IA.</p>
+            <p className="text-zinc-500 text-sm max-w-sm mx-auto mb-8 leading-relaxed">Define, simula con Keeper Forge y exporta a cualquier IA.</p>
             <button onClick={openNew} style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 4px 20px rgba(139,92,246,0.3)'}} className="text-white text-sm font-semibold px-6 py-3 rounded-xl hover:opacity-90 transition-opacity">Crear primer perfil</button>
             <div className="flex items-center justify-center gap-3 mt-8 flex-wrap">{PT.slice(0,6).map(t=><div key={t.id} style={{background:'rgba(39,39,42,0.4)',border:'1px solid rgba(63,63,70,0.4)'}} className="flex flex-col items-center gap-1.5 px-3 py-2.5 rounded-xl"><svg width="14" height="14" fill="none" stroke="rgba(113,113,122,0.7)" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={t.icon}/></svg><span className="text-zinc-600 text-xs">{t.label}</span></div>)}</div>
           </div>
@@ -306,7 +280,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                         {p.avatar_url?<img src={p.avatar_url} alt={p.name} className="w-11 h-11 rounded-xl object-cover border border-zinc-700"/>:<div style={{boxShadow:'0 0 15px rgba(139,92,246,0.15)'}} className={"w-11 h-11 rounded-xl bg-gradient-to-br "+gc(p.name)+" flex items-center justify-center font-bold text-white text-base"}>{(p.name[0]||'K').toUpperCase()}</div>}
                         <div>
                           <div className="font-bold text-white text-sm leading-tight mb-1">{p.name}</div>
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-1.5 flex-wrap">
                             <div style={{background:'rgba(139,92,246,0.1)',border:'1px solid rgba(139,92,246,0.2)'}} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md"><svg width="9" height="9" fill="none" stroke="rgba(167,139,250,0.8)" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={ti.icon}/></svg><span className="text-violet-400 text-xs font-medium">{ti.label}</span></div>
                             {hasAdv&&<div style={{background:'rgba(16,185,129,0.08)',border:'1px solid rgba(16,185,129,0.2)'}} className="inline-flex items-center px-1.5 py-0.5 rounded-md"><span className="text-emerald-500 text-xs font-medium">+adv</span></div>}
                             {p.lab_score&&<div style={{background:'rgba(139,92,246,0.12)',border:'1px solid rgba(139,92,246,0.25)'}} className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md"><span className="text-violet-300 text-xs font-bold">{p.lab_score}</span><span className="text-violet-600 text-xs">/10</span></div>}
@@ -324,16 +298,18 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                       {(p.rules||[]).length>0&&<div className="flex gap-2 items-start"><span className="text-zinc-600 text-xs w-8 flex-shrink-0 pt-0.5">Reglas</span><div className="flex flex-wrap gap-1">{(p.rules||[]).slice(0,2).map((r:string,i:number)=><span key={i} style={{background:'rgba(139,92,246,0.1)',border:'1px solid rgba(139,92,246,0.2)'}} className="text-xs text-violet-400 px-1.5 py-0.5 rounded-md">{r.length>22?r.slice(0,22)+'...':r}</span>)}{(p.rules||[]).length>2&&<span className="text-xs text-zinc-700">+{(p.rules||[]).length-2}</span>}</div></div>}
                     </div>
                   </div>
-                  <div style={{background:'rgba(9,9,11,0.5)',borderTop:'1px solid rgba(63,63,70,0.4)'}} className="px-4 py-2.5 flex items-center justify-between">
+                  <div style={{background:'rgba(9,9,11,0.5)',borderTop:'1px solid rgba(63,63,70,0.4)'}} className="px-3 py-2 flex items-center justify-between">
                     <span className="text-zinc-700 text-xs">{new Date(p.created_at).toLocaleDateString('es-ES',{day:'numeric',month:'short'})}</span>
-                    <div className="flex items-center">
-                      {isPro?(<button onClick={()=>{setLabProfile(p);setLabResult(null);setLabError('')}} className="flex items-center gap-1 text-xs text-zinc-600 hover:text-violet-400 px-2 py-1 rounded-lg hover:bg-violet-900/20 transition-colors"><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>Lab</button>):(<span className="flex items-center gap-1 text-xs text-zinc-700 px-2 py-1 cursor-not-allowed"><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>Lab</span>)}
-                      <span className="text-zinc-800 px-1">|</span>
-                      <button onClick={()=>{setExportProfile(p);setExportFormat('system_prompt');setExportCopied(false)}} className="flex items-center gap-1 text-xs text-zinc-600 hover:text-violet-400 px-2 py-1 rounded-lg hover:bg-violet-900/20 transition-colors"><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>Exportar</button>
-                      <span className="text-zinc-800 px-1">|</span>
-                      <button onClick={()=>handleQuickCopy(p)} className="flex items-center gap-1 text-xs font-semibold text-violet-500 hover:text-violet-300 px-2 py-1 rounded-lg hover:bg-violet-900/20 transition-colors">{copying===p.id?<><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>Ok</>:<><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>Copiar</>}</button>
-                      <span className="text-zinc-800 px-1">|</span>
-                      <button onClick={()=>setChatProfileId(chatProfileId===p.id?null:p.id)} className="flex items-center gap-1 text-xs text-zinc-600 hover:text-violet-400 px-2 py-1 rounded-lg hover:bg-violet-900/20 transition-colors"><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>{chatProfileId===p.id?'Cerrar':'Chat'}</button>
+                    <div className="flex items-center flex-wrap gap-0">
+                      {isPro?(<button onClick={()=>{setLabProfile(p);setLabResult(null);setLabError('')}} className="flex items-center gap-1 text-xs text-zinc-600 hover:text-violet-400 px-1.5 py-1 rounded-lg hover:bg-violet-900/20 transition-colors"><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>Lab</button>):(<span className="flex items-center gap-1 text-xs text-zinc-700 px-1.5 py-1 cursor-not-allowed"><svg width="9" height="9" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>Lab</span>)}
+                      <span className="text-zinc-800 px-0.5">|</span>
+                      {isPro?(<button onClick={()=>openForge(p)} style={{color:'rgba(251,191,36,0.8)'}} className="flex items-center gap-1 text-xs px-1.5 py-1 rounded-lg hover:bg-amber-900/20 transition-colors hover:text-amber-300"><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/><path strokeLinecap="round" strokeLinejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/></svg>Forge</button>):(<span style={{color:'rgba(113,113,122,0.5)'}} className="flex items-center gap-1 text-xs px-1.5 py-1 cursor-not-allowed"><svg width="9" height="9" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>Forge</span>)}
+                      <span className="text-zinc-800 px-0.5">|</span>
+                      <button onClick={()=>{setExportProfile(p);setExportFormat('system_prompt');setExportCopied(false)}} className="flex items-center gap-1 text-xs text-zinc-600 hover:text-violet-400 px-1.5 py-1 rounded-lg hover:bg-violet-900/20 transition-colors"><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>Export</button>
+                      <span className="text-zinc-800 px-0.5">|</span>
+                      <button onClick={()=>handleQuickCopy(p)} className="flex items-center gap-1 text-xs font-semibold text-violet-500 hover:text-violet-300 px-1.5 py-1 rounded-lg hover:bg-violet-900/20 transition-colors">{copying===p.id?<><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>Ok</>:<><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>Copiar</>}</button>
+                      <span className="text-zinc-800 px-0.5">|</span>
+                      <button onClick={()=>{if(sandboxProfile?.id===p.id){setSandboxProfile(null)}else{setSandboxProfile(p);setChatProfileId(null)}}} className="flex items-center gap-1 text-xs text-zinc-600 hover:text-emerald-400 px-1.5 py-1 rounded-lg hover:bg-emerald-900/20 transition-colors"><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>{sandboxProfile?.id===p.id?'Cerrar':'Sandbox'}</button>
                     </div>
                   </div>
                 </div>
@@ -341,73 +317,133 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
             })}
           </div>
         )}
+        {sandboxProfile&&<div className="mt-6"><KeeperSandbox profile={sandboxProfile} onClose={()=>setSandboxProfile(null)}/></div>}
         {chatProfile&&<div className="mt-6"><ProfileChat profile={chatProfile} onClose={()=>setChatProfileId(null)}/></div>}
-        {profiles.length>0&&<div style={{background:'rgba(24,24,27,0.5)',border:'1px solid rgba(63,63,70,0.4)'}} className="mt-6 p-4 rounded-xl flex items-start gap-3"><svg width="14" height="14" fill="none" stroke="rgba(139,92,246,0.6)" strokeWidth="2" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p className="text-zinc-600 text-xs"><strong className="text-zinc-400">Usar:</strong> Exportar para elegir formato (9 formatos disponibles) o Copiar para copiar el system prompt directo. Pegalo al inicio de cualquier IA.</p></div>}
+        {profiles.length>0&&<div style={{background:'rgba(24,24,27,0.5)',border:'1px solid rgba(63,63,70,0.4)'}} className="mt-6 p-4 rounded-xl flex items-start gap-3"><svg width="14" height="14" fill="none" stroke="rgba(139,92,246,0.6)" strokeWidth="2" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p className="text-zinc-600 text-xs"><strong className="text-zinc-400">Flujo recomendado:</strong> Crea el perfil → Lab (analiza) → Forge (simula escenarios) → Export (portabilidad). Sandbox para chatear directamente.</p></div>}
       </div>
       {exportProfile&&(
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={e=>{if(e.target===e.currentTarget)setExportProfile(null)}}>
           <div style={{background:'rgba(18,18,20,0.98)',border:'1px solid rgba(63,63,70,0.6)',boxShadow:'0 0 60px rgba(139,92,246,0.1)',maxHeight:'90vh'}} className="w-full max-w-2xl rounded-2xl overflow-hidden flex flex-col">
-            <div style={{borderBottom:'1px solid rgba(63,63,70,0.4)'}} className="flex items-center justify-between px-6 py-4 flex-shrink-0">
-              <div><h2 className="font-bold text-white text-sm">Exportar perfil</h2><p className="text-zinc-500 text-xs mt-0.5">{exportProfile.name}</p></div>
-              <button onClick={()=>setExportProfile(null)} className="w-8 h-8 rounded-lg hover:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-white transition-colors"><svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
-            </div>
+            <div style={{borderBottom:'1px solid rgba(63,63,70,0.4)'}} className="flex items-center justify-between px-6 py-4 flex-shrink-0"><div><h2 className="font-bold text-white text-sm">Exportar perfil</h2><p className="text-zinc-500 text-xs mt-0.5">{exportProfile.name}</p></div><button onClick={()=>setExportProfile(null)} className="w-8 h-8 rounded-lg hover:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-white transition-colors"><svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
             <div className="flex flex-col sm:flex-row overflow-hidden flex-1 min-h-0">
-              <div style={{borderRight:'1px solid rgba(63,63,70,0.4)'}} className="sm:w-56 flex-shrink-0 p-4 overflow-y-auto">
-                <p className="text-xs font-semibold text-zinc-500 mb-3 uppercase tracking-wider">Formato</p>
-                <div className="space-y-1.5">{EP.map(preset=>{const locked=preset.badge==='Pro'&&!isPro;const active=exportFormat===preset.id;return(<button key={preset.id} onClick={()=>{if(!locked)setExportFormat(preset.id)}} style={{background:active?'rgba(139,92,246,0.15)':'rgba(39,39,42,0.3)',border:active?'1px solid rgba(139,92,246,0.5)':'1px solid transparent',opacity:locked?0.45:1,cursor:locked?'not-allowed':'pointer',width:'100%'}} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all text-left"><svg width="12" height="12" fill="none" stroke={active?'#a78bfa':'#52525b'} strokeWidth="2" viewBox="0 0 24 24" className="flex-shrink-0"><path strokeLinecap="round" strokeLinejoin="round" d={preset.icon}/></svg><div className="flex-1 min-w-0"><div className={"text-xs font-semibold "+(active?'text-violet-300':'text-zinc-400')}>{preset.label}</div><div className="text-xs text-zinc-600 truncate">{preset.desc}</div></div>{preset.badge&&<span style={{background:locked?'rgba(120,53,15,0.3)':'rgba(139,92,246,0.2)',border:locked?'1px solid rgba(120,53,15,0.4)':'1px solid rgba(139,92,246,0.3)'}} className={"text-xs font-bold px-1.5 py-0.5 rounded flex-shrink-0 "+(locked?'text-amber-500':'text-violet-400')}>{preset.badge}</span>}</button>)})}</div>
-              </div>
-              <div className="flex-1 flex flex-col p-4 min-h-0">
-                <p className="text-xs font-semibold text-zinc-500 mb-2 uppercase tracking-wider flex-shrink-0">Vista previa</p>
-                <div style={{background:'rgba(9,9,11,0.8)',border:'1px solid rgba(63,63,70,0.4)'}} className="rounded-xl p-4 flex-1 overflow-y-auto min-h-0"><pre className="text-xs text-zinc-300 whitespace-pre-wrap font-mono leading-relaxed">{exportText}</pre></div>
-              </div>
+              <div style={{borderRight:'1px solid rgba(63,63,70,0.4)'}} className="sm:w-56 flex-shrink-0 p-4 overflow-y-auto"><p className="text-xs font-semibold text-zinc-500 mb-3 uppercase tracking-wider">Formato</p><div className="space-y-1.5">{EP.map(preset=>{const locked=preset.badge==='Pro'&&!isPro;const active=exportFormat===preset.id;return(<button key={preset.id} onClick={()=>{if(!locked)setExportFormat(preset.id)}} style={{background:active?'rgba(139,92,246,0.15)':'rgba(39,39,42,0.3)',border:active?'1px solid rgba(139,92,246,0.5)':'1px solid transparent',opacity:locked?0.45:1,cursor:locked?'not-allowed':'pointer',width:'100%'}} className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all text-left"><svg width="12" height="12" fill="none" stroke={active?'#a78bfa':'#52525b'} strokeWidth="2" viewBox="0 0 24 24" className="flex-shrink-0"><path strokeLinecap="round" strokeLinejoin="round" d={preset.icon}/></svg><div className="flex-1 min-w-0"><div className={"text-xs font-semibold "+(active?'text-violet-300':'text-zinc-400')}>{preset.label}</div><div className="text-xs text-zinc-600 truncate">{preset.desc}</div></div>{preset.badge&&<span style={{background:locked?'rgba(120,53,15,0.3)':'rgba(139,92,246,0.2)',border:locked?'1px solid rgba(120,53,15,0.4)':'1px solid rgba(139,92,246,0.3)'}} className={"text-xs font-bold px-1.5 py-0.5 rounded flex-shrink-0 "+(locked?'text-amber-500':'text-violet-400')}>{preset.badge}</span>}</button>)})}</div></div>
+              <div className="flex-1 flex flex-col p-4 min-h-0"><p className="text-xs font-semibold text-zinc-500 mb-2 uppercase tracking-wider flex-shrink-0">Vista previa</p><div style={{background:'rgba(9,9,11,0.8)',border:'1px solid rgba(63,63,70,0.4)'}} className="rounded-xl p-4 flex-1 overflow-y-auto min-h-0"><pre className="text-xs text-zinc-300 whitespace-pre-wrap font-mono leading-relaxed">{exportText}</pre></div></div>
             </div>
-            <div style={{borderTop:'1px solid rgba(63,63,70,0.4)'}} className="px-6 py-4 flex gap-3 flex-shrink-0">
-              <button onClick={handleExportCopy} style={{background:exportCopied?'rgba(16,185,129,0.15)':'linear-gradient(135deg,#7c3aed,#6d28d9)',border:exportCopied?'1px solid rgba(16,185,129,0.3)':'none',boxShadow:exportCopied?'none':'0 4px 15px rgba(139,92,246,0.25)'}} className="flex-1 flex items-center justify-center gap-2 text-sm font-semibold py-2.5 rounded-xl hover:opacity-90 transition-all text-white">{exportCopied?<><svg width="14" height="14" fill="none" stroke="#34d399" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg><span style={{color:'#34d399'}}>Copiado</span></>:<><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>Copiar al portapapeles</>}</button>
-              <button onClick={()=>setExportProfile(null)} style={{border:'1px solid rgba(63,63,70,0.6)'}} className="px-4 py-2.5 text-zinc-400 text-sm rounded-xl hover:bg-zinc-800 hover:text-white transition-colors">Cerrar</button>
-            </div>
+            <div style={{borderTop:'1px solid rgba(63,63,70,0.4)'}} className="px-6 py-4 flex gap-3 flex-shrink-0"><button onClick={handleExportCopy} style={{background:exportCopied?'rgba(16,185,129,0.15)':'linear-gradient(135deg,#7c3aed,#6d28d9)',border:exportCopied?'1px solid rgba(16,185,129,0.3)':'none',boxShadow:exportCopied?'none':'0 4px 15px rgba(139,92,246,0.25)'}} className="flex-1 flex items-center justify-center gap-2 text-sm font-semibold py-2.5 rounded-xl hover:opacity-90 transition-all text-white">{exportCopied?<><svg width="14" height="14" fill="none" stroke="#34d399" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg><span style={{color:'#34d399'}}>Copiado</span></>:<><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>Copiar al portapapeles</>}</button><button onClick={()=>setExportProfile(null)} style={{border:'1px solid rgba(63,63,70,0.6)'}} className="px-4 py-2.5 text-zinc-400 text-sm rounded-xl hover:bg-zinc-800 hover:text-white transition-colors">Cerrar</button></div>
           </div>
         </div>
       )}
       {labProfile&&(
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={e=>{if(e.target===e.currentTarget){setLabProfile(null);setLabResult(null)}}}>
           <div style={{background:'rgba(18,18,20,0.98)',border:'1px solid rgba(63,63,70,0.6)',boxShadow:'0 0 60px rgba(139,92,246,0.12)',maxHeight:'90vh'}} className="w-full max-w-lg rounded-2xl overflow-hidden flex flex-col">
-            <div style={{borderBottom:'1px solid rgba(63,63,70,0.4)'}} className="flex items-center justify-between px-6 py-4 flex-shrink-0">
-              <div className="flex items-center gap-3">
-                <div style={{background:'rgba(139,92,246,0.12)',border:'1px solid rgba(139,92,246,0.25)'}} className="w-8 h-8 rounded-xl flex items-center justify-center"><svg width="14" height="14" fill="none" stroke="#a78bfa" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>
-                <div><h2 className="font-bold text-white text-sm">Keeper Lab</h2><p className="text-zinc-500 text-xs">{labProfile.name}</p></div>
-              </div>
-              <button onClick={()=>{setLabProfile(null);setLabResult(null)}} className="w-8 h-8 rounded-lg hover:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-white transition-colors"><svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
-            </div>
+            <div style={{borderBottom:'1px solid rgba(63,63,70,0.4)'}} className="flex items-center justify-between px-6 py-4 flex-shrink-0"><div className="flex items-center gap-3"><div style={{background:'rgba(139,92,246,0.12)',border:'1px solid rgba(139,92,246,0.25)'}} className="w-8 h-8 rounded-xl flex items-center justify-center"><svg width="14" height="14" fill="none" stroke="#a78bfa" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div><div><h2 className="font-bold text-white text-sm">Keeper Lab</h2><p className="text-zinc-500 text-xs">{labProfile.name}</p></div></div><button onClick={()=>{setLabProfile(null);setLabResult(null)}} className="w-8 h-8 rounded-lg hover:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-white transition-colors"><svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
             <div className="p-6 space-y-4 overflow-y-auto">
-              {!labResult&&!labLoading&&!labError&&<div className="text-center py-6"><p className="text-zinc-400 text-sm mb-2 leading-relaxed">Analisis de IA en 4 dimensiones:</p><div className="flex justify-center gap-4 mb-6">{[['Claridad','text-blue-400'],['Consistencia','text-violet-400'],['Completitud','text-emerald-400'],['Efectividad','text-amber-400']].map(([label,color])=><div key={label} className="text-center"><div style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.5)'}} className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1"><span className={"text-sm font-black "+color}>?</span></div><span className="text-xs text-zinc-600">{label}</span></div>)}</div><button onClick={handleRunLab} style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 4px 20px rgba(139,92,246,0.25)'}} className="flex items-center gap-2 text-white text-sm font-semibold px-6 py-3 rounded-xl hover:opacity-90 transition-opacity mx-auto"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Analizar perfil</button></div>}
+              {!labResult&&!labLoading&&!labError&&<div className="text-center py-6"><p className="text-zinc-400 text-sm mb-2 leading-relaxed">Analisis en 4 dimensiones:</p><div className="flex justify-center gap-4 mb-6">{[['Claridad','text-blue-400'],['Consistencia','text-violet-400'],['Completitud','text-emerald-400'],['Efectividad','text-amber-400']].map(([label,color])=><div key={label} className="text-center"><div style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.5)'}} className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1"><span className={"text-sm font-black "+color}>?</span></div><span className="text-xs text-zinc-600">{label}</span></div>)}</div><button onClick={handleRunLab} style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 4px 20px rgba(139,92,246,0.25)'}} className="flex items-center gap-2 text-white text-sm font-semibold px-6 py-3 rounded-xl hover:opacity-90 transition-opacity mx-auto"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Analizar perfil</button></div>}
               {labLoading&&<div className="flex flex-col items-center py-8 gap-4"><div style={{border:'2px solid rgba(139,92,246,0.2)',borderTop:'2px solid #7c3aed'}} className="w-10 h-10 rounded-full animate-spin"/><p className="text-zinc-500 text-sm">Analizando en 4 dimensiones...</p></div>}
               {labError&&<div style={{background:'rgba(239,68,68,0.07)',border:'1px solid rgba(239,68,68,0.2)'}} className="p-4 rounded-xl"><p className="text-red-400 text-sm">{labError}</p><button onClick={handleRunLab} className="mt-3 text-xs text-violet-400 hover:text-violet-300">Reintentar</button></div>}
-              {labResult&&(
+              {labResult&&(<div className="space-y-4">
+                <div style={{background:'rgba(139,92,246,0.08)',border:'1px solid rgba(139,92,246,0.2)'}} className="p-4 rounded-xl"><div className="flex items-center gap-4 mb-4"><div style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 0 20px rgba(139,92,246,0.3)',minWidth:'56px'}} className="w-14 h-14 rounded-2xl flex items-center justify-center"><span className="text-2xl font-black text-white">{labResult.score}</span></div><div><p className="text-violet-300 font-bold text-sm">Score global</p><p className="text-zinc-500 text-xs mt-0.5 leading-relaxed">{labResult.tip}</p></div></div>
+                  <div className="grid grid-cols-4 gap-2">{[{k:'clarity',label:'Claridad',color:'#60a5fa'},{k:'consistency',label:'Consistencia',color:'#a78bfa'},{k:'completeness',label:'Completitud',color:'#34d399'},{k:'effectiveness',label:'Efectividad',color:'#fbbf24'}].map(d=>{const val=labResult[d.k as keyof typeof labResult] as number||0;return(<div key={d.k} style={{background:'rgba(0,0,0,0.3)',border:'1px solid rgba(63,63,70,0.4)'}} className="p-2.5 rounded-xl text-center"><div className="text-lg font-black mb-0.5" style={{color:d.color}}>{val}</div><div className="text-xs text-zinc-600 leading-tight">{d.label}</div><div style={{background:'rgba(63,63,70,0.4)',borderRadius:'999px',height:'3px',marginTop:'6px'}}><div style={{background:d.color,width:(val*10)+'%',height:'3px',borderRadius:'999px',transition:'width 0.5s ease'}}/></div></div>)})}</div>
+                </div>
+                <div className="grid grid-cols-2 gap-3"><div style={{background:'rgba(16,185,129,0.05)',border:'1px solid rgba(16,185,129,0.15)'}} className="p-3 rounded-xl"><p className="text-emerald-400 text-xs font-bold mb-2">Fortalezas</p><ul className="space-y-1.5">{(labResult.strengths||[]).map((s:string,i:number)=><li key={i} className="text-zinc-300 text-xs flex gap-1.5"><span className="text-emerald-500 flex-shrink-0">+</span>{s}</li>)}</ul></div><div style={{background:'rgba(245,158,11,0.05)',border:'1px solid rgba(245,158,11,0.15)'}} className="p-3 rounded-xl"><p className="text-amber-400 text-xs font-bold mb-2">Mejoras</p><ul className="space-y-1.5">{(labResult.improvements||[]).map((s:string,i:number)=><li key={i} className="text-zinc-300 text-xs flex gap-1.5"><span className="text-amber-500 flex-shrink-0">&#8593;</span>{s}</li>)}</ul></div></div>
+                {labResult.optimized&&<div style={{background:'rgba(9,9,11,0.8)',border:'1px solid rgba(63,63,70,0.5)'}} className="p-4 rounded-xl"><div className="flex items-center justify-between mb-2"><p className="text-zinc-300 text-xs font-bold">Version optimizada</p><button onClick={()=>{doCopy(labResult.optimized);showToast('Copiada')}} className="text-xs text-violet-400 hover:text-violet-300 transition-colors flex items-center gap-1"><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>Copiar</button></div><p className="text-zinc-400 text-xs leading-relaxed whitespace-pre-wrap">{labResult.optimized}</p></div>}
+                <button onClick={handleRunLab} className="w-full text-xs text-zinc-700 hover:text-zinc-400 transition-colors py-1">Analizar de nuevo</button>
+              </div>)}
+            </div>
+          </div>
+        </div>
+      )}
+      {forgeProfile&&(
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={e=>{if(e.target===e.currentTarget){setForgeProfile(null);setForgeResult(null)}}}>
+          <div style={{background:'rgba(18,18,20,0.98)',border:'1px solid rgba(245,158,11,0.2)',boxShadow:'0 0 60px rgba(245,158,11,0.06)',maxHeight:'90vh'}} className="w-full max-w-lg rounded-2xl overflow-hidden flex flex-col">
+            <div style={{borderBottom:'1px solid rgba(63,63,70,0.4)',background:'rgba(245,158,11,0.04)'}} className="flex items-center justify-between px-6 py-4 flex-shrink-0">
+              <div className="flex items-center gap-3">
+                <div style={{background:'rgba(245,158,11,0.12)',border:'1px solid rgba(245,158,11,0.25)'}} className="w-8 h-8 rounded-xl flex items-center justify-center"><svg width="14" height="14" fill="none" stroke="#fbbf24" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/><path strokeLinecap="round" strokeLinejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/></svg></div>
+                <div><h2 className="font-bold text-white text-sm">Keeper Forge</h2><p className="text-zinc-500 text-xs">Simulacion profunda — {forgeProfile.name}</p></div>
+              </div>
+              <button onClick={()=>{setForgeProfile(null);setForgeResult(null)}} className="w-8 h-8 rounded-lg hover:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-white transition-colors"><svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+            <div className="p-6 space-y-5 overflow-y-auto flex-1">
+              {!forgeResult&&!forgeLoading&&(
+                <div className="space-y-5">
+                  <div>
+                    <p className="text-xs font-semibold text-zinc-400 mb-3">Modo de simulacion</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[{id:'scenario' as const,label:'Escenario',desc:'Prueba en una situacion concreta',icon:'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7'},{id:'stress' as const,label:'Estres',desc:'Detecta puntos debiles',icon:'M13 10V3L4 14h7v7l9-11h-7z'},{id:'free' as const,label:'Libre',desc:'Validacion rapida',icon:'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'}].map(m=>(
+                        <button key={m.id} onClick={()=>{setForgeMode(m.id);setForgeResult(null);setForgeError('')}} style={{background:forgeMode===m.id?'rgba(245,158,11,0.12)':'rgba(39,39,42,0.5)',border:forgeMode===m.id?'1px solid rgba(245,158,11,0.4)':'1px solid rgba(63,63,70,0.5)'}} className="flex flex-col items-start gap-1.5 p-3 rounded-xl transition-all">
+                          <svg width="13" height="13" fill="none" stroke={forgeMode===m.id?'#fbbf24':'#52525b'} strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={m.icon}/></svg>
+                          <span className={"text-xs font-bold "+(forgeMode===m.id?'text-amber-300':'text-zinc-500')}>{m.label}</span>
+                          <span className="text-xs text-zinc-700 leading-tight">{m.desc}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {forgeMode==='scenario'&&(
+                    <div className="space-y-3">
+                      <p className="text-xs font-semibold text-zinc-400">Escenario a simular</p>
+                      <div className="space-y-1.5">
+                        {(SCENARIOS_BY_TYPE[forgeProfile.profile_type||'custom']||SCENARIOS_BY_TYPE.custom).map((s:string,i:number)=>(
+                          <button key={i} onClick={()=>{setForgeScenario(s);setForgeCustomScenario('')}} style={{background:forgeScenario===s&&!forgeCustomScenario?'rgba(245,158,11,0.1)':'rgba(39,39,42,0.4)',border:forgeScenario===s&&!forgeCustomScenario?'1px solid rgba(245,158,11,0.3)':'1px solid rgba(63,63,70,0.4)',width:'100%',textAlign:'left'}} className="px-3 py-2.5 rounded-xl text-xs transition-all">
+                            <span className={forgeScenario===s&&!forgeCustomScenario?'text-amber-300':'text-zinc-400'}>{s}</span>
+                          </button>
+                        ))}
+                      </div>
+                      <div>
+                        <p className="text-xs text-zinc-600 mb-1.5">O escribe tu propio escenario:</p>
+                        <textarea style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-xl px-3 py-2.5 text-sm placeholder-zinc-600 focus:outline-none focus:border-amber-500/50 resize-none transition-colors" placeholder="Describe una situacion especifica para simular..." rows={2} value={forgeCustomScenario} onChange={e=>{setForgeCustomScenario(e.target.value);if(e.target.value)setForgeScenario('')}}/>
+                      </div>
+                    </div>
+                  )}
+                  {forgeMode==='stress'&&<div style={{background:'rgba(239,68,68,0.05)',border:'1px solid rgba(239,68,68,0.15)'}} className="p-4 rounded-xl"><p className="text-red-400 text-xs font-semibold mb-1">Modo estres activo</p><p className="text-zinc-500 text-xs leading-relaxed">La IA generara preguntas dificiles y edge cases para encontrar donde el perfil podria fallar o ser inconsistente.</p></div>}
+                  {forgeMode==='free'&&<div style={{background:'rgba(16,185,129,0.05)',border:'1px solid rgba(16,185,129,0.15)'}} className="p-4 rounded-xl"><p className="text-emerald-400 text-xs font-semibold mb-1">Validacion rapida</p><p className="text-zinc-500 text-xs leading-relaxed">Genera una interaccion de prueba corta para verificar que el comportamiento del perfil es coherente con su definicion.</p></div>}
+                  {forgeError&&<div style={{background:'rgba(239,68,68,0.07)',border:'1px solid rgba(239,68,68,0.2)'}} className="p-3 rounded-xl"><p className="text-red-400 text-xs">{forgeError}</p></div>}
+                  <button onClick={handleRunForge} disabled={forgeMode==='scenario'&&!forgeScenario&&!forgeCustomScenario.trim()} style={{background:'linear-gradient(135deg,#d97706,#b45309)',boxShadow:'0 4px 20px rgba(245,158,11,0.2)'}} className="w-full flex items-center justify-center gap-2 text-white text-sm font-bold py-3 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-40"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>Ejecutar simulacion</button>
+                </div>
+              )}
+              {forgeLoading&&<div className="flex flex-col items-center py-12 gap-4">
+                <div style={{border:'2px solid rgba(245,158,11,0.2)',borderTop:'2px solid #fbbf24'}} className="w-12 h-12 rounded-full animate-spin"/>
+                <p className="text-zinc-400 text-sm font-medium">Simulando...</p>
+                <p className="text-zinc-600 text-xs text-center max-w-xs">Analizando comportamiento del perfil en el escenario indicado</p>
+              </div>}
+              {forgeResult&&!forgeLoading&&(
                 <div className="space-y-4">
-                  <div style={{background:'rgba(139,92,246,0.08)',border:'1px solid rgba(139,92,246,0.2)'}} className="p-4 rounded-xl">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 0 20px rgba(139,92,246,0.3)',minWidth:'56px'}} className="w-14 h-14 rounded-2xl flex items-center justify-center"><span className="text-2xl font-black text-white">{labResult.score}</span></div>
-                      <div><p className="text-violet-300 font-bold text-sm">Score global</p><p className="text-zinc-500 text-xs mt-0.5 leading-relaxed">{labResult.tip}</p></div>
+                  {forgeMode==='scenario'&&(
+                    <div className="space-y-3">
+                      {forgeResult.verdict&&(<div style={{background:(forgeResult.verdict as string)==='SOLIDO'?'rgba(16,185,129,0.08)':(forgeResult.verdict as string)==='INCONSISTENTE'?'rgba(239,68,68,0.08)':'rgba(245,158,11,0.08)',border:(forgeResult.verdict as string)==='SOLIDO'?'1px solid rgba(16,185,129,0.2)':(forgeResult.verdict as string)==='INCONSISTENTE'?'1px solid rgba(239,68,68,0.2)':'1px solid rgba(245,158,11,0.2)'}} className="flex items-center gap-3 p-3 rounded-xl">
+                        <div style={{width:'8px',height:'8px',borderRadius:'50%',background:(forgeResult.verdict as string)==='SOLIDO'?'#34d399':(forgeResult.verdict as string)==='INCONSISTENTE'?'#f87171':'#fbbf24',flexShrink:0}}/>
+                        <div>
+                          <span className={"text-xs font-black "+(forgeResult.verdict==='SOLIDO'?'text-emerald-400':forgeResult.verdict==='INCONSISTENTE'?'text-red-400':'text-amber-400')}>{forgeResult.verdict as string}</span>
+                          <span className="text-zinc-500 text-xs ml-2">Score: {forgeResult.consistency_score as number}/10</span>
+                        </div>
+                      </div>)}
+                      {forgeResult.simulated_response&&<div style={{background:'rgba(24,24,27,0.8)',border:'1px solid rgba(63,63,70,0.5)'}} className="p-4 rounded-xl"><p className="text-zinc-500 text-xs font-semibold mb-2">Respuesta simulada del perfil</p><p className="text-zinc-200 text-sm leading-relaxed">{forgeResult.simulated_response as string}</p></div>}
+                      {(forgeResult.strengths_shown as string[]||[]).length>0&&<div style={{background:'rgba(16,185,129,0.05)',border:'1px solid rgba(16,185,129,0.15)'}} className="p-3 rounded-xl"><p className="text-emerald-400 text-xs font-bold mb-2">Fortalezas demostradas</p><ul className="space-y-1">{(forgeResult.strengths_shown as string[]).map((s:string,i:number)=><li key={i} className="text-zinc-300 text-xs flex gap-1.5"><span className="text-emerald-500">+</span>{s}</li>)}</ul></div>}
+                      {(forgeResult.detected_issues as string[]||[]).length>0&&<div style={{background:'rgba(239,68,68,0.05)',border:'1px solid rgba(239,68,68,0.15)'}} className="p-3 rounded-xl"><p className="text-red-400 text-xs font-bold mb-2">Problemas detectados</p><ul className="space-y-1">{(forgeResult.detected_issues as string[]).map((s:string,i:number)=><li key={i} className="text-zinc-300 text-xs flex gap-1.5"><span className="text-red-500">!</span>{s}</li>)}</ul></div>}
+                      {forgeResult.recommendation&&<div style={{background:'rgba(139,92,246,0.06)',border:'1px solid rgba(139,92,246,0.2)'}} className="p-3 rounded-xl"><p className="text-violet-400 text-xs font-bold mb-1">Recomendacion</p><p className="text-zinc-300 text-xs leading-relaxed">{forgeResult.recommendation as string}</p></div>}
                     </div>
-                    <div className="grid grid-cols-4 gap-2">
-                      {[{k:'clarity',label:'Claridad',color:'#60a5fa'},{k:'consistency',label:'Consistencia',color:'#a78bfa'},{k:'completeness',label:'Completitud',color:'#34d399'},{k:'effectiveness',label:'Efectividad',color:'#fbbf24'}].map(d=>{
-                        const val=labResult[d.k as keyof typeof labResult] as number||0
-                        return(<div key={d.k} style={{background:'rgba(0,0,0,0.3)',border:'1px solid rgba(63,63,70,0.4)'}} className="p-2.5 rounded-xl text-center">
-                          <div className="text-lg font-black mb-0.5" style={{color:d.color}}>{val}</div>
-                          <div className="text-xs text-zinc-600 leading-tight">{d.label}</div>
-                          <div style={{background:'rgba(63,63,70,0.4)',borderRadius:'999px',height:'3px',marginTop:'6px'}}>
-                            <div style={{background:d.color,width:(val*10)+'%',height:'3px',borderRadius:'999px',transition:'width 0.5s ease'}}/>
-                          </div>
-                        </div>)
-                      })}
+                  )}
+                  {forgeMode==='stress'&&(
+                    <div className="space-y-3">
+                      {forgeResult.overall_verdict&&<div style={{background:'rgba(239,68,68,0.07)',border:'1px solid rgba(239,68,68,0.2)'}} className="flex items-center gap-3 p-3 rounded-xl"><span className="text-red-400 text-xs font-black">{forgeResult.overall_verdict as string}</span><span className="text-zinc-500 text-xs">Consistencia: {forgeResult.consistency_score as number}/10</span></div>}
+                      {(forgeResult.stress_questions as string[]||[]).length>0&&<div style={{background:'rgba(24,24,27,0.8)',border:'1px solid rgba(63,63,70,0.5)'}} className="p-4 rounded-xl"><p className="text-zinc-400 text-xs font-bold mb-3">Preguntas de estres generadas</p><ul className="space-y-2">{(forgeResult.stress_questions as string[]).map((q:string,i:number)=><li key={i} style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.4)'}} className="p-2.5 rounded-lg text-xs text-zinc-300 flex gap-2"><span className="text-amber-500 font-bold flex-shrink-0">{i+1}.</span>{q}</li>)}</ul></div>}
+                      {(forgeResult.critical_gaps as string[]||[]).length>0&&<div style={{background:'rgba(239,68,68,0.05)',border:'1px solid rgba(239,68,68,0.15)'}} className="p-3 rounded-xl"><p className="text-red-400 text-xs font-bold mb-2">Gaps criticos</p><ul className="space-y-1">{(forgeResult.critical_gaps as string[]).map((g:string,i:number)=><li key={i} className="text-zinc-300 text-xs flex gap-1.5"><span className="text-red-500">!</span>{g}</li>)}</ul></div>}
+                      {(forgeResult.hardening_suggestions as string[]||[]).length>0&&<div style={{background:'rgba(139,92,246,0.05)',border:'1px solid rgba(139,92,246,0.15)'}} className="p-3 rounded-xl"><p className="text-violet-400 text-xs font-bold mb-2">Como reforzar el perfil</p><ul className="space-y-1">{(forgeResult.hardening_suggestions as string[]).map((s:string,i:number)=><li key={i} className="text-zinc-300 text-xs flex gap-1.5"><span className="text-violet-400">+</span>{s}</li>)}</ul></div>}
                     </div>
+                  )}
+                  {forgeMode==='free'&&forgeResult.test_interaction&&(
+                    <div className="space-y-3">
+                      {forgeResult.quick_verdict&&<div style={{background:forgeResult.quick_verdict==='COHERENTE'?'rgba(16,185,129,0.08)':'rgba(245,158,11,0.08)',border:forgeResult.quick_verdict==='COHERENTE'?'1px solid rgba(16,185,129,0.2)':'1px solid rgba(245,158,11,0.2)'}} className="p-3 rounded-xl"><span className={"text-xs font-black "+(forgeResult.quick_verdict==='COHERENTE'?'text-emerald-400':'text-amber-400')}>{forgeResult.quick_verdict as string}</span></div>}
+                      <div style={{background:'rgba(24,24,27,0.8)',border:'1px solid rgba(63,63,70,0.5)'}} className="p-4 rounded-xl space-y-3">
+                        <div><p className="text-zinc-600 text-xs mb-1">Pregunta de prueba</p><p className="text-zinc-200 text-sm">{(forgeResult.test_interaction as Record<string,string>).question}</p></div>
+                        <div style={{borderTop:'1px solid rgba(63,63,70,0.4)'}} className="pt-3"><p className="text-zinc-600 text-xs mb-1">Respuesta esperada segun la identidad</p><p className="text-zinc-300 text-sm leading-relaxed">{(forgeResult.test_interaction as Record<string,string>).expected_response}</p></div>
+                      </div>
+                      {forgeResult.notes&&<div style={{background:'rgba(139,92,246,0.06)',border:'1px solid rgba(139,92,246,0.2)'}} className="p-3 rounded-xl"><p className="text-violet-400 text-xs leading-relaxed">{forgeResult.notes as string}</p></div>}
+                    </div>
+                  )}
+                  <div className="flex gap-2 pt-2">
+                    <button onClick={()=>{setForgeResult(null);setForgeError('')}} style={{border:'1px solid rgba(63,63,70,0.6)'}} className="flex-1 text-zinc-400 text-xs py-2 rounded-xl hover:bg-zinc-800 hover:text-white transition-colors">Nueva simulacion</button>
+                    <button onClick={()=>openEdit(forgeProfile)} style={{border:'1px solid rgba(139,92,246,0.3)'}} className="flex-1 text-violet-400 text-xs py-2 rounded-xl hover:bg-violet-900/20 transition-colors">Editar perfil</button>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div style={{background:'rgba(16,185,129,0.05)',border:'1px solid rgba(16,185,129,0.15)'}} className="p-3 rounded-xl"><p className="text-emerald-400 text-xs font-bold mb-2">Fortalezas</p><ul className="space-y-1.5">{(labResult.strengths||[]).map((s:string,i:number)=><li key={i} className="text-zinc-300 text-xs flex gap-1.5"><span className="text-emerald-500 flex-shrink-0">+</span>{s}</li>)}</ul></div>
-                    <div style={{background:'rgba(245,158,11,0.05)',border:'1px solid rgba(245,158,11,0.15)'}} className="p-3 rounded-xl"><p className="text-amber-400 text-xs font-bold mb-2">Mejoras</p><ul className="space-y-1.5">{(labResult.improvements||[]).map((s:string,i:number)=><li key={i} className="text-zinc-300 text-xs flex gap-1.5"><span className="text-amber-500 flex-shrink-0">&#8593;</span>{s}</li>)}</ul></div>
-                  </div>
-                  {labResult.optimized&&<div style={{background:'rgba(9,9,11,0.8)',border:'1px solid rgba(63,63,70,0.5)'}} className="p-4 rounded-xl"><div className="flex items-center justify-between mb-2"><p className="text-zinc-300 text-xs font-bold">Version optimizada</p><button onClick={()=>{doCopy(labResult.optimized);showToast('Copiada')}} className="text-xs text-violet-400 hover:text-violet-300 transition-colors flex items-center gap-1"><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>Copiar</button></div><p className="text-zinc-400 text-xs leading-relaxed whitespace-pre-wrap">{labResult.optimized}</p></div>}
-                  <button onClick={handleRunLab} className="w-full text-xs text-zinc-700 hover:text-zinc-400 transition-colors py-1">Analizar de nuevo</button>
                 </div>
               )}
             </div>
@@ -418,38 +454,16 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={e=>{if(e.target===e.currentTarget){setShowModal(false);setShowAIPanel(false)}}}>
           <div style={{background:'rgba(18,18,20,0.98)',border:'1px solid rgba(63,63,70,0.6)',boxShadow:'0 0 60px rgba(139,92,246,0.1)',maxHeight:'92vh'}} className="w-full max-w-md rounded-2xl flex flex-col">
             <div style={{borderBottom:'1px solid rgba(63,63,70,0.4)'}} className="flex items-center justify-between px-6 py-4 flex-shrink-0">
-              <div>
-                <h2 className="font-bold text-white text-sm">{editingProfile?'Editar perfil':'Nuevo Keeper Profile'}</h2>
-                <p className="text-zinc-500 text-xs mt-0.5">Define la identidad de tu IA</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button onClick={()=>{setShowAIPanel(!showAIPanel);setAiError('')}} style={{background:'rgba(139,92,246,0.1)',border:'1px solid rgba(139,92,246,0.25)'}} className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg text-violet-300 hover:bg-violet-900/20 transition-colors"><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Generar con IA</button>
-                <button onClick={()=>{setShowModal(false);setShowAIPanel(false)}} className="w-8 h-8 rounded-lg hover:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-white transition-colors"><svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
-              </div>
+              <div><h2 className="font-bold text-white text-sm">{editingProfile?'Editar perfil':'Nuevo Keeper Profile'}</h2><p className="text-zinc-500 text-xs mt-0.5">Define la identidad de tu IA</p></div>
+              <div className="flex items-center gap-2"><button onClick={()=>{setShowAIPanel(!showAIPanel);setAiError('')}} style={{background:'rgba(139,92,246,0.1)',border:'1px solid rgba(139,92,246,0.25)'}} className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg text-violet-300 hover:bg-violet-900/20 transition-colors"><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Generar con IA</button><button onClick={()=>{setShowModal(false);setShowAIPanel(false)}} className="w-8 h-8 rounded-lg hover:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-white transition-colors"><svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
             </div>
             <div style={{borderBottom:'1px solid rgba(63,63,70,0.3)'}} className="px-6 py-2.5 flex-shrink-0">
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs text-zinc-600">Completitud del perfil</span>
-                <span className={"text-xs font-bold "+(completeness>=80?'text-emerald-400':completeness>=50?'text-amber-400':'text-zinc-500')}>{completeness}%</span>
-              </div>
-              <div style={{background:'rgba(63,63,70,0.4)',borderRadius:'999px',height:'3px'}}>
-                <div style={{background:completeness>=80?'#34d399':completeness>=50?'#fbbf24':'#7c3aed',width:completeness+'%',height:'3px',borderRadius:'999px',transition:'width 0.3s ease'}}/>
-              </div>
+              <div className="flex items-center justify-between mb-1.5"><span className="text-xs text-zinc-600">Completitud del perfil</span><span className={"text-xs font-bold "+(completeness>=80?'text-emerald-400':completeness>=50?'text-amber-400':'text-zinc-500')}>{completeness}%</span></div>
+              <div style={{background:'rgba(63,63,70,0.4)',borderRadius:'999px',height:'3px'}}><div style={{background:completeness>=80?'#34d399':completeness>=50?'#fbbf24':'#7c3aed',width:completeness+'%',height:'3px',borderRadius:'999px',transition:'width 0.3s ease'}}/></div>
             </div>
             <div className="p-6 space-y-4 overflow-y-auto flex-1 min-h-0">
-              {showAIPanel&&(<div style={{background:'rgba(139,92,246,0.06)',border:'1px solid rgba(139,92,246,0.25)'}} className="rounded-xl p-4 space-y-3">
-                <p className="text-xs font-semibold text-violet-300">Describe el tipo de perfil que quieres crear</p>
-                <textarea style={{background:'rgba(9,9,11,0.8)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-lg px-3 py-2 text-sm placeholder-zinc-600 focus:outline-none focus:border-violet-500 resize-none transition-colors" placeholder="ej: Chef profesional con 15 anos en cocina italiana" rows={3} value={aiDesc} onChange={e=>setAiDesc(e.target.value)}/>
-                {aiError&&<p className="text-red-400 text-xs">{aiError}</p>}
-                <div className="flex gap-2">
-                  <button onClick={handleGenerateProfile} disabled={aiLoading||!aiDesc.trim()} style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)'}} className="flex-1 disabled:opacity-40 text-white text-xs font-semibold py-2 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5">{aiLoading?<><span className="w-3 h-3 rounded-full border-2 border-white/30 border-t-white animate-spin inline-block"/>Generando...</>:<><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Generar perfil</>}</button>
-                  <button onClick={()=>{setShowAIPanel(false);setAiDesc('');setAiError('')}} style={{border:'1px solid rgba(63,63,70,0.6)'}} className="px-3 py-2 text-xs text-zinc-400 hover:text-zinc-200 rounded-lg transition-colors">Cancelar</button>
-                </div>
-              </div>)}
-              <div>
-                <p className="text-xs font-semibold text-zinc-400 mb-2">Tipo de perfil</p>
-                <div className="grid grid-cols-4 gap-1.5">{PT.map(t=><button key={t.id} onClick={()=>setForm(f=>({...f,profile_type:t.id}))} style={{background:form.profile_type===t.id?'rgba(139,92,246,0.15)':'rgba(39,39,42,0.5)',border:form.profile_type===t.id?'1px solid rgba(139,92,246,0.4)':'1px solid rgba(63,63,70,0.5)'}} className="flex flex-col items-center gap-1 px-2 py-2 rounded-xl transition-all"><svg width="11" height="11" fill="none" stroke={form.profile_type===t.id?'#a78bfa':'#52525b'} strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={t.icon}/></svg><span className={"text-xs font-semibold leading-tight text-center "+(form.profile_type===t.id?'text-violet-300':'text-zinc-600')}>{t.label}</span></button>)}</div>
-              </div>
+              {showAIPanel&&(<div style={{background:'rgba(139,92,246,0.06)',border:'1px solid rgba(139,92,246,0.25)'}} className="rounded-xl p-4 space-y-3"><p className="text-xs font-semibold text-violet-300">Describe el tipo de perfil que quieres crear</p><textarea style={{background:'rgba(9,9,11,0.8)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-lg px-3 py-2 text-sm placeholder-zinc-600 focus:outline-none focus:border-violet-500 resize-none transition-colors" placeholder="ej: Chef profesional con 15 anos en cocina italiana" rows={3} value={aiDesc} onChange={e=>setAiDesc(e.target.value)}/>{aiError&&<p className="text-red-400 text-xs">{aiError}</p>}<div className="flex gap-2"><button onClick={handleGenerateProfile} disabled={aiLoading||!aiDesc.trim()} style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)'}} className="flex-1 disabled:opacity-40 text-white text-xs font-semibold py-2 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5">{aiLoading?<><span className="w-3 h-3 rounded-full border-2 border-white/30 border-t-white animate-spin inline-block"/>Generando...</>:<><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Generar perfil</>}</button><button onClick={()=>{setShowAIPanel(false);setAiDesc('');setAiError('')}} style={{border:'1px solid rgba(63,63,70,0.6)'}} className="px-3 py-2 text-xs text-zinc-400 hover:text-zinc-200 rounded-lg transition-colors">Cancelar</button></div></div>)}
+              <div><p className="text-xs font-semibold text-zinc-400 mb-2">Tipo de perfil</p><div className="grid grid-cols-4 gap-1.5">{PT.map(t=><button key={t.id} onClick={()=>setForm(f=>({...f,profile_type:t.id}))} style={{background:form.profile_type===t.id?'rgba(139,92,246,0.15)':'rgba(39,39,42,0.5)',border:form.profile_type===t.id?'1px solid rgba(139,92,246,0.4)':'1px solid rgba(63,63,70,0.5)'}} className="flex flex-col items-center gap-1 px-2 py-2 rounded-xl transition-all"><svg width="11" height="11" fill="none" stroke={form.profile_type===t.id?'#a78bfa':'#52525b'} strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={t.icon}/></svg><span className={"text-xs font-semibold leading-tight text-center "+(form.profile_type===t.id?'text-violet-300':'text-zinc-600')}>{t.label}</span></button>)}</div></div>
               <div><label className="block text-xs font-semibold text-zinc-400 mb-1.5">Nombre *</label><input style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-xl px-3 py-2.5 text-sm placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors" placeholder="ej: Chef Italiano, CMO SaaS..." value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} autoFocus/></div>
               <div><label className="block text-xs font-semibold text-zinc-400 mb-1.5">Rol y expertise</label><input style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-xl px-3 py-2.5 text-sm placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors" placeholder="ej: Chef con 15 anos en cocina italiana" value={form.role} onChange={e=>setForm(f=>({...f,role:e.target.value}))}/></div>
               <div><label className="block text-xs font-semibold text-zinc-400 mb-1.5">Tono y estilo</label><input style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-xl px-3 py-2.5 text-sm placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors" placeholder="ej: Directo, apasionado, tecnico" value={form.tone} onChange={e=>setForm(f=>({...f,tone:e.target.value}))}/></div>
@@ -459,54 +473,79 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
               <div><label className="block text-xs font-semibold text-zinc-400 mb-1.5">Contexto extra <span className="text-zinc-600 font-normal">(opcional)</span></label><textarea style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-xl px-3 py-2.5 text-sm placeholder-zinc-600 focus:outline-none focus:border-violet-500 resize-none transition-colors" placeholder="Empresa, audiencia, proyecto..." rows={2} value={form.extra} onChange={e=>setForm(f=>({...f,extra:e.target.value}))}/></div>
               <div><label className="block text-xs font-semibold text-zinc-400 mb-1.5">Avatar <span className="text-zinc-600 font-normal">(URL imagen o GIF)</span></label><input type="url" style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-xl px-3 py-2.5 text-sm placeholder-zinc-600 focus:outline-none focus:border-violet-500 transition-colors" placeholder="https://..." value={form.avatar_url} onChange={e=>setForm(f=>({...f,avatar_url:e.target.value}))}/>{form.avatar_url&&<div className="mt-2 flex items-center gap-2"><img src={form.avatar_url} alt="preview" className="w-12 h-12 rounded-xl object-cover border border-zinc-700" onError={(e:React.SyntheticEvent<HTMLImageElement>)=>{e.currentTarget.style.display='none'}}/><span className="text-zinc-600 text-xs">Vista previa</span></div>}</div>
               <button onClick={()=>setShowAdvanced(!showAdvanced)} style={{border:'1px solid rgba(63,63,70,0.4)'}} className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 transition-all">
-                <div className="flex items-center gap-2">
-                  <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-                  <span className="font-semibold">Campos avanzados</span>
-                  <span style={{background:'rgba(139,92,246,0.1)',border:'1px solid rgba(139,92,246,0.2)'}} className="text-violet-400 text-xs px-1.5 py-0.5 rounded">memoria base, variables, relaciones</span>
-                </div>
+                <div className="flex items-center gap-2"><svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg><span className="font-semibold">Campos avanzados</span><span style={{background:'rgba(139,92,246,0.1)',border:'1px solid rgba(139,92,246,0.2)'}} className="text-violet-400 text-xs px-1.5 py-0.5 rounded">memoria, variables, relaciones</span></div>
                 <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={{transform:showAdvanced?'rotate(180deg)':'rotate(0deg)',transition:'transform 0.2s'}}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/></svg>
               </button>
-              {showAdvanced&&(
-                <div className="space-y-4 pt-1">
-                  <div style={{background:'rgba(139,92,246,0.04)',border:'1px solid rgba(139,92,246,0.15)'}} className="rounded-xl p-4 space-y-4">
-                    <div><label className="block text-xs font-semibold text-zinc-400 mb-1.5">Memoria base <span style={{background:'rgba(139,92,246,0.1)',border:'1px solid rgba(139,92,246,0.2)'}} className="text-violet-400 text-xs font-normal px-1.5 py-0.5 rounded ml-1">Pro</span></label><textarea style={{background:'rgba(9,9,11,0.8)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-xl px-3 py-2.5 text-sm placeholder-zinc-600 focus:outline-none focus:border-violet-500 resize-none transition-colors" placeholder="Historia, contexto de fondo, lore, arquitectura del proyecto..." rows={3} value={form.base_memory} onChange={e=>setForm(f=>({...f,base_memory:e.target.value}))}/></div>
-                    <div><label className="block text-xs font-semibold text-zinc-400 mb-1.5">Variables dinamicas <span style={{background:'rgba(139,92,246,0.1)',border:'1px solid rgba(139,92,246,0.2)'}} className="text-violet-400 text-xs font-normal px-1.5 py-0.5 rounded ml-1">Pro</span></label><textarea style={{background:'rgba(9,9,11,0.8)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-xl px-3 py-2.5 text-sm placeholder-zinc-600 focus:outline-none focus:border-violet-500 resize-none transition-colors" placeholder="{{nombre_cliente}} = nombre del cliente activo&#10;{{repo}} = repositorio actual" rows={2} value={form.dynamic_variables} onChange={e=>setForm(f=>({...f,dynamic_variables:e.target.value}))}/></div>
-                    <div><label className="block text-xs font-semibold text-zinc-400 mb-1.5">Patrones de respuesta <span style={{background:'rgba(139,92,246,0.1)',border:'1px solid rgba(139,92,246,0.2)'}} className="text-violet-400 text-xs font-normal px-1.5 py-0.5 rounded ml-1">Pro</span></label><textarea style={{background:'rgba(9,9,11,0.8)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-xl px-3 py-2.5 text-sm placeholder-zinc-600 focus:outline-none focus:border-violet-500 resize-none transition-colors" placeholder="Siempre empieza con la conclusion. Luego explica el razonamiento..." rows={2} value={form.response_patterns} onChange={e=>setForm(f=>({...f,response_patterns:e.target.value}))}/></div>
-                    <div><label className="block text-xs font-semibold text-zinc-400 mb-1.5">Relaciones <span style={{background:'rgba(139,92,246,0.1)',border:'1px solid rgba(139,92,246,0.2)'}} className="text-violet-400 text-xs font-normal px-1.5 py-0.5 rounded ml-1">Pro</span></label><textarea style={{background:'rgba(9,9,11,0.8)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-xl px-3 py-2.5 text-sm placeholder-zinc-600 focus:outline-none focus:border-violet-500 resize-none transition-colors" placeholder="Trabaja con {{CMO}} en campanas. Reporta a {{CEO}}..." rows={2} value={form.relationships} onChange={e=>setForm(f=>({...f,relationships:e.target.value}))}/></div>
-                  </div>
-                </div>
-              )}
+              {showAdvanced&&(<div className="space-y-4 pt-1"><div style={{background:'rgba(139,92,246,0.04)',border:'1px solid rgba(139,92,246,0.15)'}} className="rounded-xl p-4 space-y-4">
+                <div><label className="block text-xs font-semibold text-zinc-400 mb-1.5">Memoria base <span style={{background:'rgba(139,92,246,0.1)',border:'1px solid rgba(139,92,246,0.2)'}} className="text-violet-400 text-xs font-normal px-1.5 py-0.5 rounded ml-1">Pro</span></label><textarea style={{background:'rgba(9,9,11,0.8)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-xl px-3 py-2.5 text-sm placeholder-zinc-600 focus:outline-none focus:border-violet-500 resize-none transition-colors" placeholder="Historia, contexto de fondo, lore, arquitectura..." rows={3} value={form.base_memory} onChange={e=>setForm(f=>({...f,base_memory:e.target.value}))}/></div>
+                <div><label className="block text-xs font-semibold text-zinc-400 mb-1.5">Variables dinamicas <span style={{background:'rgba(139,92,246,0.1)',border:'1px solid rgba(139,92,246,0.2)'}} className="text-violet-400 text-xs font-normal px-1.5 py-0.5 rounded ml-1">Pro</span></label><textarea style={{background:'rgba(9,9,11,0.8)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-xl px-3 py-2.5 text-sm placeholder-zinc-600 focus:outline-none focus:border-violet-500 resize-none transition-colors" placeholder="{{nombre_cliente}} = nombre del cliente activo" rows={2} value={form.dynamic_variables} onChange={e=>setForm(f=>({...f,dynamic_variables:e.target.value}))}/></div>
+                <div><label className="block text-xs font-semibold text-zinc-400 mb-1.5">Patrones de respuesta <span style={{background:'rgba(139,92,246,0.1)',border:'1px solid rgba(139,92,246,0.2)'}} className="text-violet-400 text-xs font-normal px-1.5 py-0.5 rounded ml-1">Pro</span></label><textarea style={{background:'rgba(9,9,11,0.8)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-xl px-3 py-2.5 text-sm placeholder-zinc-600 focus:outline-none focus:border-violet-500 resize-none transition-colors" placeholder="Siempre empieza con la conclusion. Luego explica..." rows={2} value={form.response_patterns} onChange={e=>setForm(f=>({...f,response_patterns:e.target.value}))}/></div>
+                <div><label className="block text-xs font-semibold text-zinc-400 mb-1.5">Relaciones <span style={{background:'rgba(139,92,246,0.1)',border:'1px solid rgba(139,92,246,0.2)'}} className="text-violet-400 text-xs font-normal px-1.5 py-0.5 rounded ml-1">Pro</span></label><textarea style={{background:'rgba(9,9,11,0.8)',border:'1px solid rgba(63,63,70,0.6)',color:'white'}} className="w-full rounded-xl px-3 py-2.5 text-sm placeholder-zinc-600 focus:outline-none focus:border-violet-500 resize-none transition-colors" placeholder="Trabaja con {{CMO}} en campanas. Reporta a {{CEO}}..." rows={2} value={form.relationships} onChange={e=>setForm(f=>({...f,relationships:e.target.value}))}/></div>
+              </div></div>)}
             </div>
-            <div style={{borderTop:'1px solid rgba(63,63,70,0.4)'}} className="flex gap-3 px-6 py-4 flex-shrink-0">
-              <button onClick={()=>{setShowModal(false);setShowAIPanel(false)}} style={{border:'1px solid rgba(63,63,70,0.6)'}} className="flex-1 text-zinc-400 text-sm font-semibold py-2.5 rounded-xl hover:bg-zinc-800 hover:text-white transition-colors">Cancelar</button>
-              <button onClick={handleSave} disabled={!form.name.trim()||saving} style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 4px 15px rgba(139,92,246,0.25)'}} className="flex-1 text-white text-sm font-semibold py-2.5 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-40">{saving?'Guardando...':editingProfile?'Guardar cambios':'Crear perfil'}</button>
-            </div>
+            <div style={{borderTop:'1px solid rgba(63,63,70,0.4)'}} className="flex gap-3 px-6 py-4 flex-shrink-0"><button onClick={()=>{setShowModal(false);setShowAIPanel(false)}} style={{border:'1px solid rgba(63,63,70,0.6)'}} className="flex-1 text-zinc-400 text-sm font-semibold py-2.5 rounded-xl hover:bg-zinc-800 hover:text-white transition-colors">Cancelar</button><button onClick={handleSave} disabled={!form.name.trim()||saving} style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 4px 15px rgba(139,92,246,0.25)'}} className="flex-1 text-white text-sm font-semibold py-2.5 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-40">{saving?'Guardando...':editingProfile?'Guardar cambios':'Crear perfil'}</button></div>
           </div>
         </div>
       )}
     </div>
   )
 }
+function KeeperSandbox({profile,onClose}:{profile:KeeperProfile;onClose:()=>void}){
+  const [messages,setMessages]=useState<Array<{role:'user'|'assistant';content:string}>>([{role:'assistant',content:'Sandbox activo. Soy '+profile.name+(profile.role?'. Rol: '+profile.role+'.':'')+' Cualquier mensaje que me envies sera respondido exactamente como defina mi identidad. Empieza cuando quieras.'}])
+  const [input,setInput]=useState('')
+  const [loading,setLoading]=useState(false)
+  const [mode,setMode]=useState<'chat'|'test'>('chat')
+  const [testQ,setTestQ]=useState('')
+  const sp=[profile.name&&'Nombre: '+profile.name,profile.role&&'Rol: '+profile.role,profile.tone&&'Tono: '+profile.tone,profile.goals&&'Objetivo: '+profile.goals,(profile.rules?.length)&&'Reglas: '+profile.rules.join(' | '),profile.limits&&'Limites: '+profile.limits,profile.base_memory&&'Memoria de fondo: '+profile.base_memory,profile.response_patterns&&'Patrones: '+profile.response_patterns,profile.relationships&&'Relaciones: '+profile.relationships,profile.extra&&'Contexto: '+profile.extra].filter(Boolean).join('\n')
+  const send=async(msg?:string)=>{
+    const userMsg=(msg||input).trim();if(!userMsg||loading)return;setInput('');setMessages(prev=>[...prev,{role:'user',content:userMsg}]);setLoading(true)
+    try{const res=await fetch('/api/chat-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:userMsg,systemPrompt:sp,history:messages.slice(-8)})});const data=await res.json();setMessages(prev=>[...prev,{role:'assistant',content:data.reply||data.error||'Error'}])}catch(_e){setMessages(prev=>[...prev,{role:'assistant',content:'Error de conexion'}])}
+    setLoading(false)
+  }
+  const TEST_PROMPTS=['Describe quien eres en una sola oracion','Dame un ejemplo de como responderas a una pregunta tipica','Cual es lo que NUNCA harias?','Actua como si alguien te desafiara fuera de tu rol']
+  return(
+    <div style={{background:'rgba(18,18,20,0.95)',border:'1px solid rgba(16,185,129,0.25)',boxShadow:'0 0 30px rgba(16,185,129,0.04)'}} className="rounded-2xl overflow-hidden">
+      <div style={{background:'rgba(16,185,129,0.04)',borderBottom:'1px solid rgba(16,185,129,0.15)'}} className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center gap-3">
+          {profile.avatar_url?<img src={profile.avatar_url} alt={profile.name} className="w-9 h-9 rounded-xl object-cover border border-zinc-700"/>:<div style={{boxShadow:'0 0 12px rgba(16,185,129,0.15)'}} className={"w-9 h-9 rounded-xl bg-gradient-to-br "+gc(profile.name)+" flex items-center justify-center text-white font-bold text-sm"}>{profile.name[0].toUpperCase()}</div>}
+          <div>
+            <div className="flex items-center gap-2"><p className="text-sm font-bold text-white">{profile.name}</p><div style={{background:'rgba(16,185,129,0.12)',border:'1px solid rgba(16,185,129,0.25)'}} className="flex items-center gap-1 px-1.5 py-0.5 rounded-md"><div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"/><span className="text-emerald-400 text-xs font-bold">SANDBOX</span></div></div>
+            {profile.role&&<p className="text-xs text-zinc-500 line-clamp-1">{profile.role}</p>}
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <div style={{background:'rgba(39,39,42,0.8)',border:'1px solid rgba(63,63,70,0.5)'}} className="flex rounded-lg overflow-hidden">
+            <button onClick={()=>setMode('chat')} style={{background:mode==='chat'?'rgba(16,185,129,0.15)':'transparent',color:mode==='chat'?'#34d399':'#52525b'}} className="text-xs px-3 py-1.5 font-semibold transition-all">Chat libre</button>
+            <button onClick={()=>setMode('test')} style={{background:mode==='test'?'rgba(139,92,246,0.15)':'transparent',color:mode==='test'?'#a78bfa':'#52525b'}} className="text-xs px-3 py-1.5 font-semibold transition-all">Pruebas</button>
+          </div>
+          <button onClick={onClose} className="p-1.5 text-zinc-600 hover:text-white transition-colors"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12"/></svg></button>
+        </div>
+      </div>
+      {mode==='test'&&(
+        <div style={{background:'rgba(139,92,246,0.04)',borderBottom:'1px solid rgba(63,63,70,0.4)'}} className="px-4 py-3">
+          <p className="text-xs text-zinc-500 mb-2 font-semibold">Preguntas de prueba rapidas</p>
+          <div className="flex flex-wrap gap-2">{TEST_PROMPTS.map((q,i)=><button key={i} onClick={()=>send(q)} style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.5)'}} className="text-xs text-zinc-400 px-2.5 py-1.5 rounded-lg hover:border-violet-500/40 hover:text-violet-300 transition-colors">{q}</button>)}</div>
+        </div>
+      )}
+      <div className="h-72 overflow-y-auto p-4 space-y-3">
+        {messages.map((msg,i)=><div key={i} className={"flex "+(msg.role==='user'?'justify-end':'justify-start')}><div style={msg.role==='assistant'?{background:'rgba(39,39,42,0.8)',border:'1px solid rgba(63,63,70,0.5)',maxWidth:'80%'}:{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',maxWidth:'80%'}} className={"px-3 py-2.5 rounded-xl text-sm leading-relaxed "+(msg.role==='user'?'text-white':'text-zinc-100')}>{msg.content}</div></div>)}
+        {loading&&<div className="flex justify-start"><div style={{background:'rgba(39,39,42,0.8)',border:'1px solid rgba(63,63,70,0.5)'}} className="px-3 py-2.5 rounded-xl"><div className="flex gap-1 items-center">{[0,150,300].map(d=><div key={d} className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce" style={{animationDelay:d+'ms'}}/>)}</div></div></div>}
+      </div>
+      <div style={{borderTop:'1px solid rgba(63,63,70,0.4)'}} className="p-3 flex gap-2">
+        <input type="text" value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')send()}} placeholder={'Escribe a '+profile.name+'...'} disabled={loading} style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.5)',color:'white'}} className="flex-1 px-3 py-2 rounded-xl text-sm placeholder-zinc-600 focus:outline-none focus:border-emerald-500/50 transition-colors"/>
+        <button onClick={()=>send()} disabled={!input.trim()||loading} style={{background:'linear-gradient(135deg,#059669,#047857)'}} className="px-4 py-2 disabled:opacity-40 text-white text-sm font-semibold rounded-xl hover:opacity-90 transition-opacity"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg></button>
+      </div>
+    </div>
+  )
+}
+
 function ProfileChat({profile,onClose}:{profile:KeeperProfile;onClose:()=>void}){
   const [messages,setMessages]=useState<Array<{role:'user'|'assistant';content:string}>>([{role:'assistant',content:'Hola! Soy '+profile.name+'. '+(profile.role?'Mi rol es: '+profile.role+'. ':'')+' En que te ayudo?'}])
   const [input,setInput]=useState('')
   const [loading,setLoading]=useState(false)
   const send=async()=>{
-    if(!input.trim()||loading)return
-    const userMsg=input.trim();setInput('');setMessages(prev=>[...prev,{role:'user',content:userMsg}]);setLoading(true)
-    try{
-      const sp=[
-        profile.name&&'Nombre: '+profile.name,profile.role&&'Rol: '+profile.role,
-        profile.tone&&'Tono: '+profile.tone,profile.goals&&'Objetivo: '+profile.goals,
-        (profile.rules?.length)&&'Reglas: '+profile.rules.join(', '),profile.limits&&'Limites: '+profile.limits,
-        profile.base_memory&&'Memoria de fondo: '+profile.base_memory,
-        profile.response_patterns&&'Patrones de respuesta: '+profile.response_patterns,
-        profile.extra&&'Contexto: '+profile.extra
-      ].filter(Boolean).join('\n')
-      const res=await fetch('/api/chat-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:userMsg,systemPrompt:sp,history:messages.slice(-6)})})
-      const data=await res.json()
-      setMessages(prev=>[...prev,{role:'assistant',content:data.reply||data.error||'Error'}])
-    }catch(_e){setMessages(prev=>[...prev,{role:'assistant',content:'Error de conexion'}])}
+    if(!input.trim()||loading)return;const userMsg=input.trim();setInput('');setMessages(prev=>[...prev,{role:'user',content:userMsg}]);setLoading(true)
+    try{const sp=[profile.name&&'Nombre: '+profile.name,profile.role&&'Rol: '+profile.role,profile.tone&&'Tono: '+profile.tone,profile.goals&&'Objetivo: '+profile.goals,(profile.rules?.length)&&'Reglas: '+profile.rules.join(', '),profile.limits&&'Limites: '+profile.limits,profile.base_memory&&'Memoria: '+profile.base_memory,profile.extra&&'Contexto: '+profile.extra].filter(Boolean).join('\n');const res=await fetch('/api/chat-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:userMsg,systemPrompt:sp,history:messages.slice(-6)})});const data=await res.json();setMessages(prev=>[...prev,{role:'assistant',content:data.reply||data.error||'Error'}])}catch(_e){setMessages(prev=>[...prev,{role:'assistant',content:'Error de conexion'}])}
     setLoading(false)
   }
   return(
