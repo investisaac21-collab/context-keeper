@@ -1,65 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent'
+
 export async function POST(req: NextRequest) {
   try {
     const { currentPrompt, instruction } = await req.json()
-
     if (!currentPrompt?.trim() || !instruction?.trim()) {
-      return NextResponse.json({ error: 'Faltan parámetros' }, { status: 400 })
+      return NextResponse.json({ error: 'Faltan parametros' }, { status: 400 })
     }
+    const apiKey = process.env.GEMINI_API_KEY
+    if (!apiKey) return NextResponse.json({ error: 'GEMINI_API_KEY no configurada' }, { status: 500 })
 
-    const apiKey = process.env.GROQ_API_KEY
-    if (!apiKey) {
-      return NextResponse.json({ error: 'GROQ_API_KEY no configurada' }, { status: 500 })
-    }
-
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
-        messages: [
-          {
-            role: 'system',
-            content: `Eres un experto en ingeniería de prompts. Tu tarea es refinar y mejorar prompts según las instrucciones del usuario.
-
+    const prompt = `Eres un experto en ingenieria de prompts. Refina y mejora el prompt segun las instrucciones del usuario.
 REGLAS:
-- Mantén las variables dinámicas con formato {{nombre}} exactamente igual
+- Manten las variables dinamicas con formato {{nombre}} exactamente igual
 - Preserva el idioma del prompt original
-- Solo devuelve el prompt refinado, sin explicaciones ni comentarios adicionales
-- No añadas comillas ni formato markdown alrededor del prompt
-- El resultado debe ser el prompt listo para usar directamente`,
-          },
-          {
-            role: 'user',
-            content: `PROMPT ACTUAL:
+- Solo devuelve el prompt refinado, sin explicaciones ni comentarios
+- No anadas comillas ni formato markdown alrededor del prompt
+- El resultado debe ser el prompt listo para usar directamente
+
+PROMPT ACTUAL:
 ${currentPrompt}
 
-INSTRUCCIÓN DE REFINAMIENTO:
-${instruction}
+INSTRUCCION DE REFINAMIENTO: ${instruction}
 
-Devuelve el prompt refinado:`,
-          },
-        ],
-        max_tokens: 1024,
-        temperature: 0.7,
-      }),
+Devuelve el prompt refinado:`
+
+    const res = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 1024 } })
     })
+    const data = await res.json()
+    if (!res.ok) return NextResponse.json({ error: data.error?.message || 'Error Gemini' }, { status: 500 })
 
-    if (!response.ok) {
-      const err = await response.text()
-      return NextResponse.json({ error: 'Error de Groq: ' + err }, { status: 500 })
-    }
-
-    const data = await response.json()
-    const refined = data.choices?.[0]?.message?.content?.trim()
-
-    if (!refined) {
-      return NextResponse.json({ error: 'Respuesta vacía de Groq' }, { status: 500 })
-    }
+    const refined = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+    if (!refined) return NextResponse.json({ error: 'Respuesta vacia de IA' }, { status: 500 })
 
     return NextResponse.json({ refined })
   } catch (err) {
