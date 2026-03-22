@@ -103,5 +103,5 @@ Realiza una prueba libre de interaccion con este perfil. Responde SOLO con JSON 
     return NextResponse.json({ error: 'No se pudo simular' }, { status: 500 })
   }
 
-  return NextResponse.json(parsed)
+  return NextResponse.json({ result: parsed })
 }
