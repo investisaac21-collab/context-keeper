@@ -9,13 +9,14 @@ export default async function ProfilesPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: profilesData } = await supabase
-    .from('profiles')
+  // Read plan from subscriptions (same source as dashboard)
+  const { data: sub } = await supabase
+    .from('subscriptions')
     .select('plan')
-    .eq('id', user.id)
+    .eq('user_id', user.id)
     .single()
 
-  // Intentar cargar keeper_profiles (tabla puede no existir aun)
+  // Load keeper_profiles
   let keeperProfiles: any[] = []
   try {
     const { data } = await supabase
@@ -24,7 +25,7 @@ export default async function ProfilesPage() {
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
     keeperProfiles = data || []
-  } catch(e) {
+  } catch(_e) {
     keeperProfiles = []
   }
 
@@ -32,7 +33,7 @@ export default async function ProfilesPage() {
     <ProfilesClient
       userId={user.id}
       userEmail={user.email || ''}
-      plan={profilesData?.plan || 'free'}
+      plan={sub?.plan || 'free'}
       initialProfiles={keeperProfiles}
     />
   )
