@@ -49,10 +49,10 @@ Responde UNICAMENTE con el JSON, sin markdown, sin backticks, sin texto adiciona
 
     const raw = data.choices?.[0]?.message?.content || ''
 
-    // Step 1: strip markdown fences if present
+    // Layer 1: strip markdown fences
     let text = raw.replace(/```(?:json)?\s*/gi, '').replace(/```\s*/g, '').trim()
 
-    // Step 2: find the JSON object
+    // Layer 2: find the JSON object boundaries
     const jsonStart = text.indexOf('{')
     const jsonEnd = text.lastIndexOf('}')
     if (jsonStart === -1 || jsonEnd === -1) {
@@ -60,8 +60,8 @@ Responde UNICAMENTE con el JSON, sin markdown, sin backticks, sin texto adiciona
     }
     let rawJson = text.slice(jsonStart, jsonEnd + 1)
 
-    // Step 3: sanitize — escape literal control chars inside JSON string values
-    // This regex matches JSON string values and escapes any real newlines/tabs inside them
+    // Layer 3: sanitize control characters inside JSON string values
+    // First pass: escape \n \r \t
     rawJson = rawJson.replace(/"((?:[^"\\\r\n]|\\.)*)"/g, (_match: string, inner: string) => {
       const sanitized = inner
         .replace(/\n/g, '\\n')
@@ -70,11 +70,14 @@ Responde UNICAMENTE con el JSON, sin markdown, sin backticks, sin texto adiciona
       return '"' + sanitized + '"'
     })
 
+    // Layer 4: strip remaining control chars U+0000-U+001F (except legal escapes already present)
+    rawJson = rawJson.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '')
+
     let profile: Record<string, unknown>
     try {
       profile = JSON.parse(rawJson)
     } catch (_e) {
-      // Step 4: last resort manual extraction
+      // Last resort: manual field extraction
       const nm = raw.match(/"name"\s*:\s*"([^"\n\r]+)"/)
       const rl = raw.match(/"role"\s*:\s*"([^"\n\r]+)"/)
       const tn = raw.match(/"tone"\s*:\s*"([^"\n\r]+)"/)
