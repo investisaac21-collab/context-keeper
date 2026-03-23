@@ -236,7 +236,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
   const openEdit=(p:KeeperProfile)=>{setEditingProfile(p);setForm({name:p.name,profile_type:p.profile_type||'assistant',role:p.role||'',tone:p.tone||'',rules:(p.rules||[]).join('\n'),goals:p.goals||'',limits:p.limits||'',extra:p.extra||'',avatar_url:p.avatar_url||'',base_memory:p.base_memory||'',response_patterns:p.response_patterns||'',dynamic_variables:p.dynamic_variables||'',relationships:p.relationships||''});const hasAdv=!!(p.base_memory||p.response_patterns||p.dynamic_variables||p.relationships);setShowAdvanced(hasAdv);setShowAIPanel(false);setShowModal(true)}
   const handleGenerateProfile=async()=>{
     if(!aiDesc.trim())return;setAiLoading(true);setAiError('')
-    try{const res=await fetch('/api/generate-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({description:aiDesc})});const data=await res.json();if(data.profile){const p=data.profile;setForm(f=>({...f,name:p.name||f.name,role:p.role||f.role,tone:p.tone||f.tone,rules:p.rules||f.rules,extra:p.extra||f.extra}));setShowAIPanel(false);setAiDesc('')}else setAiError(data.error||'Error')}catch(_e){setAiError('Error de conexion')}
+    try{const res=await fetch('/api/generate-profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({description:aiDesc})});const data=await res.json();if(data.name||data.role){const p=data;setForm(f=>({...f,name:p.name||f.name,role:p.role||f.role,tone:p.tone||f.tone,rules:p.rules||f.rules,extra:p.extra||f.extra}));setShowAIPanel(false);setAiDesc('')}else setAiError(data.error||'Error')}catch(_e){setAiError('Error de conexion')}
     setAiLoading(false)
   }
   const handleSave=async()=>{
@@ -257,7 +257,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
   const handleRunLab=async()=>{
     if(!labProfile)return;setLabLoading(true);setLabError('');setLabResult(null);setLabAnimated(false);setLabLoadMsg(0)
     labTimerRef.current=setInterval(()=>setLabLoadMsg(p=>(p+1)%4),1800)
-    try{const res=await fetch('/api/analyze-context',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({content:ge(labProfile,'plain_text'),type:'profile'})});const data=await res.json();if(data.analysis){setLabResult(data.analysis);if((data.analysis?.relevance_score||data.analysis?.score)&&labProfile){setLabScores(prev=>({...prev,[labProfile.id]:data.analysis.relevance_score||data.analysis.score||0}));setLabHistory(prev=>({before:labResult,after:data.analysis}))}setTimeout(()=>setLabAnimated(true),80)}else setLabError(data.error||'Error al analizar')}catch(_e){setLabError('Error de conexion')}
+    try{const res=await fetch('/api/analyze-context',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({profileId:labProfile.id,content:ge(labProfile,'plain_text'),type:'profile'})});const data=await res.json();if(data.analysis){setLabResult(data.analysis);if((data.analysis?.relevance_score||data.analysis?.score)&&labProfile){setLabScores(prev=>({...prev,[labProfile.id]:data.analysis.relevance_score||data.analysis.score||0}));setLabHistory(prev=>({before:labResult,after:data.analysis}))}setTimeout(()=>setLabAnimated(true),80)}else setLabError(data.error||'Error al analizar')}catch(_e){setLabError('Error de conexion')}
     if(labTimerRef.current)clearInterval(labTimerRef.current)
     setLabLoading(false)
   }
@@ -407,7 +407,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
         )}
         {sandboxProfile&&<div className="mt-6"><KeeperSandbox profile={sandboxProfile} onClose={()=>setSandboxProfile(null)}/></div>}
         {chatProfile&&<div className="mt-6"><ProfileChat profile={chatProfile} onClose={()=>setChatProfileId(null)}/></div>}
-        {profiles.length>0&&<div style={{background:'rgba(24,24,27,0.5)',border:'1px solid rgba(63,63,70,0.4)'}} className="mt-6 p-4 rounded-xl flex items-start gap-3"><svg width="14" height="14" fill="none" stroke="rgba(139,92,246,0.6)" strokeWidth="2" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p className="text-zinc-600 text-xs"><strong className="text-zinc-400">Flujo recomendado:</strong> Crea el perfil â Lab (analiza) â Forge (simula escenarios) â Export (portabilidad). Sandbox para chatear directamente.</p></div>}
+        {profiles.length>0&&<div style={{background:'rgba(24,24,27,0.5)',border:'1px solid rgba(63,63,70,0.4)'}} className="mt-6 p-4 rounded-xl flex items-start gap-3"><svg width="14" height="14" fill="none" stroke="rgba(139,92,246,0.6)" strokeWidth="2" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p className="text-zinc-600 text-xs"><strong className="text-zinc-400">Flujo recomendado:</strong> Crea el perfil Ã¢ÂÂ Lab (analiza) Ã¢ÂÂ Forge (simula escenarios) Ã¢ÂÂ Export (portabilidad). Sandbox para chatear directamente.</p></div>}
       </div>
       {exportProfile&&(
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={e=>{if(e.target===e.currentTarget)setExportProfile(null)}}>
@@ -427,7 +427,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
             <div style={{borderBottom:'1px solid rgba(59,130,246,0.15)',background:'rgba(59,130,246,0.03)'}} className="flex items-center justify-between px-6 py-4 flex-shrink-0"><div className="flex items-center gap-3"><div style={{background:'rgba(59,130,246,0.12)',border:'1px solid rgba(59,130,246,0.25)'}} className="w-8 h-8 rounded-xl flex items-center justify-center"><svg width="14" height="14" fill="none" stroke="#60a5fa" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div><div><h2 className="font-bold text-white text-sm">Keeper Lab</h2><p className="text-blue-500/60 text-xs">{labProfile.name}</p></div></div><button onClick={()=>{setLabProfile(null);setLabResult(null)}} className="w-8 h-8 rounded-lg hover:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-white transition-colors"><svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
             <div className="p-6 space-y-4 overflow-y-auto">
               {!labResult&&!labLoading&&!labError&&<div className="text-center py-6"><p className="text-zinc-400 text-sm mb-2 leading-relaxed">Analisis en 4 dimensiones:</p><div className="flex justify-center gap-4 mb-6">{[['Claridad','text-blue-400'],['Consistencia','text-violet-400'],['Completitud','text-emerald-400'],['Efectividad','text-amber-400']].map(([label,color])=><div key={label} className="text-center"><div style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.5)'}} className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1"><span className={"text-sm font-black "+color}>?</span></div><span className="text-xs text-zinc-600">{label}</span></div>)}</div><button onClick={handleRunLab} style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 4px 20px rgba(139,92,246,0.25)'}} className="flex items-center gap-2 text-white text-sm font-semibold px-6 py-3 rounded-xl hover:opacity-90 transition-opacity mx-auto"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Analizar perfil</button></div>}
-              {labLoading&&<div className="flex flex-col items-center py-8 gap-4"><div className="relative w-12 h-12"><div style={{border:'2px solid rgba(59,130,246,0.15)',borderTop:'2px solid #3b82f6'}} className="absolute inset-0 rounded-full animate-spin"/><div style={{border:'2px solid rgba(139,92,246,0.1)',borderBottom:'2px solid #7c3aed',animationDuration:'1.4s'}} className="absolute inset-1.5 rounded-full animate-spin"/></div><div className="text-center space-y-1"><p className="text-blue-400 text-sm font-medium" style={{transition:'opacity 0.4s'}}>{labMsgs[labLoadMsg]}</p><p className="text-zinc-700 text-xs">Keeper Lab Â· Analisis profundo</p></div></div>}
+              {labLoading&&<div className="flex flex-col items-center py-8 gap-4"><div className="relative w-12 h-12"><div style={{border:'2px solid rgba(59,130,246,0.15)',borderTop:'2px solid #3b82f6'}} className="absolute inset-0 rounded-full animate-spin"/><div style={{border:'2px solid rgba(139,92,246,0.1)',borderBottom:'2px solid #7c3aed',animationDuration:'1.4s'}} className="absolute inset-1.5 rounded-full animate-spin"/></div><div className="text-center space-y-1"><p className="text-blue-400 text-sm font-medium" style={{transition:'opacity 0.4s'}}>{labMsgs[labLoadMsg]}</p><p className="text-zinc-700 text-xs">Keeper Lab ÃÂ· Analisis profundo</p></div></div>}
               {labError&&<div style={{background:'rgba(239,68,68,0.07)',border:'1px solid rgba(239,68,68,0.2)'}} className="p-4 rounded-xl"><p className="text-red-400 text-sm">{labError}</p><button onClick={handleRunLab} className="mt-3 text-xs text-violet-400 hover:text-violet-300">Reintentar</button></div>}
               {labResult&&(<div className="space-y-5">
                   <div style={{textAlign:'center',padding:'20px 0 12px'}}>
@@ -492,7 +492,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
             <div style={{borderBottom:'1px solid rgba(63,63,70,0.4)',background:'rgba(245,158,11,0.04)'}} className="flex items-center justify-between px-6 py-4 flex-shrink-0">
               <div className="flex items-center gap-3">
                 <div style={{background:'rgba(245,158,11,0.12)',border:'1px solid rgba(245,158,11,0.25)'}} className="w-8 h-8 rounded-xl flex items-center justify-center"><svg width="14" height="14" fill="none" stroke="#fbbf24" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/><path strokeLinecap="round" strokeLinejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/></svg></div>
-                <div><h2 className="font-bold text-white text-sm">Keeper Forge</h2><p className="text-zinc-500 text-xs">Simulacion profunda â {forgeProfile.name}</p></div>
+                <div><h2 className="font-bold text-white text-sm">Keeper Forge</h2><p className="text-zinc-500 text-xs">Simulacion profunda Ã¢ÂÂ {forgeProfile.name}</p></div>
               </div>
               <button onClick={()=>{setForgeProfile(null);setForgeResult(null)}} className="w-8 h-8 rounded-lg hover:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-white transition-colors"><svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
             </div>
@@ -562,7 +562,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                             letterSpacing:'0.06em',
                             color:forgeResult.verdict==='SOLIDO'?'rgba(134,239,172,0.95)':forgeResult.verdict==='ACEPTABLE'?'rgba(253,230,138,0.95)':'rgba(252,165,165,0.95)',
                             lineHeight:1
-                          }}>{String(forgeResult.verdict||'â')}</div>
+                          }}>{String(forgeResult.verdict||'Ã¢ÂÂ')}</div>
                           <div style={{fontSize:9,letterSpacing:'0.12em',opacity:0.5,marginTop:4,color:'white'}}>VEREDICTO FORGE</div>
                         </div>
                         {forgeResult.consistency_score!=null&&(
@@ -609,12 +609,12 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                           background:forgeResult.overall_verdict==='ROBUSTO'?'rgba(34,197,94,0.1)':forgeResult.overall_verdict==='FRAGIL'?'rgba(239,68,68,0.08)':'rgba(251,191,36,0.08)',
                           border:forgeResult.overall_verdict==='ROBUSTO'?'1px solid rgba(34,197,94,0.3)':forgeResult.overall_verdict==='FRAGIL'?'1px solid rgba(239,68,68,0.25)':'1px solid rgba(251,191,36,0.25)'
                         }}>
-                          <div style={{fontSize:28,fontWeight:900,letterSpacing:'0.06em',color:forgeResult.overall_verdict==='ROBUSTO'?'rgba(134,239,172,0.95)':forgeResult.overall_verdict==='FRAGIL'?'rgba(252,165,165,0.95)':'rgba(253,230,138,0.95)',lineHeight:1}}>{String(forgeResult.overall_verdict||'â')}</div>
-                          <div style={{fontSize:9,letterSpacing:'0.12em',opacity:0.5,marginTop:4,color:'white'}}>ESTRÃS FORGE</div>
+                          <div style={{fontSize:28,fontWeight:900,letterSpacing:'0.06em',color:forgeResult.overall_verdict==='ROBUSTO'?'rgba(134,239,172,0.95)':forgeResult.overall_verdict==='FRAGIL'?'rgba(252,165,165,0.95)':'rgba(253,230,138,0.95)',lineHeight:1}}>{String(forgeResult.overall_verdict||'Ã¢ÂÂ')}</div>
+                          <div style={{fontSize:9,letterSpacing:'0.12em',opacity:0.5,marginTop:4,color:'white'}}>ESTRÃÂS FORGE</div>
                         </div>
                       </div>
                       {(forgeResult.stress_questions as string[]||[]).length>0&&<div style={{marginBottom:10}}>
-                        <p style={{fontSize:10,color:'rgba(251,191,36,0.5)',letterSpacing:'0.08em',marginBottom:6}}>PREGUNTAS DE ESTRÃS</p>
+                        <p style={{fontSize:10,color:'rgba(251,191,36,0.5)',letterSpacing:'0.08em',marginBottom:6}}>PREGUNTAS DE ESTRÃÂS</p>
                         {(forgeResult.stress_questions as string[]).map((q,i)=><div key={i} style={{borderLeft:'2px solid rgba(251,191,36,0.3)',paddingLeft:10,marginBottom:6}}><p style={{fontSize:11,color:'rgba(253,230,138,0.75)',margin:0}}>{q}</p></div>)}
                       </div>}
                       {(forgeResult.critical_gaps as string[]||[]).length>0&&<div style={{marginBottom:8}}>
@@ -638,7 +638,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                           background:forgeResult.quick_verdict==='COHERENTE'?'rgba(34,197,94,0.1)':'rgba(239,68,68,0.08)',
                           border:forgeResult.quick_verdict==='COHERENTE'?'1px solid rgba(34,197,94,0.3)':'1px solid rgba(239,68,68,0.25)'
                         }}>
-                          <div style={{fontSize:26,fontWeight:900,letterSpacing:'0.06em',color:forgeResult.quick_verdict==='COHERENTE'?'rgba(134,239,172,0.95)':'rgba(252,165,165,0.95)',lineHeight:1}}>{String(forgeResult.quick_verdict||'â')}</div>
+                          <div style={{fontSize:26,fontWeight:900,letterSpacing:'0.06em',color:forgeResult.quick_verdict==='COHERENTE'?'rgba(134,239,172,0.95)':'rgba(252,165,165,0.95)',lineHeight:1}}>{String(forgeResult.quick_verdict||'Ã¢ÂÂ')}</div>
                           <div style={{fontSize:9,letterSpacing:'0.12em',opacity:0.5,marginTop:4,color:'white'}}>VERIFICACION LIBRE</div>
                         </div>
                       </div>
