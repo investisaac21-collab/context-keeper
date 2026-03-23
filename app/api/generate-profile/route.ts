@@ -39,9 +39,9 @@ REGLAS CRITICAS:
 - NO uses caracteres de control en los valores
 
 FORMATO (una sola linea, sin saltos dentro de strings):
-{"name":"[nombre corto]","role":"[rol conciso]","context":"[descripcion 2-3 oraciones sin saltos]","rules":"[reglas en una oracion]","variables":[{"name":"var1","description":"desc","example":"ej"}]}
+{"name":"[nombre corto]","role":"[rol conciso]","tone":"[tono en 2-4 palabras ej: directo y empático]","goals":"[objetivo principal una oracion]","context":"[descripcion 2-3 oraciones sin saltos]","rules":"[reglas en una oracion]","limits":"[limitaciones si aplica sino vacio]","variables":[{"name":"var1","description":"desc","example":"ej"}]}
 
-Maximo 2 variables. Todo en el mismo idioma que la descripcion.`
+Maximo 2 variables. tone, goals, rules son obligatorios. Todo en el mismo idioma que la descripcion.`
 
   let raw = ''
   try {
