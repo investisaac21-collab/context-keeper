@@ -301,113 +301,350 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
           </div>
         )}
         {profiles.length>0&&(
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
             {profiles.map((p)=>{
               const ti=PT.find(t=>t.id===p.profile_type)||PT[6]
-              const hasAdv=!!(p.base_memory||p.response_patterns||p.dynamic_variables||p.relationships)
-              return(
-                <div key={p.id} style={{background:'rgba(14,14,18,0.95)',border:sandboxProfile?.id===p.id?'1px solid rgba(16,185,129,0.35)':'1px solid rgba(63,63,70,0.5)',transition:'all 0.25s',boxShadow:sandboxProfile?.id===p.id?'0 0 0 1px rgba(16,185,129,0.15), 0 8px 32px rgba(16,185,129,0.06)':'none'}} className="rounded-2xl overflow-hidden group" onMouseEnter={e=>{if(!sandboxProfile||(sandboxProfile&&sandboxProfile.id!==p.id)){e.currentTarget.style.boxShadow='0 0 24px rgba(139,92,246,0.07)';e.currentTarget.style.borderColor='rgba(139,92,246,0.25)'}}} onMouseLeave={e=>{if(!sandboxProfile||(sandboxProfile&&sandboxProfile.id!==p.id)){e.currentTarget.style.boxShadow='none';e.currentTarget.style.borderColor='rgba(63,63,70,0.5)'}}}>
-                  <div className="p-5 pb-4">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        {p.avatar_url?<img src={p.avatar_url} alt={p.name} className="w-11 h-11 rounded-xl object-cover border border-zinc-700"/>:<div style={{boxShadow:'0 0 15px rgba(139,92,246,0.15)'}} className={"w-11 h-11 rounded-xl bg-gradient-to-br "+gc(p.name)+" flex items-center justify-center font-bold text-white text-base"}>{(p.name[0]||'K').toUpperCase()}</div>}
-                        <div>
-                          <div className="font-bold text-white text-sm leading-tight mb-1">{p.name}</div>
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <div style={{background:ti.id==='npc'?'rgba(34,197,94,0.1)':ti.id==='brand'?'rgba(139,92,246,0.12)':ti.id==='assistant'?'rgba(59,130,246,0.1)':ti.id==='support'?'rgba(6,182,212,0.1)':ti.id==='dev'?'rgba(251,191,36,0.1)':ti.id==='character'?'rgba(236,72,153,0.1)':'rgba(113,113,122,0.1)',border:ti.id==='npc'?'1px solid rgba(34,197,94,0.25)':ti.id==='brand'?'1px solid rgba(139,92,246,0.3)':ti.id==='assistant'?'1px solid rgba(59,130,246,0.25)':ti.id==='support'?'1px solid rgba(6,182,212,0.25)':ti.id==='dev'?'1px solid rgba(251,191,36,0.25)':ti.id==='character'?'1px solid rgba(236,72,153,0.25)':'1px solid rgba(113,113,122,0.2)'}} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md"><svg width="9" height="9" fill="none" stroke={ti.id==='npc'?'rgba(134,239,172,0.9)':ti.id==='brand'?'rgba(167,139,250,0.9)':ti.id==='assistant'?'rgba(147,197,253,0.9)':ti.id==='support'?'rgba(103,232,249,0.9)':ti.id==='dev'?'rgba(253,230,138,0.9)':ti.id==='character'?'rgba(249,168,212,0.9)':'rgba(161,161,170,0.7)'} strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d={ti.icon}/></svg><span style={{color:ti.id==='npc'?'rgba(134,239,172,0.9)':ti.id==='brand'?'rgba(167,139,250,0.9)':ti.id==='assistant'?'rgba(147,197,253,0.9)':ti.id==='support'?'rgba(103,232,249,0.9)':ti.id==='dev'?'rgba(253,230,138,0.9)':ti.id==='character'?'rgba(249,168,212,0.9)':'rgba(161,161,170,0.7)',fontSize:11,fontWeight:500}} >{ti.label}</span></div>
-                            {hasAdv&&<div style={{background:'rgba(16,185,129,0.08)',border:'1px solid rgba(16,185,129,0.2)'}} className="inline-flex items-center px-1.5 py-0.5 rounded-md"><span className="text-emerald-500 text-xs font-medium">+adv</span></div>}
-                            {p.lab_score?(<div style={{background:Number(p.lab_score)>=8?'rgba(34,197,94,0.12)':Number(p.lab_score)>=6?'rgba(251,191,36,0.12)':'rgba(239,68,68,0.12)',border:Number(p.lab_score)>=8?'1px solid rgba(34,197,94,0.3)':Number(p.lab_score)>=6?'1px solid rgba(251,191,36,0.3)':'1px solid rgba(239,68,68,0.3)',borderRadius:6,padding:'2px 7px',display:'inline-flex',alignItems:'center',gap:4}}><span style={{width:5,height:5,borderRadius:'50%',background:Number(p.lab_score)>=8?'#22c55e':Number(p.lab_score)>=6?'#fbbf24':'#ef4444',display:'inline-block',flexShrink:0}}></span><span style={{color:Number(p.lab_score)>=8?'#86efac':Number(p.lab_score)>=6?'#fde68a':'#fca5a5',fontSize:11,fontWeight:700,letterSpacing:'0.02em'}}>{Number(p.lab_score)>=8?'SOLIDO':Number(p.lab_score)>=6?'ACEPT.':'FRAGIL'}</span><span style={{color:'rgba(255,255,255,0.3)',fontSize:10,marginLeft:2}}>{p.lab_score}</span></div>):(<div style={{display:'inline-flex',alignItems:'center',gap:4,padding:'2px 7px',borderRadius:6,border:'1px solid rgba(251,146,60,0.25)',background:'rgba(251,146,60,0.07)'}}><span style={{width:5,height:5,borderRadius:'50%',background:'#fb923c',display:'inline-block',flexShrink:0}}></span><span style={{color:'rgba(251,146,60,0.85)',fontSize:11,fontWeight:600}}>Sin analizar</span></div>)}
-                          </div>
-                        </div>
+              const score=p.lab_score||0
+              const comp=profileCompleteness(p)
+              const isChar=p.profile_type==='character'||p.profile_type==='npc'||p.profile_type==='persona'
+              const isGaming=p.profile_type==='npc'
+              
+              // Per-type accent colors
+              const typeAccent:Record<string,string>={
+                assistant:'rgba(139,92,246,0.25)',
+                character:'rgba(168,85,247,0.30)',
+                brand:'rgba(6,182,212,0.25)',
+                technical:'rgba(59,130,246,0.25)',
+                npc:'rgba(34,197,94,0.25)',
+                persona:'rgba(244,114,182,0.25)',
+                custom:'rgba(148,163,184,0.20)'
+              }
+              const typeBorder:Record<string,string>={
+                assistant:'rgba(139,92,246,0.35)',
+                character:'rgba(168,85,247,0.45)',
+                brand:'rgba(6,182,212,0.35)',
+                technical:'rgba(59,130,246,0.35)',
+                npc:'rgba(34,197,94,0.45)',
+                persona:'rgba(244,114,182,0.40)',
+                custom:'rgba(148,163,184,0.25)'
+              }
+              const typeGlow:Record<string,string>={
+                assistant:'rgba(139,92,246,0.08)',
+                character:'rgba(168,85,247,0.12)',
+                brand:'rgba(6,182,212,0.08)',
+                technical:'rgba(59,130,246,0.08)',
+                npc:'rgba(34,197,94,0.12)',
+                persona:'rgba(244,114,182,0.10)',
+                custom:'rgba(148,163,184,0.06)'
+              }
+              const typeBadgeColor:Record<string,string>={
+                assistant:'rgba(139,92,246,0.20)',
+                character:'rgba(168,85,247,0.22)',
+                brand:'rgba(6,182,212,0.20)',
+                technical:'rgba(59,130,246,0.20)',
+                npc:'rgba(34,197,94,0.22)',
+                persona:'rgba(244,114,182,0.20)',
+                custom:'rgba(148,163,184,0.15)'
+              }
+              const typeBadgeText:Record<string,string>={
+                assistant:'rgb(167,139,250)',
+                character:'rgb(192,132,252)',
+                brand:'rgb(34,211,238)',
+                technical:'rgb(96,165,250)',
+                npc:'rgb(74,222,128)',
+                persona:'rgb(244,114,182)',
+                custom:'rgb(148,163,184)'
+              }
+              const accent=typeAccent[p.profile_type]||typeAccent.custom
+              const border=typeBorder[p.profile_type]||typeBorder.custom
+              const glow=typeGlow[p.profile_type]||typeGlow.custom
+              const badgeBg=typeBadgeColor[p.profile_type]||typeBadgeColor.custom
+              const badgeText=typeBadgeText[p.profile_type]||typeBadgeText.custom
+              
+              const scoreColor=score>=8?'rgb(74,222,128)':score>=6?'rgb(250,204,21)':score>=4?'rgb(251,146,60)':'rgb(148,163,184)'
+              const scoreLabel=score>=8?'Optimizado':score>=6?'Bueno':score>=4?'Mejorable':score===0?'Sin analizar':'Básico'
+              
+              return (
+              <div key={p.id} style={{
+                background:`linear-gradient(135deg, rgba(15,15,25,0.97) 0%, ${glow} 100%)`,
+                border:`1px solid ${border}`,
+                borderRadius:16,
+                boxShadow:`0 0 0 1px ${accent}, 0 8px 32px rgba(0,0,0,0.4)`,
+                overflow:'hidden',
+                position:'relative',
+                transition:'all 0.2s ease'
+              }}>
+                {/* Character/NPC ambient top bar */}
+                {isChar&&<div style={{
+                  height:3,
+                  background:`linear-gradient(90deg, transparent, ${badgeText}, transparent)`,
+                  opacity:0.6
+                }}/>}
+                
+                {/* HEADER — Identity */}
+                <div style={{padding:'18px 18px 12px',borderBottom:`1px solid rgba(255,255,255,0.06)`}}>
+                  <div style={{display:'flex',alignItems:'flex-start',gap:14}}>
+                    {/* Avatar */}
+                    <div style={{
+                      width:isChar?52:44,height:isChar?52:44,flexShrink:0,
+                      borderRadius:isChar?14:12,
+                      background:`linear-gradient(135deg, ${accent} 0%, rgba(0,0,0,0.3) 100%)`,
+                      border:`1.5px solid ${border}`,
+                      display:'flex',alignItems:'center',justifyContent:'center',
+                      boxShadow:isChar?`0 0 20px ${glow}`:'none',
+                      fontSize:isChar?22:18,
+                      position:'relative'
+                    }}>
+                      <svg width={isChar?22:18} height={isChar?22:18} fill="none" stroke={badgeText} strokeWidth="1.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d={ti.icon}/>
+                      </svg>
+                      {/* Live dot */}
+                      {score>0&&<div style={{
+                        position:'absolute',bottom:-3,right:-3,
+                        width:10,height:10,borderRadius:'50%',
+                        background:scoreColor,
+                        border:'2px solid rgba(10,10,20,1)',
+                        boxShadow:`0 0 6px ${scoreColor}`
+                      }}/>}
+                    </div>
+                    
+                    {/* Name + type + status */}
+                    <div style={{flex:1,minWidth:0}}>
+                      <div style={{display:'flex',alignItems:'center',gap:6,flexWrap:'wrap',marginBottom:3}}>
+                        <h3 style={{
+                          fontSize:isChar?17:15,fontWeight:700,color:'rgba(255,255,255,0.95)',
+                          margin:0,lineHeight:1.2,
+                          letterSpacing:isChar?'-0.02em':'0'
+                        }}>{p.name}</h3>
+                        {/* Score badge inline */}
+                        {score>0&&<span style={{
+                          fontSize:10,fontWeight:700,
+                          color:scoreColor,
+                          background:`${scoreColor}18`,
+                          border:`1px solid ${scoreColor}40`,
+                          borderRadius:20,padding:'1px 7px',
+                          letterSpacing:'0.03em',flexShrink:0
+                        }}>{scoreLabel}</span>}
+                        {score===0&&<span style={{
+                          fontSize:10,fontWeight:600,
+                          color:'rgba(251,191,36,0.9)',
+                          background:'rgba(251,191,36,0.10)',
+                          border:'1px solid rgba(251,191,36,0.30)',
+                          borderRadius:20,padding:'1px 7px',
+                          display:'flex',alignItems:'center',gap:4,flexShrink:0
+                        }}>
+                          <span style={{
+                            width:5,height:5,borderRadius:'50%',
+                            background:'rgba(251,191,36,0.9)',
+                            display:'inline-block',
+                            animation:'pulse 2s infinite'
+                          }}/>
+                          Sin analizar
+                        </span>}
                       </div>
-                      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={()=>openEdit(p)} className="w-7 h-7 rounded-lg hover:bg-zinc-800 flex items-center justify-center text-zinc-600 hover:text-zinc-200 transition-colors"><svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                        <button onClick={()=>handleDelete(p.id)} disabled={deleting===p.id} className="w-7 h-7 rounded-lg hover:bg-red-900/20 flex items-center justify-center transition-colors">{deleting===p.id?<div className="w-3 h-3 border-2 border-red-400 border-t-transparent rounded-full animate-spin"/>:<svg width="12" height="12" fill="none" stroke="#f87171" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>}</button>
+                      <div style={{display:'flex',alignItems:'center',gap:6,flexWrap:'wrap'}}>
+                        <span style={{
+                          fontSize:10,fontWeight:600,letterSpacing:'0.05em',textTransform:'uppercase',
+                          color:badgeText,background:badgeBg,
+                          border:`1px solid ${border}`,
+                          borderRadius:6,padding:'2px 8px'
+                        }}>{ti.label}</span>
+                        {p.tone&&<span style={{fontSize:11,color:'rgba(148,163,184,0.8)',fontStyle:'italic'}}>· {p.tone}</span>}
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      {p.role&&<div className="flex gap-2"><span className="text-zinc-600 text-xs w-8 flex-shrink-0 pt-0.5">Rol</span><span className="text-zinc-300 text-xs line-clamp-2">{p.role}</span></div>}
-                      {p.tone&&<div className="flex gap-2"><span className="text-zinc-600 text-xs w-8 flex-shrink-0 pt-0.5">Tono</span><span className="text-zinc-400 text-xs line-clamp-1">{p.tone}</span></div>}
-                      {(p.rules||[]).length>0&&<div className="flex gap-2 items-start"><span className="text-zinc-600 text-xs w-8 flex-shrink-0 pt-0.5">Reglas</span><div className="flex flex-wrap gap-1">{(p.rules||[]).slice(0,2).map((r:string,i:number)=><span key={i} style={{background:'rgba(139,92,246,0.1)',border:'1px solid rgba(139,92,246,0.2)'}} className="text-xs text-violet-400 px-1.5 py-0.5 rounded-md">{r.length>22?r.slice(0,22)+'...':r}</span>)}{(p.rules||[]).length>2&&<span className="text-xs text-zinc-700">+{(p.rules||[]).length-2}</span>}</div></div>}
+                    
+                    {/* Edit/Delete actions */}
+                    <div style={{display:'flex',gap:4,flexShrink:0}}>
+                      <button onClick={()=>openEdit(p)} style={{
+                        width:28,height:28,borderRadius:8,
+                        background:'rgba(255,255,255,0.05)',
+                        border:'1px solid rgba(255,255,255,0.10)',
+                        display:'flex',alignItems:'center',justifyContent:'center',
+                        cursor:'pointer',color:'rgba(148,163,184,0.7)',transition:'all 0.15s'
+                      }}>
+                        <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                      </button>
+                      <button onClick={()=>handleDelete(p.id)} disabled={deleting===p.id} style={{
+                        width:28,height:28,borderRadius:8,
+                        background:'rgba(239,68,68,0.06)',
+                        border:'1px solid rgba(239,68,68,0.20)',
+                        display:'flex',alignItems:'center',justifyContent:'center',
+                        cursor:'pointer',color:'rgba(239,68,68,0.6)',transition:'all 0.15s'
+                      }}>
+                        {deleting===p.id?<div style={{width:10,height:10,border:'2px solid rgba(239,68,68,0.5)',borderTopColor:'transparent',borderRadius:'50%'}}/>:<svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>}
+                      </button>
                     </div>
                   </div>
-                  {(()=>{const cp=profileCompleteness(p);return cp>10?(<div title={'Completitud: '+cp+'%'} style={{height:'2px',background:'rgba(255,255,255,0.04)'}}><div style={{width:cp+'%',height:'2px',background:cp>=80?'rgba(16,185,129,0.5)':cp>=50?'rgba(245,158,11,0.5)':'rgba(124,58,237,0.4)',transition:'width 0.6s ease'}}/></div>):null})()}
-                  {labScores[p.id]&&(<div style={{display:'flex',alignItems:'center',gap:'4px',padding:'2px 8px',background:'rgba(124,58,237,0.15)',border:'1px solid rgba(124,58,237,0.3)',borderRadius:'6px',marginTop:'4px',marginLeft:'12px',marginRight:'12px',marginBottom:'2px'}}><span style={{fontSize:'10px',color:'#7c3aed'}}>&#9679;</span><span style={{fontSize:'11px',color:'#a78bfa',fontWeight:'600'}}>Lab: {labScores[p.id]}/10</span></div>)}
-                  <div style={{background:'rgba(9,9,11,0.5)',borderTop:'1px solid rgba(63,63,70,0.4)'}} className="px-3 py-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-zinc-700 text-xs">{new Date(p.created_at).toLocaleDateString('es-ES',{day:'numeric',month:'short'})}</span>
-                      {p.lab_score!=null&&<div style={{background:p.lab_score>=75?'rgba(16,185,129,0.12)':p.lab_score>=50?'rgba(245,158,11,0.12)':'rgba(239,68,68,0.1)',border:'1px solid '+( p.lab_score>=75?'rgba(16,185,129,0.25)':p.lab_score>=50?'rgba(245,158,11,0.25)':'rgba(239,68,68,0.2)'),color:p.lab_score>=75?'#34d399':p.lab_score>=50?'#fbbf24':'#f87171'}} className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-xs font-bold leading-none"><svg width="7" height="7" fill="currentColor" viewBox="0 0 24 24"><path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>{p.lab_score}</div>}
-                    </div>
-                    <div className="space-y-2 mt-1">
-                      <div style={{display:'flex',gap:8}}>
-                        <button
-                          onClick={()=>{setLabProfile(p);setLabResult(null);setLabError('');setLabAnimated(false)}}
-                          style={{flex:1,background:'rgba(59,130,246,0.1)',border:'1px solid rgba(59,130,246,0.28)',color:'rgba(147,197,253,0.95)',padding:'9px 0 8px',borderRadius:10,cursor:'pointer',transition:'all 0.15s',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:2}}
-                          onMouseOver={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(59,130,246,0.18)';(e.currentTarget as HTMLButtonElement).style.borderColor='rgba(59,130,246,0.5)'}}
-                          onMouseOut={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(59,130,246,0.1)';(e.currentTarget as HTMLButtonElement).style.borderColor='rgba(59,130,246,0.28)'}}
-                        >
-                          <div style={{display:'flex',alignItems:'center',gap:5}}>
-                            <svg style={{width:12,height:12}} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                            <span style={{fontSize:12,fontWeight:700,letterSpacing:'0.04em'}}>Lab</span>
-                          </div>
-                          <span style={{fontSize:9,color:'rgba(147,197,253,0.5)',fontWeight:400,letterSpacing:'0.02em'}}>Analizar coherencia</span>
-                        </button>
-                        {isPro?(
-                          <button
-                            onClick={()=>openForge(p)}
-                            style={{flex:1,background:'rgba(251,191,36,0.1)',border:'1px solid rgba(251,191,36,0.28)',color:'rgba(253,230,138,0.95)',padding:'9px 0 8px',borderRadius:10,cursor:'pointer',transition:'all 0.15s',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:2}}
-                            onMouseOver={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(251,191,36,0.18)';(e.currentTarget as HTMLButtonElement).style.borderColor='rgba(251,191,36,0.5)'}}
-                            onMouseOut={e=>{(e.currentTarget as HTMLButtonElement).style.background='rgba(251,191,36,0.1)';(e.currentTarget as HTMLButtonElement).style.borderColor='rgba(251,191,36,0.28)'}}
-                          >
-                            <div style={{display:'flex',alignItems:'center',gap:5}}>
-                              <svg style={{width:12,height:12}} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                              <span style={{fontSize:12,fontWeight:700,letterSpacing:'0.04em'}}>Forge</span>
-                            </div>
-                            <span style={{fontSize:9,color:'rgba(253,230,138,0.5)',fontWeight:400,letterSpacing:'0.02em'}}>Simular escenario</span>
-                          </button>
-                        ):(
-                          <div
-                            style={{flex:1,background:'rgba(251,191,36,0.03)',border:'1px solid rgba(251,191,36,0.1)',color:'rgba(253,230,138,0.3)',padding:'9px 0 8px',borderRadius:10,cursor:'not-allowed',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:2}}
-                            title="Disponible en Pro"
-                          >
-                            <div style={{display:'flex',alignItems:'center',gap:5}}>
-                              <svg style={{width:10,height:10}} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                              <span style={{fontSize:12,fontWeight:700,letterSpacing:'0.04em'}}>Forge</span>
-                            </div>
-                            <span style={{fontSize:9,color:'rgba(253,230,138,0.25)',fontWeight:400}}>Solo Pro</span>
-                          </div>
-                        )}
-                      </div>
-                      <div style={{display:'flex',gap:4}}>
-                        <button
-                          onClick={()=>handleQuickCopy(p)}
-                          style={{flex:1,background:'transparent',border:'1px solid rgba(255,255,255,0.07)',color:'rgba(255,255,255,0.4)',padding:'5px 0',borderRadius:6,fontSize:11,cursor:'pointer',transition:'all 0.15s'}}
-                          onMouseOver={e=>{(e.currentTarget as HTMLButtonElement).style.color='rgba(255,255,255,0.7)'}}
-                          onMouseOut={e=>{(e.currentTarget as HTMLButtonElement).style.color='rgba(255,255,255,0.4)'}}
-                        >Copiar</button>
-                        <button
-                          onClick={()=>setExportProfile(p)}
-                          style={{flex:1,background:'transparent',border:'1px solid rgba(255,255,255,0.07)',color:'rgba(255,255,255,0.4)',padding:'5px 0',borderRadius:6,fontSize:11,cursor:'pointer',transition:'all 0.15s'}}
-                          onMouseOver={e=>{(e.currentTarget as HTMLButtonElement).style.color='rgba(255,255,255,0.7)'}}
-                          onMouseOut={e=>{(e.currentTarget as HTMLButtonElement).style.color='rgba(255,255,255,0.4)'}}
-                        >Export</button>
-                        <button
-                          onClick={()=>{if(sandboxProfile?.id===p.id){setSandboxProfile(null)}else{setSandboxProfile(p)}}}
-                          style={{flex:1,background:sandboxProfile?.id===p.id?'rgba(34,197,94,0.1)':'transparent',border:sandboxProfile?.id===p.id?'1px solid rgba(34,197,94,0.25)':'1px solid rgba(255,255,255,0.07)',color:sandboxProfile?.id===p.id?'rgba(134,239,172,0.8)':'rgba(255,255,255,0.4)',padding:'5px 0',borderRadius:6,fontSize:11,cursor:'pointer',transition:'all 0.15s'}}
-                          onMouseOver={e=>{(e.currentTarget as HTMLButtonElement).style.color=sandboxProfile?.id===p.id?'rgba(134,239,172,1)':'rgba(255,255,255,0.7)'}}
-                          onMouseOut={e=>{(e.currentTarget as HTMLButtonElement).style.color=sandboxProfile?.id===p.id?'rgba(134,239,172,0.8)':'rgba(255,255,255,0.4)'}}
-                        >Chat</button>
-                      </div>
-                    </div>
-                  </div>
+                  
+                  {/* Role */}
+                  {p.role&&<p style={{
+                    fontSize:12,color:'rgba(148,163,184,0.75)',margin:'10px 0 0',
+                    lineHeight:1.5,
+                    display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical',overflow:'hidden'
+                  }}>{p.role}</p>}
                 </div>
+                
+                {/* LAB SCORE STRIP — visible always */}
+                <div style={{
+                  padding:'10px 18px',
+                  borderBottom:'1px solid rgba(255,255,255,0.05)',
+                  display:'flex',alignItems:'center',gap:10
+                }}>
+                  <span style={{fontSize:10,color:'rgba(100,116,139,0.8)',fontWeight:600,letterSpacing:'0.05em',textTransform:'uppercase',whiteSpace:'nowrap'}}>Lab Score</span>
+                  <div style={{flex:1,height:4,background:'rgba(255,255,255,0.07)',borderRadius:4,overflow:'hidden'}}>
+                    <div style={{
+                      height:'100%',width:`${score*10}%`,
+                      background:score>0?`linear-gradient(90deg, ${scoreColor}80, ${scoreColor})`:'transparent',
+                      borderRadius:4,transition:'width 0.6s ease'
+                    }}/>
+                  </div>
+                  <span style={{fontSize:11,fontWeight:700,color:score>0?scoreColor:'rgba(100,116,139,0.5)',minWidth:28,textAlign:'right'}}>
+                    {score>0?`${score}/10`:'—'}
+                  </span>
+                </div>
+                
+                {/* BODY — Rules preview */}
+                {(p.rules&&p.rules.length>0)&&<div style={{padding:'10px 18px',borderBottom:'1px solid rgba(255,255,255,0.05)'}}>
+                  <div style={{display:'flex',flexWrap:'wrap',gap:5}}>
+                    {p.rules.slice(0,2).map((r:string,i:number)=>(
+                      <span key={i} style={{
+                        fontSize:10,color:'rgba(148,163,184,0.7)',
+                        background:'rgba(255,255,255,0.04)',
+                        border:'1px solid rgba(255,255,255,0.08)',
+                        borderRadius:6,padding:'3px 8px',
+                        maxWidth:180,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'
+                      }}>· {r}</span>
+                    ))}
+                    {p.rules.length>2&&<span style={{fontSize:10,color:'rgba(100,116,139,0.6)',padding:'3px 0'}}>+{p.rules.length-2}</span>}
+                  </div>
+                </div>}
+                
+                {/* ACTIONS ZONE */}
+                <div style={{padding:'12px 18px 14px'}}>
+                  
+                  {/* PRIMARY: Lab + Forge */}
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginBottom:8}}>
+                    {/* LAB */}
+                    <button onClick={()=>setLabProfile(p)} style={{
+                      padding:'9px 12px',borderRadius:10,cursor:'pointer',
+                      background:'rgba(99,102,241,0.12)',
+                      border:'1px solid rgba(99,102,241,0.30)',
+                      display:'flex',flexDirection:'column',alignItems:'flex-start',gap:2,
+                      transition:'all 0.15s',textAlign:'left'
+                    }}>
+                      <div style={{display:'flex',alignItems:'center',gap:5}}>
+                        <svg width="13" height="13" fill="none" stroke="rgb(129,140,248)" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1 1 .03 2.798-1.499 2.798H4.297c-1.529 0-2.498-1.798-1.499-2.798L4.5 15.3"/></svg>
+                        <span style={{fontSize:11,fontWeight:700,color:'rgb(129,140,248)',letterSpacing:'0.03em'}}>LAB</span>
+                      </div>
+                      <span style={{fontSize:10,color:'rgba(99,102,241,0.7)'}}>Analiza · Optimiza</span>
+                    </button>
+                    
+                    {/* FORGE */}
+                    <button onClick={()=>setForgeProfile(p)} style={{
+                      padding:'9px 12px',borderRadius:10,cursor:'pointer',
+                      background:'rgba(245,158,11,0.10)',
+                      border:'1px solid rgba(245,158,11,0.28)',
+                      display:'flex',flexDirection:'column',alignItems:'flex-start',gap:2,
+                      transition:'all 0.15s',textAlign:'left'
+                    }}>
+                      <div style={{display:'flex',alignItems:'center',gap:5}}>
+                        <svg width="13" height="13" fill="none" stroke="rgb(251,191,36)" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z"/><path strokeLinecap="round" strokeLinejoin="round" d="M12 18a3.75 3.75 0 00.495-7.467 5.99 5.99 0 00-1.925 3.546 5.974 5.974 0 01-2.133-1A3.75 3.75 0 0012 18z"/></svg>
+                        <span style={{fontSize:11,fontWeight:700,color:'rgb(251,191,36)',letterSpacing:'0.03em'}}>FORGE</span>
+                      </div>
+                      <span style={{fontSize:10,color:'rgba(245,158,11,0.7)'}}>Simula · Estresa</span>
+                    </button>
+                  </div>
+                  
+                  {/* SECONDARY: Chat + Copy + Export */}
+                  <div style={{display:'flex',gap:6}}>
+                    <button onClick={()=>handleQuickCopy(p)} style={{
+                      flex:1,padding:'7px 10px',borderRadius:8,cursor:'pointer',
+                      background:'rgba(255,255,255,0.04)',
+                      border:'1px solid rgba(255,255,255,0.10)',
+                      display:'flex',alignItems:'center',justifyContent:'center',gap:5,
+                      transition:'all 0.15s'
+                    }}>
+                      {copying===p.id?<svg width="12" height="12" fill="none" stroke="rgb(74,222,128)" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>:<svg width="12" height="12" fill="none" stroke="rgba(148,163,184,0.7)" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>}
+                      <span style={{fontSize:10,color:copying===p.id?'rgb(74,222,128)':'rgba(148,163,184,0.7)',fontWeight:600}}>{copying===p.id?'¡Copiado!':'Copiar'}</span>
+                    </button>
+                    
+                    <button onClick={()=>setChatProfileId(p.id)} style={{
+                      flex:1,padding:'7px 10px',borderRadius:8,cursor:'pointer',
+                      background:'rgba(16,185,129,0.08)',
+                      border:'1px solid rgba(16,185,129,0.22)',
+                      display:'flex',alignItems:'center',justifyContent:'center',gap:5,
+                      transition:'all 0.15s'
+                    }}>
+                      <svg width="12" height="12" fill="none" stroke="rgb(52,211,153)" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                      <span style={{fontSize:10,color:'rgb(52,211,153)',fontWeight:600}}>Chat</span>
+                    </button>
+                    
+                    <button onClick={()=>setExportProfile(p)} style={{
+                      padding:'7px 10px',borderRadius:8,cursor:'pointer',
+                      background:'rgba(255,255,255,0.03)',
+                      border:'1px solid rgba(255,255,255,0.08)',
+                      display:'flex',alignItems:'center',justifyContent:'center',
+                      transition:'all 0.15s'
+                    }} title="Exportar">
+                      <svg width="13" height="13" fill="none" stroke="rgba(100,116,139,0.7)" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    </button>
+                  </div>
+                  
+                  {/* Context AI tip — only if not analyzed */}
+                  {score===0&&<div style={{
+                    marginTop:10,padding:'7px 10px',
+                    background:'rgba(251,191,36,0.06)',
+                    border:'1px solid rgba(251,191,36,0.18)',
+                    borderRadius:8,
+                    display:'flex',alignItems:'center',gap:7
+                  }}>
+                    <svg width="11" height="11" fill="none" stroke="rgba(251,191,36,0.8)" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    <span style={{fontSize:10,color:'rgba(251,191,36,0.75)'}}>Empieza por <strong style={{color:'rgba(251,191,36,0.95)'}}>Lab</strong> para analizar y optimizar este perfil</span>
+                  </div>}
+                  
+                  {/* Context AI tip — if analyzed, suggest Forge */}
+                  {score>0&&score<8&&<div style={{
+                    marginTop:10,padding:'7px 10px',
+                    background:'rgba(245,158,11,0.06)',
+                    border:'1px solid rgba(245,158,11,0.15)',
+                    borderRadius:8,
+                    display:'flex',alignItems:'center',gap:7
+                  }}>
+                    <svg width="11" height="11" fill="none" stroke="rgba(245,158,11,0.8)" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z"/></svg>
+                    <span style={{fontSize:10,color:'rgba(245,158,11,0.75)'}}>Score {score}/10 · <strong style={{color:'rgba(245,158,11,0.95)'}}>Forge</strong> puede revelar los puntos débiles</span>
+                  </div>}
+                  
+                  {score>=8&&<div style={{
+                    marginTop:10,padding:'7px 10px',
+                    background:'rgba(34,197,94,0.06)',
+                    border:'1px solid rgba(34,197,94,0.18)',
+                    borderRadius:8,
+                    display:'flex',alignItems:'center',gap:7
+                  }}>
+                    <svg width="11" height="11" fill="none" stroke="rgba(34,197,94,0.8)" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"/></svg>
+                    <span style={{fontSize:10,color:'rgba(34,197,94,0.75)'}}>Perfil optimizado · Prueba <strong style={{color:'rgba(34,197,94,0.95)'}}>Chat</strong> en vivo</span>
+                  </div>}
+                </div>
+                
+                {/* Date footer */}
+                <div style={{
+                  padding:'6px 18px 10px',
+                  borderTop:'1px solid rgba(255,255,255,0.04)',
+                  display:'flex',justifyContent:'space-between',alignItems:'center'
+                }}>
+                  <span style={{fontSize:9,color:'rgba(100,116,139,0.5)',letterSpacing:'0.03em'}}>
+                    {new Date(p.created_at).toLocaleDateString('es',{day:'numeric',month:'short',year:'2-digit'})}
+                  </span>
+                  <span style={{fontSize:9,color:'rgba(100,116,139,0.4)',letterSpacing:'0.02em'}}>ID {p.id.substring(0,8)}</span>
+                </div>
+              </div>
               )
-            })}
+            })})}
           </div>
         )}
         {sandboxProfile&&<div className="mt-6"><KeeperSandbox profile={sandboxProfile} onClose={()=>setSandboxProfile(null)}/></div>}
         {chatProfile&&<div className="mt-6"><ProfileChat profile={chatProfile} onClose={()=>setChatProfileId(null)}/></div>}
-        {profiles.length>0&&<div style={{background:'rgba(24,24,27,0.5)',border:'1px solid rgba(63,63,70,0.4)'}} className="mt-6 p-4 rounded-xl flex items-start gap-3"><svg width="14" height="14" fill="none" stroke="rgba(139,92,246,0.6)" strokeWidth="2" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p className="text-zinc-600 text-xs"><strong className="text-zinc-400">Flujo recomendado:</strong> Crea el perfil ÃÂ¢ÃÂÃÂ Lab (analiza) ÃÂ¢ÃÂÃÂ Forge (simula escenarios) ÃÂ¢ÃÂÃÂ Export (portabilidad). Sandbox para chatear directamente.</p></div>}
+        {profiles.length>0&&<div style={{background:'rgba(24,24,27,0.5)',border:'1px solid rgba(63,63,70,0.4)'}} className="mt-6 p-4 rounded-xl flex items-start gap-3"><svg width="14" height="14" fill="none" stroke="rgba(139,92,246,0.6)" strokeWidth="2" viewBox="0 0 24 24" className="flex-shrink-0 mt-0.5"><path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><p className="text-zinc-600 text-xs"><strong className="text-zinc-400">Flujo recomendado:</strong> Crea el perfil ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Lab (analiza) ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Forge (simula escenarios) ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Export (portabilidad). Sandbox para chatear directamente.</p></div>}
       </div>
       {exportProfile&&(
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={e=>{if(e.target===e.currentTarget)setExportProfile(null)}}>
@@ -427,7 +664,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
             <div style={{borderBottom:'1px solid rgba(59,130,246,0.15)',background:'rgba(59,130,246,0.03)'}} className="flex items-center justify-between px-6 py-4 flex-shrink-0"><div className="flex items-center gap-3"><div style={{background:'rgba(59,130,246,0.12)',border:'1px solid rgba(59,130,246,0.25)'}} className="w-8 h-8 rounded-xl flex items-center justify-center"><svg width="14" height="14" fill="none" stroke="#60a5fa" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div><div><h2 className="font-bold text-white text-sm">Keeper Lab</h2><p className="text-blue-500/60 text-xs">{labProfile.name}</p></div></div><button onClick={()=>{setLabProfile(null);setLabResult(null)}} className="w-8 h-8 rounded-lg hover:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-white transition-colors"><svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button></div>
             <div className="p-6 space-y-4 overflow-y-auto">
               {!labResult&&!labLoading&&!labError&&<div className="text-center py-6"><p className="text-zinc-400 text-sm mb-2 leading-relaxed">Analisis en 4 dimensiones:</p><div className="flex justify-center gap-4 mb-6">{[['Claridad','text-blue-400'],['Consistencia','text-violet-400'],['Completitud','text-emerald-400'],['Efectividad','text-amber-400']].map(([label,color])=><div key={label} className="text-center"><div style={{background:'rgba(39,39,42,0.6)',border:'1px solid rgba(63,63,70,0.5)'}} className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-1"><span className={"text-sm font-black "+color}>?</span></div><span className="text-xs text-zinc-600">{label}</span></div>)}</div><button onClick={handleRunLab} style={{background:'linear-gradient(135deg,#7c3aed,#6d28d9)',boxShadow:'0 4px 20px rgba(139,92,246,0.25)'}} className="flex items-center gap-2 text-white text-sm font-semibold px-6 py-3 rounded-xl hover:opacity-90 transition-opacity mx-auto"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Analizar perfil</button></div>}
-              {labLoading&&<div className="flex flex-col items-center py-8 gap-4"><div className="relative w-12 h-12"><div style={{border:'2px solid rgba(59,130,246,0.15)',borderTop:'2px solid #3b82f6'}} className="absolute inset-0 rounded-full animate-spin"/><div style={{border:'2px solid rgba(139,92,246,0.1)',borderBottom:'2px solid #7c3aed',animationDuration:'1.4s'}} className="absolute inset-1.5 rounded-full animate-spin"/></div><div className="text-center space-y-1"><p className="text-blue-400 text-sm font-medium" style={{transition:'opacity 0.4s'}}>{labMsgs[labLoadMsg]}</p><p className="text-zinc-700 text-xs">Keeper Lab ÃÂÃÂ· Analisis profundo</p></div></div>}
+              {labLoading&&<div className="flex flex-col items-center py-8 gap-4"><div className="relative w-12 h-12"><div style={{border:'2px solid rgba(59,130,246,0.15)',borderTop:'2px solid #3b82f6'}} className="absolute inset-0 rounded-full animate-spin"/><div style={{border:'2px solid rgba(139,92,246,0.1)',borderBottom:'2px solid #7c3aed',animationDuration:'1.4s'}} className="absolute inset-1.5 rounded-full animate-spin"/></div><div className="text-center space-y-1"><p className="text-blue-400 text-sm font-medium" style={{transition:'opacity 0.4s'}}>{labMsgs[labLoadMsg]}</p><p className="text-zinc-700 text-xs">Keeper Lab ÃÂÃÂÃÂÃÂ· Analisis profundo</p></div></div>}
               {labError&&<div style={{background:'rgba(239,68,68,0.07)',border:'1px solid rgba(239,68,68,0.2)'}} className="p-4 rounded-xl"><p className="text-red-400 text-sm">{labError}</p><button onClick={handleRunLab} className="mt-3 text-xs text-violet-400 hover:text-violet-300">Reintentar</button></div>}
               {labResult&&(<div className="space-y-5">
                   <div style={{textAlign:'center',padding:'20px 0 12px'}}>
@@ -492,7 +729,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
             <div style={{borderBottom:'1px solid rgba(63,63,70,0.4)',background:'rgba(245,158,11,0.04)'}} className="flex items-center justify-between px-6 py-4 flex-shrink-0">
               <div className="flex items-center gap-3">
                 <div style={{background:'rgba(245,158,11,0.12)',border:'1px solid rgba(245,158,11,0.25)'}} className="w-8 h-8 rounded-xl flex items-center justify-center"><svg width="14" height="14" fill="none" stroke="#fbbf24" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/><path strokeLinecap="round" strokeLinejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/></svg></div>
-                <div><h2 className="font-bold text-white text-sm">Keeper Forge</h2><p className="text-zinc-500 text-xs">Simulacion profunda ÃÂ¢ÃÂÃÂ {forgeProfile.name}</p></div>
+                <div><h2 className="font-bold text-white text-sm">Keeper Forge</h2><p className="text-zinc-500 text-xs">Simulacion profunda ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ {forgeProfile.name}</p></div>
               </div>
               <button onClick={()=>{setForgeProfile(null);setForgeResult(null)}} className="w-8 h-8 rounded-lg hover:bg-zinc-800 flex items-center justify-center text-zinc-500 hover:text-white transition-colors"><svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
             </div>
@@ -562,7 +799,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                             letterSpacing:'0.06em',
                             color:forgeResult.verdict==='SOLIDO'?'rgba(134,239,172,0.95)':forgeResult.verdict==='ACEPTABLE'?'rgba(253,230,138,0.95)':'rgba(252,165,165,0.95)',
                             lineHeight:1
-                          }}>{String(forgeResult.verdict||'ÃÂ¢ÃÂÃÂ')}</div>
+                          }}>{String(forgeResult.verdict||'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ')}</div>
                           <div style={{fontSize:9,letterSpacing:'0.12em',opacity:0.5,marginTop:4,color:'white'}}>VEREDICTO FORGE</div>
                         </div>
                         {forgeResult.consistency_score!=null&&(
@@ -609,12 +846,12 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                           background:forgeResult.overall_verdict==='ROBUSTO'?'rgba(34,197,94,0.1)':forgeResult.overall_verdict==='FRAGIL'?'rgba(239,68,68,0.08)':'rgba(251,191,36,0.08)',
                           border:forgeResult.overall_verdict==='ROBUSTO'?'1px solid rgba(34,197,94,0.3)':forgeResult.overall_verdict==='FRAGIL'?'1px solid rgba(239,68,68,0.25)':'1px solid rgba(251,191,36,0.25)'
                         }}>
-                          <div style={{fontSize:28,fontWeight:900,letterSpacing:'0.06em',color:forgeResult.overall_verdict==='ROBUSTO'?'rgba(134,239,172,0.95)':forgeResult.overall_verdict==='FRAGIL'?'rgba(252,165,165,0.95)':'rgba(253,230,138,0.95)',lineHeight:1}}>{String(forgeResult.overall_verdict||'ÃÂ¢ÃÂÃÂ')}</div>
-                          <div style={{fontSize:9,letterSpacing:'0.12em',opacity:0.5,marginTop:4,color:'white'}}>ESTRÃÂÃÂS FORGE</div>
+                          <div style={{fontSize:28,fontWeight:900,letterSpacing:'0.06em',color:forgeResult.overall_verdict==='ROBUSTO'?'rgba(134,239,172,0.95)':forgeResult.overall_verdict==='FRAGIL'?'rgba(252,165,165,0.95)':'rgba(253,230,138,0.95)',lineHeight:1}}>{String(forgeResult.overall_verdict||'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ')}</div>
+                          <div style={{fontSize:9,letterSpacing:'0.12em',opacity:0.5,marginTop:4,color:'white'}}>ESTRÃÂÃÂÃÂÃÂS FORGE</div>
                         </div>
                       </div>
                       {(forgeResult.stress_questions as string[]||[]).length>0&&<div style={{marginBottom:10}}>
-                        <p style={{fontSize:10,color:'rgba(251,191,36,0.5)',letterSpacing:'0.08em',marginBottom:6}}>PREGUNTAS DE ESTRÃÂÃÂS</p>
+                        <p style={{fontSize:10,color:'rgba(251,191,36,0.5)',letterSpacing:'0.08em',marginBottom:6}}>PREGUNTAS DE ESTRÃÂÃÂÃÂÃÂS</p>
                         {(forgeResult.stress_questions as string[]).map((q,i)=><div key={i} style={{borderLeft:'2px solid rgba(251,191,36,0.3)',paddingLeft:10,marginBottom:6}}><p style={{fontSize:11,color:'rgba(253,230,138,0.75)',margin:0}}>{q}</p></div>)}
                       </div>}
                       {(forgeResult.critical_gaps as string[]||[]).length>0&&<div style={{marginBottom:8}}>
@@ -638,7 +875,7 @@ export default function ProfilesClient({userId,userEmail,plan,initialProfiles}:P
                           background:forgeResult.quick_verdict==='COHERENTE'?'rgba(34,197,94,0.1)':'rgba(239,68,68,0.08)',
                           border:forgeResult.quick_verdict==='COHERENTE'?'1px solid rgba(34,197,94,0.3)':'1px solid rgba(239,68,68,0.25)'
                         }}>
-                          <div style={{fontSize:26,fontWeight:900,letterSpacing:'0.06em',color:forgeResult.quick_verdict==='COHERENTE'?'rgba(134,239,172,0.95)':'rgba(252,165,165,0.95)',lineHeight:1}}>{String(forgeResult.quick_verdict||'ÃÂ¢ÃÂÃÂ')}</div>
+                          <div style={{fontSize:26,fontWeight:900,letterSpacing:'0.06em',color:forgeResult.quick_verdict==='COHERENTE'?'rgba(134,239,172,0.95)':'rgba(252,165,165,0.95)',lineHeight:1}}>{String(forgeResult.quick_verdict||'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ')}</div>
                           <div style={{fontSize:9,letterSpacing:'0.12em',opacity:0.5,marginTop:4,color:'white'}}>VERIFICACION LIBRE</div>
                         </div>
                       </div>
